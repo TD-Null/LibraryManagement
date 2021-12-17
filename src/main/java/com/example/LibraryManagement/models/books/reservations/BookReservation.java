@@ -1,15 +1,11 @@
 package com.example.LibraryManagement.models.books.reservations;
 
 import com.example.LibraryManagement.models.enums.reservations.ReservationStatus;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
 import java.sql.Date;
 
-@Getter
-@Setter
-@AllArgsConstructor
+@Data
 public class BookReservation
 {
     private Date creationDate;

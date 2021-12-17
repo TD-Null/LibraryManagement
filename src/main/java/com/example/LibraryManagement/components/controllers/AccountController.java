@@ -1,4 +1,4 @@
 package com.example.LibraryManagement.components.controllers;
 
-public class LoginController {
+public class AccountController {
 }

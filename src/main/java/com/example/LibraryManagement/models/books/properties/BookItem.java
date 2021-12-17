@@ -2,46 +2,46 @@ package com.example.LibraryManagement.models.books.properties;
 
 import com.example.LibraryManagement.models.enums.books.BookFormat;
 import com.example.LibraryManagement.models.enums.books.BookStatus;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
+import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
 import java.sql.Date;
 
-@Getter
-@Setter
-public class BookItem extends Book
+@MappedSuperclass
+@Data
+public class BookItem
 {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "Barcode")
     private String barcode;
+
+    @NotBlank
+    @Column(name = "Reference")
     private boolean isReferenceOnly;
+
+    @Column(name = "Borrowed")
     private Date borrowed;
+
+    @Column(name = "Due Date")
     private Date dueDate;
+
+    @Column(name = "Price")
     private double price;
+
+    @NotBlank
+    @Column(name = "Format")
     private BookFormat format;
+
+    @NotBlank
+    @Column(name = "Status")
     private BookStatus status;
+
+    @Column(name = "Date of Purchase")
     private Date dateOfPurchase;
+
+    @NotBlank
+    @Column(name = "Publication Date")
     private Date publicationDate;
-
-    public BookItem(String ISBN, String title, String subject,
-                    String publisher, String language, int numberOfPages,
-                    String barcode, boolean isReferenceOnly, Date borrowed,
-                    Date dueDate, double price, BookFormat format, BookStatus status,
-                    Date dateOfPurchase, Date publicationDate)
-    {
-        super(ISBN, title, subject, publisher, language, numberOfPages);
-        this.barcode = barcode;
-        this.isReferenceOnly = isReferenceOnly;
-        this.borrowed = borrowed;
-        this.dueDate = dueDate;
-        this.price = price;
-        this.format = format;
-        this.status = status;
-        this.dateOfPurchase = dateOfPurchase;
-        this.publicationDate = publicationDate;
-    }
-
-    // Method for checking out a book.
-    public boolean checkout()
-    {
-        return true;
-    }
 }

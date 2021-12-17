@@ -1,14 +1,10 @@
 package com.example.LibraryManagement.models.books.reservations;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
 import java.sql.Date;
 
-@Getter
-@Setter
-@AllArgsConstructor
+@Data
 public class BookLending
 {
     private Date creationDate;
