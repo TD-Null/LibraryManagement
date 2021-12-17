@@ -9,7 +9,7 @@ public class AccountNotification
 {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private int notificationId;
+    private Long notificationId;
 
     @NotBlank
     @Column(name = "Date")

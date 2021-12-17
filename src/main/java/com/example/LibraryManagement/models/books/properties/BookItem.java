@@ -8,8 +8,8 @@ import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import java.sql.Date;
 
-@MappedSuperclass
 @Data
+@MappedSuperclass
 public class BookItem
 {
     @Id

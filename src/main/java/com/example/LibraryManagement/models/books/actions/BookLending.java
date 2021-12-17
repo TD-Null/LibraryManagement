@@ -1,4 +1,4 @@
-package com.example.LibraryManagement.models.books.reservations;
+package com.example.LibraryManagement.models.books.actions;
 
 import lombok.Data;
 
