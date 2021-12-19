@@ -1,6 +1,5 @@
 package com.example.LibraryManagement.models.accounts;
 
-import com.example.LibraryManagement.models.accounts.cards.LibraryCard;
 import com.example.LibraryManagement.models.books.properties.Book;
 import com.example.LibraryManagement.models.datatypes.Person;
 import com.example.LibraryManagement.models.enums.accounts.AccountStatus;
@@ -32,16 +31,4 @@ public class Account
     @NotBlank
     @Column(name = "Details")
     private Person person;
-
-    @NotBlank
-    @Column(name = "Library Card")
-    private LibraryCard libraryCard;
-
-    @JsonIgnore
-    @OneToMany(mappedBy = "account", cascade = CascadeType.ALL)
-    private Set<Book> checkedOutBooks = new HashSet<>();
-
-    @JsonIgnore
-    @OneToMany(mappedBy = "account", cascade = CascadeType.ALL)
-    private Set<Book> reservedBooks = new HashSet<>();
 }

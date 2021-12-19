@@ -1,4 +1,5 @@
 package com.example.LibraryManagement.components.controllers;
 
-public class AccountController {
+public class AccountController
+{
 }

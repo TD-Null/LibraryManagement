@@ -10,7 +10,7 @@ import java.sql.Date;
 
 @Data
 @MappedSuperclass
-public class BookItem
+public class BookItem extends Book
 {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -10,7 +10,7 @@ import javax.validation.constraints.NotBlank;
 @Data
 @Entity
 @Table
-public class Book extends BookItem
+public class Book
 {
     @NotBlank
     @Column(name = "ISBN")

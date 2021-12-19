@@ -1,4 +1,4 @@
-package com.example.LibraryManagement.models.accounts.cards;
+package com.example.LibraryManagement.models.accounts;
 
 import lombok.Data;
 
