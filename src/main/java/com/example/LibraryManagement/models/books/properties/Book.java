@@ -6,6 +6,11 @@ import javax.persistence.Column;
 import javax.persistence.MappedSuperclass;
 import javax.validation.constraints.NotBlank;
 
+/*
+ * Description:
+ * The basic building block of the system. Every book will
+ * have ISBN, Title, Subject, Publishers, etc.
+ */
 @Data
 @MappedSuperclass
 public class Book
@@ -30,6 +35,6 @@ public class Book
     @Column(name = "Language")
     private String language;
 
-    @Column(name = "Number of Pages")
+    @Column(name = "Number_of_Pages")
     private int numberOfPages;
 }
