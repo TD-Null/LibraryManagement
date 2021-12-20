@@ -27,7 +27,7 @@ public class Account
     @Column(name = "ID")
     private String id;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "barcode", nullable = false)
     private LibraryCard libraryCard;
 
