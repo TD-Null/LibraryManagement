@@ -1,8 +1,7 @@
 package com.example.LibraryManagement.models.accounts.types;
 
 import com.example.LibraryManagement.models.accounts.Account;
-import com.example.LibraryManagement.models.accounts.LibraryCard;
-import com.example.LibraryManagement.models.books.properties.Book;
+import com.example.LibraryManagement.models.books.properties.BookItem;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
@@ -16,10 +15,6 @@ import java.util.Set;
  * Description:
  * All members can search the catalog, as well as check-out, reserve, renew,
  * and return a book.
- *
- * There should be a maximum limit (5) on how many books a member can check-out,
- * and there should be a maximum limit (10) on how many days a member can keep a
- * book.
  */
 @Data
 @Entity
@@ -30,17 +25,26 @@ public class Member extends Account
     @Column(name = "Date_of_Membership")
     private Date dateOfMembership;
 
-    @Column(name = "Check_Out_Total")
-    private int checkOutTotal;
-
-    @Column(name = "Reserved Total")
-    private int reservedTotal;
+    @Column(name = "Issued_Books_Total")
+    private int issuedBooksTotal;
 
     @JsonIgnore
-    @OneToMany(mappedBy = "account")
-    private Set<Book> checkedOutBooks = new HashSet<>();
+    @OneToMany(mappedBy = "account", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private Set<BookItem> checkedOutBooks = new HashSet<>();
 
     @JsonIgnore
-    @OneToMany(mappedBy = "account")
-    private Set<Book> reservedBooks = new HashSet<>();
+    @OneToMany(mappedBy = "account", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private Set<BookItem> reservedBooks = new HashSet<>();
+
+    // TODO: Add functionality for checking out a BookItem.
+    public boolean checkOutBookItem(BookItem b) { return true; }
+
+    // TODO: Add functionality reserving a BookItem.
+    public boolean reserveBookItem(BookItem b) { return true; }
+
+    // TODO: Add functionality for cancelling a reservation for a BookItem.
+    public boolean cancelReservation(BookItem b) { return true; }
+
+    // TODO: Add functionality reserving a BookItem.
+    public boolean renewBookItem(BookItem b) { return true; }
 }
