@@ -28,7 +28,7 @@ public class Account
     private String id;
 
     @OneToOne
-    @JoinColumn(name = "barcode")
+    @JoinColumn(name = "barcode", nullable = false)
     private LibraryCard libraryCard;
 
     @NotBlank
