@@ -12,6 +12,15 @@ import java.sql.Date;
 import java.util.HashSet;
 import java.util.Set;
 
+/*
+ * Description:
+ * All members can search the catalog, as well as check-out, reserve, renew,
+ * and return a book.
+ *
+ * There should be a maximum limit (5) on how many books a member can check-out,
+ * and There should be a maximum limit (10) on how many days a member can keep a
+ * book.
+ */
 @Data
 @Entity
 @Table
@@ -24,6 +33,12 @@ public class Member extends Account
     @NotBlank
     @Column(name = "Library Card")
     private LibraryCard libraryCard;
+
+    @Column(name = "Check Out Total")
+    private int checkOutTotal;
+
+    @Column(name = "Reserved Total")
+    private int reservedTotal;
 
     @JsonIgnore
     @OneToMany(mappedBy = "account", cascade = CascadeType.ALL)

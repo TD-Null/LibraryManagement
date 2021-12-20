@@ -1,4 +1,10 @@
 package com.example.LibraryManagement.components.services;
 
-public class AccountService {
+import lombok.AllArgsConstructor;
+import org.springframework.stereotype.Service;
+
+@AllArgsConstructor
+@Service
+public class AccountService
+{
 }
