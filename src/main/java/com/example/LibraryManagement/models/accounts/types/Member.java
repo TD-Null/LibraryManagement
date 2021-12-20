@@ -30,10 +30,6 @@ public class Member extends Account
     @Column(name = "Date of Membership")
     private Date dateOfMembership;
 
-    @OneToOne
-    @JoinColumn(name = "barcode")
-    private LibraryCard libraryCard;
-
     @Column(name = "Check Out Total")
     private int checkOutTotal;
 

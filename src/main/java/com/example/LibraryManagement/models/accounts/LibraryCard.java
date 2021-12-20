@@ -13,8 +13,8 @@ import java.sql.Date;
  * Each library user will be issued a library card, which will
  * be used to identify users while issuing or returning books.
  *
- * Each library member will have a single library card that is
- * linked to their account.
+ * Each account will have a single library card and will be
+ * used as an additional form of logging in.
  */
 @Data
 @Entity
@@ -28,14 +28,13 @@ public class LibraryCard
 
     @JsonIgnore
     @OneToOne(mappedBy = "libraryCard")
-    private Member member;
+    private Account account;
 
     @NotBlank
     @Column(name = "Card Number")
     private String cardNumber;
 
-    @NotBlank
-    @Column(name = "Issue Date")
+    @Column(name = "Issue Date", nullable = false)
     private Date issuedAt;
 
     @Column(name = "Active Status")

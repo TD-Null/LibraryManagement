@@ -7,6 +7,17 @@ import lombok.Data;
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 
+/*
+ * Description:
+ * There will be two types of accounts, a librarian and a member.
+ *
+ * Librarians will have access to adding and modifying book items,
+ * while members will have access to borrowing, renewing, and
+ * returning book items from a library.
+ *
+ * Each account will have a library card, a password, a status,
+ * and the personal details of the user.
+ */
 @Data
 @MappedSuperclass
 public class Account
@@ -16,15 +27,17 @@ public class Account
     @Column(name = "ID")
     private String id;
 
+    @OneToOne
+    @JoinColumn(name = "barcode")
+    private LibraryCard libraryCard;
+
     @NotBlank
     @Column(name = "Password")
     private String password;
 
-    @NotBlank
-    @Column(name = "Status")
+    @Column(name = "Status", nullable = false)
     private AccountStatus status;
 
-    @NotBlank
-    @Column(name = "Details")
+    @Column(name = "Details", nullable = false)
     private Person details;
 }

@@ -8,7 +8,9 @@ import javax.persistence.Table;
 /*
  * Description:
  * Mainly responsible for adding and modifying books, book items, and users.
- * The Librarian can also issue, reserve, and return book items.
+ * The Librarian will have access to updating accounts on their status as well
+ * as check the current status of book items and their lending and reservation
+ * statuses.
  */
 @Entity
 @Table
