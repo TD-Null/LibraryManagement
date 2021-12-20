@@ -18,7 +18,7 @@ import java.util.Set;
  * and return a book.
  *
  * There should be a maximum limit (5) on how many books a member can check-out,
- * and There should be a maximum limit (10) on how many days a member can keep a
+ * and there should be a maximum limit (10) on how many days a member can keep a
  * book.
  */
 @Data
@@ -30,8 +30,8 @@ public class Member extends Account
     @Column(name = "Date of Membership")
     private Date dateOfMembership;
 
-    @NotBlank
-    @Column(name = "Library Card")
+    @OneToOne
+    @JoinColumn(name = "barcode")
     private LibraryCard libraryCard;
 
     @Column(name = "Check Out Total")
@@ -41,10 +41,10 @@ public class Member extends Account
     private int reservedTotal;
 
     @JsonIgnore
-    @OneToMany(mappedBy = "account", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "account")
     private Set<Book> checkedOutBooks = new HashSet<>();
 
     @JsonIgnore
-    @OneToMany(mappedBy = "account", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "account")
     private Set<Book> reservedBooks = new HashSet<>();
 }
