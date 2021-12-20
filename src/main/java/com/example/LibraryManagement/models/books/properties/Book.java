@@ -3,13 +3,11 @@ package com.example.LibraryManagement.models.books.properties;
 import lombok.Data;
 
 import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import javax.persistence.MappedSuperclass;
 import javax.validation.constraints.NotBlank;
 
 @Data
-@Entity
-@Table
+@MappedSuperclass
 public class Book
 {
     @NotBlank
@@ -32,7 +30,6 @@ public class Book
     @Column(name = "Language")
     private String language;
 
-    @NotBlank
     @Column(name = "Number of Pages")
     private int numberOfPages;
 }

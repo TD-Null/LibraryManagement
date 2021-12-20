@@ -5,11 +5,11 @@ import com.example.LibraryManagement.models.enums.books.BookStatus;
 import lombok.Data;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotBlank;
 import java.sql.Date;
 
 @Data
-@MappedSuperclass
+@Entity
+@Table
 public class BookItem extends Book
 {
     @Id
@@ -17,7 +17,6 @@ public class BookItem extends Book
     @Column(name = "Barcode")
     private String barcode;
 
-    @NotBlank
     @Column(name = "Reference")
     private boolean isReferenceOnly;
 
@@ -30,18 +29,15 @@ public class BookItem extends Book
     @Column(name = "Price")
     private double price;
 
-    @NotBlank
-    @Column(name = "Format")
+    @Column(name = "Format", nullable = false)
     private BookFormat format;
 
-    @NotBlank
-    @Column(name = "Status")
+    @Column(name = "Status", nullable = false)
     private BookStatus status;
 
     @Column(name = "Date of Purchase")
     private Date dateOfPurchase;
 
-    @NotBlank
-    @Column(name = "Publication Date")
+    @Column(name = "Publication Date", nullable = false)
     private Date publicationDate;
 }
