@@ -31,12 +31,12 @@ public class LibraryCard
     private Account account;
 
     @NotBlank
-    @Column(name = "Card Number")
+    @Column(name = "Card_Number")
     private String cardNumber;
 
-    @Column(name = "Issue Date", nullable = false)
+    @Column(name = "Issue_Date", nullable = false)
     private Date issuedAt;
 
-    @Column(name = "Active Status")
+    @Column(name = "Active_Status")
     private boolean active;
 }

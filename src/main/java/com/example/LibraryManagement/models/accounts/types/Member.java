@@ -27,10 +27,10 @@ import java.util.Set;
 public class Member extends Account
 {
     @NotBlank
-    @Column(name = "Date of Membership")
+    @Column(name = "Date_of_Membership")
     private Date dateOfMembership;
 
-    @Column(name = "Check Out Total")
+    @Column(name = "Check_Out_Total")
     private int checkOutTotal;
 
     @Column(name = "Reserved Total")
