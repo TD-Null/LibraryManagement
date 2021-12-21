@@ -1,14 +1,13 @@
 package com.example.LibraryManagement.models.books.fines.transactions;
 
-import com.example.LibraryManagement.models.books.fines.FineTransaction;
 import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.Getter;
-import lombok.Setter;
 
+// Type of transaction that uses a check to pay a fine.
 @Getter
-@Setter
 @AllArgsConstructor
-public class CheckTransaction extends FineTransaction
+public class CheckTransaction
 {
     private String bankName;
     private String checkNumber;

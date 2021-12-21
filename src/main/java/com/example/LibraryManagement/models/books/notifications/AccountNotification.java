@@ -7,16 +7,22 @@ import javax.validation.constraints.NotBlank;
 import java.sql.Date;
 
 @Data
-@MappedSuperclass
+@Entity
+@Table
 public class AccountNotification
 {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long notificationId;
 
-    @NotBlank
-    @Column(name = "Date")
+    @Column(name = "Date", nullable = false)
     private Date createdOn;
+
+    @Column(name = "Email")
+    private String email;
+
+    @Column(name = "Address")
+    private String address;
 
     @NotBlank
     @Column(name = "Content")

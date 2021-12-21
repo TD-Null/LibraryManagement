@@ -1,14 +1,12 @@
 package com.example.LibraryManagement.models.books.fines.transactions;
 
-import com.example.LibraryManagement.models.books.fines.FineTransaction;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.Setter;
 
+// Type of transaction that uses a credit card to pay a fine.
 @Getter
-@Setter
 @AllArgsConstructor
-public class CreditCardTransaction extends FineTransaction
+public class CreditCardTransaction
 {
     private String nameOnCard;
 }

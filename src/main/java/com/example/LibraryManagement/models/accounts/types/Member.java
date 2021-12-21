@@ -3,8 +3,9 @@ package com.example.LibraryManagement.models.accounts.types;
 import com.example.LibraryManagement.models.accounts.Account;
 import com.example.LibraryManagement.models.books.actions.BookLending;
 import com.example.LibraryManagement.models.books.actions.BookReservation;
+import com.example.LibraryManagement.models.books.fines.Fine;
+import com.example.LibraryManagement.models.books.notifications.AccountNotification;
 import com.example.LibraryManagement.models.books.properties.BookItem;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
 import javax.persistence.*;
@@ -38,6 +39,12 @@ public class Member extends Account
 
     @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Set<BookReservation> bookReservations = new HashSet<>();
+
+    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private Set<AccountNotification> notifications = new HashSet<>();
+
+    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private Set<Fine> fines = new HashSet<>();
 
     // TODO: Add functionality for checking out a BookItem.
     public boolean checkOutBookItem(BookItem b) { return true; }
