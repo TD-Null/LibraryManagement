@@ -1,6 +1,8 @@
 package com.example.LibraryManagement.models.accounts.types;
 
 import com.example.LibraryManagement.models.accounts.Account;
+import com.example.LibraryManagement.models.books.actions.BookLending;
+import com.example.LibraryManagement.models.books.actions.BookReservation;
 import com.example.LibraryManagement.models.books.properties.BookItem;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
@@ -29,22 +31,29 @@ public class Member extends Account
     private int issuedBooksTotal;
 
     @JsonIgnore
-    @OneToMany(mappedBy = "account", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Set<BookItem> checkedOutBooks = new HashSet<>();
 
     @JsonIgnore
-    @OneToMany(mappedBy = "account", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private Set<BookItem> reservedBooks = new HashSet<>();
+    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private Set<BookLending> bookLendings = new HashSet<>();
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private Set<BookReservation> bookReservations = new HashSet<>();
 
     // TODO: Add functionality for checking out a BookItem.
     public boolean checkOutBookItem(BookItem b) { return true; }
+
+    // TODO: Add functionality reserving a BookItem.
+    public boolean renewBookItem(BookItem b) { return true; }
+
+    // TODO: Add functionality for returning a BookItem.
+    public boolean returnBookItem(BookItem b) { return true; }
 
     // TODO: Add functionality reserving a BookItem.
     public boolean reserveBookItem(BookItem b) { return true; }
 
     // TODO: Add functionality for cancelling a reservation for a BookItem.
     public boolean cancelReservation(BookItem b) { return true; }
-
-    // TODO: Add functionality reserving a BookItem.
-    public boolean renewBookItem(BookItem b) { return true; }
 }
