@@ -57,6 +57,7 @@ public class BookItem extends Book
     @Column(name = "Reference")
     private boolean isReferenceOnly;
 
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "member_id", nullable = false)
     private Member currMember;

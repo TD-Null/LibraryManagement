@@ -30,15 +30,12 @@ public class Member extends Account
     @Column(name = "Issued_Books_Total")
     private int issuedBooksTotal;
 
-    @JsonIgnore
     @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Set<BookItem> checkedOutBooks = new HashSet<>();
 
-    @JsonIgnore
     @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Set<BookLending> bookLendings = new HashSet<>();
 
-    @JsonIgnore
     @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Set<BookReservation> bookReservations = new HashSet<>();
 

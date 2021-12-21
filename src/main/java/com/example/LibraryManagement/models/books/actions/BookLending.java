@@ -3,6 +3,7 @@ package com.example.LibraryManagement.models.books.actions;
 import com.example.LibraryManagement.models.books.libraries.Library;
 import com.example.LibraryManagement.models.books.libraries.Rack;
 import com.example.LibraryManagement.models.books.properties.BookItem;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
 import javax.persistence.*;
@@ -23,6 +24,7 @@ public class BookLending
     @JoinColumn(name = "book_item_id", nullable = false)
     private BookItem bookItem;
 
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "member_id", nullable = false)
     private Member member;
