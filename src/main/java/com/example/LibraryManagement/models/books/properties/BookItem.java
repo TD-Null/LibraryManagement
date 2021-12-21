@@ -32,12 +32,18 @@ public class BookItem extends Book
     private Library library;
 
     @ManyToOne
-    @JoinColumn(name = "rack")
+    @JoinColumn(name = "rack_id")
     private Rack rack;
 
     @ManyToOne
     @JoinColumn(name = "author_name", nullable = false)
     private Author author;
+
+    @Column(name = "Format", nullable = false)
+    private BookFormat format;
+
+    @Column(name = "Status", nullable = false)
+    private BookStatus status;
 
     @Column(name = "Reference")
     private boolean isReferenceOnly;
@@ -50,12 +56,6 @@ public class BookItem extends Book
 
     @Column(name = "Price")
     private double price;
-
-    @Column(name = "Format", nullable = false)
-    private BookFormat format;
-
-    @Column(name = "Status", nullable = false)
-    private BookStatus status;
 
     @Column(name = "Date_of_Purchase")
     private Date dateOfPurchase;
