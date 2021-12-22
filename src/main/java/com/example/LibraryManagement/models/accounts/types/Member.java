@@ -50,10 +50,10 @@ public class Member extends Account
     public boolean checkOutBookItem(BookItem b) { return true; }
 
     // TODO: Add functionality reserving a BookItem.
-    public boolean renewBookItem(BookItem b) { return true; }
+    public boolean renewBookItem(BookItem book, BookLending lending) { return true; }
 
     // TODO: Add functionality for returning a BookItem.
-    public boolean returnBookItem(BookItem b) { return true; }
+    public boolean returnBookItem(BookLending b) { return true; }
 
     // TODO: Add functionality reserving a BookItem.
     public boolean reserveBookItem(BookItem b) { return true; }

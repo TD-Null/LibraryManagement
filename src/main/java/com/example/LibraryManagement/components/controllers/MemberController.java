@@ -7,6 +7,9 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+/*
+ * TODO: Add functions for borrowing, reserving, renewing books, as well check their account's details.
+ */
 @CrossOrigin(origins = "*", maxAge = 3600)
 @AllArgsConstructor
 @RestController
