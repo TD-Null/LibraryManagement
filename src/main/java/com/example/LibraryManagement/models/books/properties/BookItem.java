@@ -20,8 +20,9 @@ import java.util.Set;
  * Any book can have multiple copies, each copy will be considered
  * a book item in our system. Each book item will have a unique barcode.
  *
- * Many BookItem objects can be associated with a single library as well
- * as be associated to different or the same authors.
+ * Many BookItem objects can be associated with a single library and be
+ * placed on different racks as well as be associated to different or the
+ * same authors.
  */
 @Data
 @Entity
@@ -68,7 +69,7 @@ public class BookItem extends Book
 
     @JsonIgnore
     @OneToMany(mappedBy = "bookItem", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private Set<BookReservation> reservations = new HashSet<>();
+    private Set<BookReservation> reservationRecords = new HashSet<>();
 
     @Column(name = "Borrowed_Date")
     private Date borrowed;
