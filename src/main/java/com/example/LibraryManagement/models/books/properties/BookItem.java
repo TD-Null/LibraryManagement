@@ -9,6 +9,7 @@ import com.example.LibraryManagement.models.enums.books.BookFormat;
 import com.example.LibraryManagement.models.enums.books.BookStatus;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import javax.persistence.*;
 import java.sql.Date;
@@ -25,6 +26,7 @@ import java.util.Set;
  * same authors.
  */
 @Data
+@EqualsAndHashCode(callSuper = true)
 @Entity
 @Table
 public class BookItem extends Book
@@ -61,7 +63,12 @@ public class BookItem extends Book
     @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "member_id", nullable = false)
-    private Member currMember;
+    private Member currLoanMember;
+
+    @JsonIgnore
+    @ManyToOne
+    @JoinColumn(name = "member_id", nullable = false)
+    private Member currReservedMember;
 
     @JsonIgnore
     @OneToMany(mappedBy = "bookItem", fetch = FetchType.LAZY, cascade = CascadeType.ALL)

@@ -9,6 +9,7 @@ import com.example.LibraryManagement.models.books.properties.BookItem;
 import com.example.LibraryManagement.models.interfaces.MemberActions;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
@@ -32,6 +33,7 @@ import java.util.Set;
  * fines, or miscellaneous notifications that can be sent from librarians.
  */
 @Data
+@EqualsAndHashCode(callSuper = true)
 @Entity
 @Table
 public class Member extends Account implements MemberActions
@@ -46,6 +48,10 @@ public class Member extends Account implements MemberActions
     @JsonIgnore
     @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Set<BookItem> checkedOutBooks = new HashSet<>();
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private Set<BookItem> reservedBooks = new HashSet<>();
 
     @JsonIgnore
     @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
