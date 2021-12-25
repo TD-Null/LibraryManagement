@@ -1,6 +1,6 @@
-package com.example.LibraryManagement.models.io.output.exceptions;
+package com.example.LibraryManagement.models.io.responses.exceptions;
 
-import com.example.LibraryManagement.models.io.output.MessageResponse;
+import com.example.LibraryManagement.models.io.responses.MessageResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;

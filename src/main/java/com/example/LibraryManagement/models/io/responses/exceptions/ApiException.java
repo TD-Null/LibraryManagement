@@ -1,6 +1,6 @@
-package com.example.LibraryManagement.models.io.output.exceptions;
+package com.example.LibraryManagement.models.io.responses.exceptions;
 
-import com.example.LibraryManagement.models.io.output.MessageResponse;
+import com.example.LibraryManagement.models.io.responses.MessageResponse;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;

@@ -1,4 +1,4 @@
-package com.example.LibraryManagement.models.io.output;
+package com.example.LibraryManagement.models.io.responses;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

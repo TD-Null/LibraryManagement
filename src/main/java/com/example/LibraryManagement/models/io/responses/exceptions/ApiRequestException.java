@@ -1,4 +1,4 @@
-package com.example.LibraryManagement.models.io.output.exceptions;
+package com.example.LibraryManagement.models.io.responses.exceptions;
 
 /*
  * REST API Exception:
