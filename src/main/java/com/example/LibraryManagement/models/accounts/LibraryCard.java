@@ -35,6 +35,9 @@ public class LibraryCard
     @OneToOne(mappedBy = "libraryCard")
     private Librarian librarian;
 
+    @Column(name = "Type")
+    private AccessType type;
+
     @NotBlank
     @Column(name = "Card_Number")
     private String cardNumber;

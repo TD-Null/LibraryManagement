@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 @CrossOrigin(origins = "*", maxAge = 3600)
 @AllArgsConstructor
 @RestController
-@RequestMapping("library_website/librarian")
+@RequestMapping("library_website/account/librarian")
 public class LibrarianController
 {
     @Autowired

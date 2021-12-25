@@ -7,7 +7,7 @@ import com.example.LibraryManagement.models.books.actions.BookReservation;
 import com.example.LibraryManagement.models.books.fines.Fine;
 import com.example.LibraryManagement.models.books.notifications.AccountNotification;
 import com.example.LibraryManagement.models.books.properties.BookItem;
-import com.example.LibraryManagement.models.interfaces.actions.MemberActions;
+import com.example.LibraryManagement.models.interfaces.methods.MemberMethods;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -37,7 +37,7 @@ import java.util.Set;
 @EqualsAndHashCode(callSuper = true)
 @Entity
 @Table
-public class Member extends Account implements MemberActions
+public class Member extends Account implements MemberMethods
 {
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "barcode", nullable = false)
@@ -74,21 +74,17 @@ public class Member extends Account implements MemberActions
     @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Set<Fine> fines = new HashSet<>();
 
-    // TODO: Add functionality for checking out a BookItem.
-    public boolean checkOutBookItem(BookItem b) { return true; }
+    public void addBookItem(BookItem b) { checkedOutBooks.add(b); }
 
-    // TODO: Add functionality renewing a BookItem.
-    public boolean renewBookItem(BookItem b, BookLending bl) { return true; }
+    public void removeBookItem(BookItem b) { checkedOutBooks.remove(b); }
 
-    // TODO: Add functionality for returning a BookItem.
-    public boolean returnBookItem(BookItem b, BookLending bl) { return true; }
+    public void reserveBookItem(BookItem b) { reservedBooks.add(b); }
 
-    // TODO: Add functionality reserving a BookItem.
-    public boolean reserveBookItem(BookItem b) { return true; }
+    public void removeReservedBookItem(BookItem b) { reservedBooks.remove(b); }
 
-    // TODO: Add functionality for cancelling a reservation for a BookItem.
-    public boolean cancelReservation(BookItem b, BookReservation br) { return true; }
-
-    // TODO: Add functionality for checking out a reserved BookItem.
-    public boolean checkOutReservedBookItem(BookItem b, BookReservation br) { return true; }
+    public void addReservedBookItem(BookItem b)
+    {
+        removeBookItem(b);
+        addBookItem(b);
+    }
 }
