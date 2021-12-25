@@ -1,6 +1,6 @@
 package com.example.LibraryManagement.components.controllers;
 
-import com.example.LibraryManagement.components.services.LibrarianService;
+import com.example.LibraryManagement.components.services.LibrarianServiceImp;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -17,5 +17,5 @@ import org.springframework.web.bind.annotation.RestController;
 public class LibrarianController
 {
     @Autowired
-    private final LibrarianService librarianService;
+    private final LibrarianServiceImp librarianService;
 }

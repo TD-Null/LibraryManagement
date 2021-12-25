@@ -27,10 +27,6 @@ public class Account
     @Column(name = "ID")
     private String id;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "barcode", nullable = false)
-    private LibraryCard libraryCard;
-
     @NotBlank
     @Column(name = "Password")
     private String password;

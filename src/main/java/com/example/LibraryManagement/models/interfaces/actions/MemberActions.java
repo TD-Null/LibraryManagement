@@ -1,4 +1,4 @@
-package com.example.LibraryManagement.models.interfaces;
+package com.example.LibraryManagement.models.interfaces.actions;
 
 import com.example.LibraryManagement.models.books.actions.BookLending;
 import com.example.LibraryManagement.models.books.actions.BookReservation;
@@ -8,13 +8,9 @@ import com.example.LibraryManagement.models.books.properties.BookItem;
  * Actions that a member account can do, including:
  *
  * - Checking out a book
- *
  * - Renewing a borrowed book's due date
- *
  * - Returning a borrowed book
- *
  * - Creating a reservation for a book
- *
  * - Cancelling a reservation for a book
  */
 public interface MemberActions

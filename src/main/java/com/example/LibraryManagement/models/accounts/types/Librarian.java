@@ -1,9 +1,9 @@
 package com.example.LibraryManagement.models.accounts.types;
 
 import com.example.LibraryManagement.models.accounts.Account;
+import com.example.LibraryManagement.models.accounts.LibraryCard;
 
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 /*
  * Description:
@@ -16,4 +16,7 @@ import javax.persistence.Table;
 @Table
 public class Librarian extends Account
 {
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "barcode", nullable = false)
+    private LibraryCard libraryCard;
 }

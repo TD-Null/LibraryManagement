@@ -1,5 +1,6 @@
 package com.example.LibraryManagement.models.accounts;
 
+import com.example.LibraryManagement.models.accounts.types.Librarian;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
@@ -28,7 +29,11 @@ public class LibraryCard
 
     @JsonIgnore
     @OneToOne(mappedBy = "libraryCard")
-    private Account account;
+    private Member member;
+
+    @JsonIgnore
+    @OneToOne(mappedBy = "libraryCard")
+    private Librarian librarian;
 
     @NotBlank
     @Column(name = "Card_Number")

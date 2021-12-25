@@ -1,12 +1,13 @@
 package com.example.LibraryManagement.models.accounts.types;
 
 import com.example.LibraryManagement.models.accounts.Account;
+import com.example.LibraryManagement.models.accounts.LibraryCard;
 import com.example.LibraryManagement.models.books.actions.BookLending;
 import com.example.LibraryManagement.models.books.actions.BookReservation;
 import com.example.LibraryManagement.models.books.fines.Fine;
 import com.example.LibraryManagement.models.books.notifications.AccountNotification;
 import com.example.LibraryManagement.models.books.properties.BookItem;
-import com.example.LibraryManagement.models.interfaces.MemberActions;
+import com.example.LibraryManagement.models.interfaces.actions.MemberActions;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -27,7 +28,7 @@ import java.util.Set;
  * - A number keeping in track of how many books they have checked out or
  * reserved as they are allowed at most 5 books issued to their account.
  *
- * - Lists of records of books loaned or reserved for them in their account.
+ * - List of records of books loaned or reserved for them in their account.
  *
  * - List of notifications that can be from book loans, reservations,
  * fines, or miscellaneous notifications that can be sent from librarians.
@@ -38,6 +39,10 @@ import java.util.Set;
 @Table
 public class Member extends Account implements MemberActions
 {
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "barcode", nullable = false)
+    private LibraryCard libraryCard;
+
     @NotBlank
     @Column(name = "Date_of_Membership")
     private Date dateOfMembership;

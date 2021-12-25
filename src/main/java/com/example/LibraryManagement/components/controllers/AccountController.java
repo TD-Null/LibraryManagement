@@ -1,6 +1,6 @@
 package com.example.LibraryManagement.components.controllers;
 
-import com.example.LibraryManagement.components.services.AccountService;
+import com.example.LibraryManagement.components.services.AccountServiceImp;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -17,5 +17,5 @@ import org.springframework.web.bind.annotation.RestController;
 public class AccountController
 {
     @Autowired
-    private final AccountService accountService;
+    private final AccountServiceImp accountService;
 }
