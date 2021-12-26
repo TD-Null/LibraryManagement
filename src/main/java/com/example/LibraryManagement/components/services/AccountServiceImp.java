@@ -79,7 +79,7 @@ public class AccountServiceImp implements AccountService
 
     private String generateCardNumber()
     {
-        String generatedCardNumber = "";
+        String generatedCardNumber;
 
         do {
             Random rnd = new Random();
