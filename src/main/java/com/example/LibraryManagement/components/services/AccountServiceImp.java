@@ -1,5 +1,6 @@
 package com.example.LibraryManagement.components.services;
 
+import com.example.LibraryManagement.components.repositories.accounts.LibrarianRepository;
 import com.example.LibraryManagement.components.repositories.accounts.LibraryCardRepository;
 import com.example.LibraryManagement.components.repositories.accounts.MemberRepository;
 import com.example.LibraryManagement.models.accounts.types.Member;
@@ -35,16 +36,19 @@ public class AccountServiceImp implements AccountService
     @Autowired
     private final MemberRepository memberRepository;
 
+    @Autowired
+    private final LibrarianRepository librarianRepository;
+
     // Authenticates the users credentials with their given library card number and password to login into their account.
     public ResponseEntity<LibraryCard> authenticateUser(String libraryCardNumber, String password)
     {
-        Optional<LibraryCard> cardValidate = libraryCardRepository
+        Optional<LibraryCard> cardValidation = libraryCardRepository
                 .findLibraryCardByCardNumber(libraryCardNumber);
 
         // Ensure that the card exists within the database of the system.
-        if(cardValidate.isPresent())
+        if(cardValidation.isPresent())
         {
-            LibraryCard card = cardValidate.get();
+            LibraryCard card = cardValidation.get();
             AccountType type = card.getType();
 
             /*
@@ -97,6 +101,14 @@ public class AccountServiceImp implements AccountService
 
         // Return the details of the user's library card after the account has been successfully created.
         return ResponseEntity.ok(libraryCard);
+    }
+
+    // TODO: Add more functionality for the barcode reader to validate library cards.
+    // A barcode reader method that validates the library card of the
+    public boolean barCodeReader(String barcode)
+    {
+        Optional<LibraryCard> cardValidation = libraryCardRepository.findById(barcode);
+        return cardValidation.isPresent() && cardValidation.get().isActive();
     }
 
     /*
