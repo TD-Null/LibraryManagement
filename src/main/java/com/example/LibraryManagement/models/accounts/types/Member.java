@@ -7,13 +7,18 @@ import com.example.LibraryManagement.models.books.actions.BookReservation;
 import com.example.LibraryManagement.models.books.fines.Fine;
 import com.example.LibraryManagement.models.books.notifications.AccountNotification;
 import com.example.LibraryManagement.models.books.properties.BookItem;
+import com.example.LibraryManagement.models.datatypes.Person;
+import com.example.LibraryManagement.models.enums.accounts.AccountStatus;
 import com.example.LibraryManagement.models.interfaces.methods.MemberMethods;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 import java.sql.Date;
 import java.util.HashSet;
 import java.util.Set;
@@ -33,7 +38,8 @@ import java.util.Set;
  * - List of notifications that can be from book loans, reservations,
  * fines, or miscellaneous notifications that can be sent from librarians.
  */
-@Data
+@Getter
+@Setter
 @EqualsAndHashCode(callSuper = true)
 @Entity
 @Table
@@ -74,13 +80,35 @@ public class Member extends Account implements MemberMethods
     @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Set<Fine> fines = new HashSet<>();
 
-    public void addBookItem(BookItem b) { checkedOutBooks.add(b); }
+    public Member(String password, AccountStatus status, Person details, Date dateOfMembership)
+    {
+        super(password, status, details);
+        this.dateOfMembership = dateOfMembership;
+    }
 
-    public void removeBookItem(BookItem b) { checkedOutBooks.remove(b); }
+    public void addBookItem(BookItem b)
+    {
+        checkedOutBooks.add(b);
+        issuedBooksTotal++;
+    }
 
-    public void reserveBookItem(BookItem b) { reservedBooks.add(b); }
+    public void removeBookItem(BookItem b)
+    {
+        checkedOutBooks.remove(b);
+        issuedBooksTotal--;
+    }
 
-    public void removeReservedBookItem(BookItem b) { reservedBooks.remove(b); }
+    public void reserveBookItem(BookItem b)
+    {
+        reservedBooks.add(b);
+        issuedBooksTotal++;
+    }
+
+    public void removeReservedBookItem(BookItem b)
+    {
+        reservedBooks.remove(b);
+        issuedBooksTotal--;
+    }
 
     public void addReservedBookItem(BookItem b)
     {

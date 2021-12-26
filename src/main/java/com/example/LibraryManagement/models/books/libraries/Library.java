@@ -24,7 +24,9 @@ import java.util.Set;
  */
 @Data
 @Entity
-@Table
+@Table(uniqueConstraints = {
+        @UniqueConstraint(columnNames = "Name")
+})
 public class Library
 {
     @Id

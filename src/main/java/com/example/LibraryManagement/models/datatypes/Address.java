@@ -1,6 +1,8 @@
 package com.example.LibraryManagement.models.datatypes;
 
-import lombok.Data;
+import lombok.*;
+
+import javax.validation.constraints.NotBlank;
 
 /*
  * Contains details regarding a user's/account's address,
@@ -11,11 +13,21 @@ import lombok.Data;
  * Zipcode
  * Country
  */
-@Data
+@Getter
+@Setter
+@EqualsAndHashCode
+@AllArgsConstructor
 public class Address
 {
+    @NotBlank
     private String streetAddress;
+
+    @NotBlank
     private String city;
+
+    @NotBlank
     private String zipcode;
+
+    @NotBlank
     private String country;
 }

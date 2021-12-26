@@ -1,4 +1,13 @@
 package com.example.LibraryManagement.models.interfaces.services;
 
-public interface AccountService {
+import com.example.LibraryManagement.models.accounts.LibraryCard;
+import org.springframework.http.ResponseEntity;
+
+public interface AccountService
+{
+    public ResponseEntity<LibraryCard> authenticateUser(String libraryCardNumber, String password);
+
+    public ResponseEntity<LibraryCard> registerMember(String name, String password, String email,
+                                                    String streetAddress, String city, String zipcode,
+                                                    String country, String phoneNumber);
 }
