@@ -99,7 +99,11 @@ public class AccountServiceImp implements AccountService
         return ResponseEntity.ok(libraryCard);
     }
 
-    // Generate a random 6-digit card number to create a new library card.
+    /*
+     * Generates a random 6-digit card number to create a new library card.
+     * Also ensures that the generated card number is unique across all
+     * user accounts.
+     */
     private String generateCardNumber()
     {
         String generatedCardNumber;
