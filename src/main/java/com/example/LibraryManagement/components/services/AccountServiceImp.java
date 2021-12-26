@@ -29,15 +29,25 @@ public class AccountServiceImp implements AccountService
     @Autowired
     private final MemberRepository memberRepository;
 
+    // Authenticates the users credentials with their given library card number and password to login into their account.
     public ResponseEntity<LibraryCard> authenticateUser(String libraryCardNumber, String password)
     {
-        Optional<LibraryCard> cardValidate = libraryCardRepository.findLibraryCardByCardNumber(libraryCardNumber);
+        Optional<LibraryCard> cardValidate = libraryCardRepository
+                .findLibraryCardByCardNumber(libraryCardNumber);
 
+        // Ensure that the card exists within the database of the system.
         if(cardValidate.isPresent())
         {
             LibraryCard card = cardValidate.get();
             AccountType type = card.getType();
 
+            /*
+             * Check if the card is active. If so, check the user's password,
+             * either of a MEMBER or LIBRARIAN, matches their account corresponding
+             * to the library card details given. If the password matches to their
+             * account, then the login is successful and the details of the library
+             * card are given.
+             */
             if(card.isActive() && (
                     (type == AccountType.MEMBER && card.getMember().getPassword().equals(password)) ||
                     (type == AccountType.LIBRARIAN && card.getLibrarian().getPassword().equals(password))))
@@ -46,17 +56,23 @@ public class AccountServiceImp implements AccountService
             }
         }
 
-        throw new ApiRequestException("Wrong library card number or password.");
+        // Else, throw an API request exception stating that the given credentials were invalid.
+        throw new ApiRequestException("Invalid credentials. (Wrong library card number of password)");
     }
 
-
-    // TODO: Add functionality to check if the given user details are valid, such as making sure the email is unique.
+    // Registers a new member using the user's inputted details to create an account.
     @Transactional
     public ResponseEntity<LibraryCard> registerMember(String name, String password, String email,
                                                     String streetAddress, String city, String zipcode,
                                                     String country, String phoneNumber)
     {
-        // First, get the current date when creating this account.
+        // First, validate that the user's email isn't already being used in the website's other user accounts.
+        if(memberRepository.findMemberByEmail(email).isPresent())
+        {
+            throw new ApiRequestException("Failed to create the account with the given credentials.");
+        }
+
+        // Get the current date when creating this account.
         Date currDate = new Date((System.currentTimeMillis()));
 
         // Use the given details of the user to create an account and save to the repository.
@@ -73,9 +89,11 @@ public class AccountServiceImp implements AccountService
         // Link the library card to the user's account.
         member.setLibraryCard(libraryCard);
 
+        // Return the details of the user's library card after the account has been successfully created.
         return ResponseEntity.ok(libraryCard);
     }
 
+    // Generate a random 6-digit card number to create a new library card.
     private String generateCardNumber()
     {
         String generatedCardNumber;
