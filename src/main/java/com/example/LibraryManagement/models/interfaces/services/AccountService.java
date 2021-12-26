@@ -3,6 +3,7 @@ package com.example.LibraryManagement.models.interfaces.services;
 import com.example.LibraryManagement.models.accounts.LibraryCard;
 import org.springframework.http.ResponseEntity;
 
+// Methods used in a service component relating to accounts.
 public interface AccountService
 {
     public ResponseEntity<LibraryCard> authenticateUser(String libraryCardNumber, String password);
