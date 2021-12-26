@@ -5,7 +5,6 @@ import com.example.LibraryManagement.components.repositories.accounts.MemberRepo
 import com.example.LibraryManagement.models.accounts.types.Member;
 import com.example.LibraryManagement.models.accounts.LibraryCard;
 import com.example.LibraryManagement.models.datatypes.Address;
-import com.example.LibraryManagement.models.datatypes.Person;
 import com.example.LibraryManagement.models.enums.accounts.AccountStatus;
 import com.example.LibraryManagement.models.enums.accounts.AccountType;
 import com.example.LibraryManagement.models.interfaces.services.AccountService;
@@ -62,8 +61,8 @@ public class AccountServiceImp implements AccountService
 
         // Use the given details of the user to create an account and save to the repository.
         Address address = new Address(streetAddress, city, zipcode, country);
-        Person details = new Person(name, address, email, phoneNumber);
-        Member member = new Member(password, AccountStatus.ACTIVE, details, currDate);
+        Member member = new Member(name, password, AccountStatus.ACTIVE,
+                address, email, phoneNumber, currDate);
         memberRepository.save(member);
 
         // Create a new library card for the user.

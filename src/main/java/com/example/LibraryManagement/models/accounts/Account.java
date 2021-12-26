@@ -1,11 +1,12 @@
 package com.example.LibraryManagement.models.accounts;
 
-import com.example.LibraryManagement.models.datatypes.Person;
+import com.example.LibraryManagement.models.datatypes.Address;
 import com.example.LibraryManagement.models.enums.accounts.AccountStatus;
 import lombok.*;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 /*
@@ -31,6 +32,10 @@ public class Account
     private String id;
 
     @NotBlank
+    @Column(name = "Name")
+    private String name;
+
+    @NotBlank
     @Size(min = 6, max = 40)
     @Column(name = "Password")
     private String password;
@@ -38,13 +43,26 @@ public class Account
     @Column(name = "Status", nullable = false)
     private AccountStatus status;
 
-    @Column(name = "Details", nullable = false)
-    private Person details;
+    @NotNull
+    @Column(name = "Address")
+    private Address address;
 
-    public Account(String password, AccountStatus status, Person details)
+    @NotBlank
+    @Column(name = "Email")
+    private String email;
+
+    @NotBlank
+    @Column(name = "Phone_Number")
+    private String phoneNumber;
+
+    public Account(String name, String password, AccountStatus status,
+                   Address address, String email, String phoneNumber)
     {
+        this.name = name;
         this.password = password;
         this.status = status;
-        this.details = details;
+        this.address = address;
+        this.email = email;
+        this.phoneNumber = phoneNumber;
     }
 }

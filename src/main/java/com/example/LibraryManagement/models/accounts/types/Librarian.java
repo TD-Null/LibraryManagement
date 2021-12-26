@@ -2,9 +2,8 @@ package com.example.LibraryManagement.models.accounts.types;
 
 import com.example.LibraryManagement.models.accounts.Account;
 import com.example.LibraryManagement.models.accounts.LibraryCard;
-import com.example.LibraryManagement.models.datatypes.Person;
+import com.example.LibraryManagement.models.datatypes.Address;
 import com.example.LibraryManagement.models.enums.accounts.AccountStatus;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -27,8 +26,9 @@ public class Librarian extends Account
     @JoinColumn(name = "barcode", nullable = false)
     private LibraryCard libraryCard;
 
-    public Librarian(String password, AccountStatus status, Person details)
+    public Librarian(String name, String password, AccountStatus status,
+                     Address address, String email, String phoneNumber)
     {
-        super(password, status, details);
+        super(name, password, status, address, email, phoneNumber);
     }
 }

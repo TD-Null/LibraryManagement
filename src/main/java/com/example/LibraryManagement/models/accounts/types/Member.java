@@ -7,18 +7,16 @@ import com.example.LibraryManagement.models.books.actions.BookReservation;
 import com.example.LibraryManagement.models.books.fines.Fine;
 import com.example.LibraryManagement.models.books.notifications.AccountNotification;
 import com.example.LibraryManagement.models.books.properties.BookItem;
-import com.example.LibraryManagement.models.datatypes.Person;
+import com.example.LibraryManagement.models.datatypes.Address;
 import com.example.LibraryManagement.models.enums.accounts.AccountStatus;
 import com.example.LibraryManagement.models.interfaces.methods.MemberMethods;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Size;
 import java.sql.Date;
 import java.util.HashSet;
 import java.util.Set;
@@ -80,9 +78,11 @@ public class Member extends Account implements MemberMethods
     @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Set<Fine> fines = new HashSet<>();
 
-    public Member(String password, AccountStatus status, Person details, Date dateOfMembership)
+    public Member(String name, String password, AccountStatus status,
+                  Address address, String email, String phoneNumber,
+                  Date dateOfMembership)
     {
-        super(password, status, details);
+        super(name, password, status, address, email, phoneNumber);
         this.dateOfMembership = dateOfMembership;
     }
 
