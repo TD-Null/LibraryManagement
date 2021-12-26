@@ -40,7 +40,9 @@ import java.util.Set;
 @Setter
 @EqualsAndHashCode(callSuper = true)
 @Entity
-@Table
+@Table(uniqueConstraints = {
+        @UniqueConstraint(columnNames = "Email")
+})
 public class Member extends Account implements MemberMethods
 {
     @OneToOne(cascade = CascadeType.ALL)

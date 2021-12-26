@@ -19,7 +19,9 @@ import javax.persistence.*;
 @Getter
 @Setter
 @Entity
-@Table
+@Table(uniqueConstraints = {
+        @UniqueConstraint(columnNames = "Email")
+})
 public class Librarian extends Account
 {
     @OneToOne(cascade = CascadeType.ALL)
