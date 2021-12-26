@@ -19,6 +19,12 @@ import java.sql.Date;
 import java.util.Optional;
 import java.util.Random;
 
+/*
+ * Service component that contains methods relating to accounts:
+ *
+ * - User authentication for logging into a user's account
+ * - Registering users as members with a newly created account using the user's details
+ */
 @AllArgsConstructor
 @Service
 public class AccountServiceImp implements AccountService

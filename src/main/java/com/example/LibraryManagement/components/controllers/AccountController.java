@@ -12,7 +12,10 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 
 /*
- * TODO: Add functions login(), register().
+ * Controller component containing the API requests relating to accounts:
+ *
+ * - Logging in
+ * - Signing up for a new account
  */
 @CrossOrigin(origins = "*", maxAge = 3600)
 @AllArgsConstructor
