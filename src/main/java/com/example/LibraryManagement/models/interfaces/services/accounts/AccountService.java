@@ -1,4 +1,4 @@
-package com.example.LibraryManagement.models.interfaces.services;
+package com.example.LibraryManagement.models.interfaces.services.accounts;
 
 import com.example.LibraryManagement.models.accounts.LibraryCard;
 import org.springframework.http.ResponseEntity;

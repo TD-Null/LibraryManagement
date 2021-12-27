@@ -8,7 +8,7 @@ import com.example.LibraryManagement.models.accounts.LibraryCard;
 import com.example.LibraryManagement.models.datatypes.Address;
 import com.example.LibraryManagement.models.enums.accounts.AccountStatus;
 import com.example.LibraryManagement.models.enums.accounts.AccountType;
-import com.example.LibraryManagement.models.interfaces.services.AccountService;
+import com.example.LibraryManagement.models.interfaces.services.accounts.AccountService;
 import com.example.LibraryManagement.models.io.responses.exceptions.ApiRequestException;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,4 +1,4 @@
-package com.example.LibraryManagement.models.interfaces.services;
+package com.example.LibraryManagement.models.interfaces.services.catalogs;
 
 import com.example.LibraryManagement.models.books.properties.BookItem;
 import org.springframework.http.ResponseEntity;

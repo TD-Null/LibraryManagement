@@ -5,7 +5,7 @@ import com.example.LibraryManagement.components.repositories.books.BookItemRepos
 import com.example.LibraryManagement.components.repositories.books.SubjectRepository;
 import com.example.LibraryManagement.models.books.properties.Author;
 import com.example.LibraryManagement.models.books.properties.BookItem;
-import com.example.LibraryManagement.models.interfaces.services.ViewCatalogService;
+import com.example.LibraryManagement.models.interfaces.services.catalogs.ViewCatalogService;
 import com.example.LibraryManagement.models.io.responses.exceptions.ApiRequestException;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
