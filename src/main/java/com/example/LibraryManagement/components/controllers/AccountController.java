@@ -40,7 +40,7 @@ public class AccountController
 
     /*
      * Registration POST request.
-     * Expects a valid SignupRequest in the body including the .
+     * Expects a valid SignupRequest in the body including the user's details and password.
      * Returns a 200 response code with the details of the user's library card.
      */
     @PostMapping("/signup")

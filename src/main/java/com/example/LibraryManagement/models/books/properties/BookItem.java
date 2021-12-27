@@ -12,6 +12,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
 import java.sql.Date;
 import java.util.HashSet;
 import java.util.Set;
@@ -47,6 +48,10 @@ public class BookItem extends Book
     @ManyToOne
     @JoinColumn(name = "author_name", nullable = false)
     private Author author;
+
+    @ManyToOne
+    @JoinColumn(name = "subject_name", nullable = false)
+    private Set<Subject> subjects = new HashSet<>();
 
     @Column(name = "Format", nullable = false)
     private BookFormat format;

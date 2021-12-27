@@ -24,10 +24,6 @@ public class Book
     private String title;
 
     @NotBlank
-    @Column(name = "Subject")
-    private String subject;
-
-    @NotBlank
     @Column(name = "Publisher")
     private String publisher;
 
