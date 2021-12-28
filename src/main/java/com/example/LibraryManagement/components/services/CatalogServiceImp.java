@@ -76,7 +76,7 @@ public class CatalogServiceImp implements ViewCatalogService
         }
 
         if(currRack == null)
-            throw new ApiRequestException("This rack is not present in this library.");
+            throw new ApiRequestException("This rack is not present within this library.");
 
         Set<BookItem> libraryBooks = library.get().getBooks();
         List<BookItem> currBooks = new ArrayList<>(libraryBooks);
@@ -89,7 +89,7 @@ public class CatalogServiceImp implements ViewCatalogService
 
     public ResponseEntity<List<BookItem>> searchBooksByTitle(String title)
     {
-        List<BookItem> currBooks = bookItemRepository.findBookItemByTitleContaining(title);
+        List<BookItem> currBooks = bookItemRepository.findAllByTitleContaining(title);
 
         if(currBooks.isEmpty())
             throw new ApiRequestException("There are no books available under this title.");
@@ -131,6 +131,11 @@ public class CatalogServiceImp implements ViewCatalogService
 
     public ResponseEntity<List<BookItem>> searchBooksByPubDate(Date publicationDate)
     {
-        return null;
+        List<BookItem> currBooks = bookItemRepository.findAllByPublicationDate(publicationDate);
+
+        if(currBooks.isEmpty())
+            throw new ApiRequestException("There are no books available within this publication date.");
+
+        return ResponseEntity.ok(currBooks);
     }
 }
