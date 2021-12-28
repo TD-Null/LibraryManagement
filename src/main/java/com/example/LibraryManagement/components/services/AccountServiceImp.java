@@ -16,7 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.sql.Date;
+import java.util.Date;
 import java.util.Optional;
 import java.util.Random;
 
@@ -87,7 +87,7 @@ public class AccountServiceImp implements AccountService
         }
 
         // Get the current date when creating this account.
-        Date currDate = new Date((System.currentTimeMillis()));
+        Date currDate = new Date();
 
         // Use the given details of the user to create an account and save to the repository.
         Address address = new Address(streetAddress, city, zipcode, country);

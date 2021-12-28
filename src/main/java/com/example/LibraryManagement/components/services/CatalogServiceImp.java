@@ -89,7 +89,12 @@ public class CatalogServiceImp implements ViewCatalogService
 
     public ResponseEntity<List<BookItem>> searchBooksByTitle(String title)
     {
-        return null;
+        List<BookItem> currBooks = bookItemRepository.findBookItemByTitleContaining(title);
+
+        if(currBooks.isEmpty())
+            throw new ApiRequestException("There are no books available under this title.");
+
+        return ResponseEntity.ok(currBooks);
     }
 
     public ResponseEntity<List<BookItem>> searchBooksByAuthor(String name)
