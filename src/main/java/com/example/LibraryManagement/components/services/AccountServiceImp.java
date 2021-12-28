@@ -105,9 +105,14 @@ public class AccountServiceImp implements AccountService
         return ResponseEntity.ok(libraryCard);
     }
 
-    // TODO: Add validation to ensure that the account is MEMBER or a LIBRARIAN before proceeding with any action.
-    // A barcode reader method that validates the library card of the user and their account.
-    public boolean barCodeReader(String barcode)
+    /*
+     * A barcode reader method that validates the library card of the user and their account.
+     * This is also used to verify that the right type of account is being validated before
+     * taking any action.
+     *
+     * For example, only librarians can be able to add and modify books.
+     */
+    public boolean barcodeReader(String barcode, AccountType type)
     {
         Optional<LibraryCard> cardValidation = libraryCardRepository.findById(barcode);
 
@@ -115,21 +120,20 @@ public class AccountServiceImp implements AccountService
         if(cardValidation.isPresent())
         {
             LibraryCard card = cardValidation.get();
-            AccountType type = card.getType();
+
+            // Ensure that the right type of account is associated with the library card.
+            if(card.getType() != type) return false;
 
             /*
              * Check if the card is active. If so, check that the user's account is
              * still active, either of a MEMBER or LIBRARIAN. If the both library
              * card and user's account is still active, then the user may proceed.
              */
-            if(card.isActive() && (
+            return card.isActive() && (
                     (type == AccountType.MEMBER && card.getMember() != null
                             && card.getMember().getStatus() == AccountStatus.ACTIVE) ||
                     (type == AccountType.LIBRARIAN && card.getLibrarian() != null
-                            && card.getLibrarian().getStatus() == AccountStatus.ACTIVE)))
-            {
-                return true;
-            }
+                            && card.getLibrarian().getStatus() == AccountStatus.ACTIVE));
         }
 
         // Else, the user will be unable to proceed with any action.
