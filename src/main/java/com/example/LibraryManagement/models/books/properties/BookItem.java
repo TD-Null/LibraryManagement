@@ -58,6 +58,7 @@ public class BookItem extends Book
     @Column(name = "Status", nullable = false)
     private BookStatus status;
 
+    @Temporal(TemporalType.DATE)
     @Column(name = "Publication_Date", nullable = false)
     private Date publicationDate;
 
