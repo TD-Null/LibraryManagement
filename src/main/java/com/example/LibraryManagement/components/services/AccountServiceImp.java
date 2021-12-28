@@ -34,8 +34,6 @@ public class AccountServiceImp implements AccountService
     private final LibraryCardRepository libraryCardRepository;
     @Autowired
     private final MemberRepository memberRepository;
-    @Autowired
-    private final LibrarianRepository librarianRepository;
 
     // Authenticates the users credentials with their given library card number and password to login into their account.
     public ResponseEntity<LibraryCard> authenticateUser(String libraryCardNumber, String password)
