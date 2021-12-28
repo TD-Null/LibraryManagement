@@ -1,7 +1,6 @@
 package com.example.LibraryManagement.models.interfaces.services.catalogs;
 
 import com.example.LibraryManagement.models.books.libraries.Library;
-import com.example.LibraryManagement.models.books.libraries.Rack;
 import com.example.LibraryManagement.models.books.properties.BookItem;
 import org.springframework.http.ResponseEntity;
 

@@ -49,6 +49,7 @@ public class LibraryCard
     @Column(name = "Card_Number")
     private String cardNumber;
 
+    @Temporal(TemporalType.DATE)
     @Column(name = "Issue_Date", nullable = false)
     private Date issuedAt;
 

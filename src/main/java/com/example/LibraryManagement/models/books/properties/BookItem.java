@@ -91,6 +91,7 @@ public class BookItem extends Book
     @Column(name = "Price")
     private double price;
 
+    @Temporal(TemporalType.DATE)
     @Column(name = "Date_of_Purchase")
     private Date dateOfPurchase;
 }

@@ -32,10 +32,8 @@ public class AccountServiceImp implements AccountService
 {
     @Autowired
     private final LibraryCardRepository libraryCardRepository;
-
     @Autowired
     private final MemberRepository memberRepository;
-
     @Autowired
     private final LibrarianRepository librarianRepository;
 
@@ -107,6 +105,7 @@ public class AccountServiceImp implements AccountService
         return ResponseEntity.ok(libraryCard);
     }
 
+    // TODO: Add validation to ensure that the account is MEMBER or a LIBRARIAN before proceeding with any action.
     // A barcode reader method that validates the library card of the user and their account.
     public boolean barCodeReader(String barcode)
     {
