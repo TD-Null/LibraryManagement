@@ -45,22 +45,26 @@ public class AccountServiceImp implements AccountService
         Optional<LibraryCard> cardValidation = libraryCardRepository
                 .findLibraryCardByCardNumber(libraryCardNumber);
 
-        // Ensure that the card exists within the database of the system.
+        // Ensure that the card exists within the database of the system using its card number.
         if(cardValidation.isPresent())
         {
             LibraryCard card = cardValidation.get();
             AccountType type = card.getType();
 
             /*
-             * Check if the card is active. If so, check the user's password,
-             * either of a MEMBER or LIBRARIAN, matches their account corresponding
-             * to the library card details given. If the password matches to their
-             * account, then the login is successful and the details of the library
-             * card are given.
+             * Check if the card is active. If so, check that the user's account is
+             * still active, either of a MEMBER or LIBRARIAN, and if the user's password
+             * matches to their account corresponding to the library card's details given.
+             * If the password matches to their account, then the login is successful and
+             * the details of the library card are given.
              */
             if(card.isActive() && (
-                    (type == AccountType.MEMBER && card.getMember().getPassword().equals(password)) ||
-                    (type == AccountType.LIBRARIAN && card.getLibrarian().getPassword().equals(password))))
+                    (type == AccountType.MEMBER && card.getMember() != null
+                            && card.getMember().getStatus() == AccountStatus.ACTIVE
+                            && card.getMember().getPassword().equals(password)) ||
+                    (type == AccountType.LIBRARIAN && card.getLibrarian() != null
+                            && card.getLibrarian().getStatus() == AccountStatus.ACTIVE
+                            && card.getLibrarian().getPassword().equals(password))))
             {
                 return ResponseEntity.ok(card);
             }
@@ -103,12 +107,34 @@ public class AccountServiceImp implements AccountService
         return ResponseEntity.ok(libraryCard);
     }
 
-    // TODO: Add more functionality for the barcode reader to validate library cards.
-    // A barcode reader method that validates the library card of the
+    // A barcode reader method that validates the library card of the user and their account.
     public boolean barCodeReader(String barcode)
     {
         Optional<LibraryCard> cardValidation = libraryCardRepository.findById(barcode);
-        return cardValidation.isPresent() && cardValidation.get().isActive();
+
+        // Ensure that the card exists within the database of the system using its barcode.
+        if(cardValidation.isPresent())
+        {
+            LibraryCard card = cardValidation.get();
+            AccountType type = card.getType();
+
+            /*
+             * Check if the card is active. If so, check that the user's account is
+             * still active, either of a MEMBER or LIBRARIAN. If the both library
+             * card and user's account is still active, then the user may proceed.
+             */
+            if(card.isActive() && (
+                    (type == AccountType.MEMBER && card.getMember() != null
+                            && card.getMember().getStatus() == AccountStatus.ACTIVE) ||
+                    (type == AccountType.LIBRARIAN && card.getLibrarian() != null
+                            && card.getLibrarian().getStatus() == AccountStatus.ACTIVE)))
+            {
+                return true;
+            }
+        }
+
+        // Else, the user will be unable to proceed with any action.
+        return false;
     }
 
     /*
