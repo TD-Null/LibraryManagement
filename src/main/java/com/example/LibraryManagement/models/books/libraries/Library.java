@@ -42,7 +42,6 @@ public class Library
     @OneToMany(mappedBy = "library", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Set<BookItem> books = new HashSet<>();
 
-    @JsonIgnore
     @OneToMany(mappedBy = "library", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Set<Rack> racks = new HashSet<>();
 
