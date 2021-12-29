@@ -5,6 +5,8 @@ import com.example.LibraryManagement.components.services.CatalogServiceImp;
 import com.example.LibraryManagement.components.services.LibrarianServiceImp;
 import com.example.LibraryManagement.models.accounts.types.Librarian;
 import com.example.LibraryManagement.models.accounts.types.Member;
+import com.example.LibraryManagement.models.books.actions.BookLending;
+import com.example.LibraryManagement.models.books.actions.BookReservation;
 import com.example.LibraryManagement.models.enums.accounts.AccountStatus;
 import com.example.LibraryManagement.models.enums.accounts.AccountType;
 import com.example.LibraryManagement.models.io.requests.account_requests.librarian_requests.AddLibrarianRequest;
@@ -49,6 +51,20 @@ public class LibrarianController
         return librarianService.listAllMembers();
     }
 
+    @GetMapping("/records/book_loans")
+    public ResponseEntity<List<BookLending>> viewAllBookLendings(@Valid @RequestBody BarcodeValidationRequest request)
+    {
+        accountService.barcodeReader(request.getBarcode(), AccountType.LIBRARIAN, AccountStatus.ACTIVE);
+        return librarianService.listAllBookLendings();
+    }
+
+    @GetMapping("/records/book_reservations")
+    public ResponseEntity<List<BookReservation>> viewAllBookReservations(@Valid @RequestBody BarcodeValidationRequest request)
+    {
+        accountService.barcodeReader(request.getBarcode(), AccountType.LIBRARIAN, AccountStatus.ACTIVE);
+        return librarianService.listAllBookReservations();
+    }
+
     @PostMapping("/account/librarian")
     public ResponseEntity<MessageResponse> addLibrarian(@Valid @RequestBody AddLibrarianRequest request)
     {
@@ -60,12 +76,6 @@ public class LibrarianController
                 request.getCountry(), request.getPhoneNumber());
     }
 
-//    @PostMapping("/catalog")
-//    public ResponseEntity<MessageResponse> addBookItem()
-//    {
-//
-//    }
-
     @PutMapping("/account/member/{id}")
     public ResponseEntity<MessageResponse> updateMemberStatus(@PathVariable("id") String memberID,
                                                               @Valid @RequestBody UpdateMemberStatusRequest request)
@@ -73,4 +83,12 @@ public class LibrarianController
         accountService.barcodeReader(request.getBarcode(), AccountType.LIBRARIAN, AccountStatus.ACTIVE);
         return accountService.updateMemberStatus(memberID, request.getStatus());
     }
+
+//    @PostMapping("/catalog")
+//    public ResponseEntity<MessageResponse> addBookItem()
+//    {
+//
+//    }
+
+
 }

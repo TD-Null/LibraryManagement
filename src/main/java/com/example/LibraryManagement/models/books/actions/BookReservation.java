@@ -23,7 +23,6 @@ public class BookReservation
     @JoinColumn(name = "book_item_id", nullable = false)
     private BookItem bookItem;
 
-    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "member_id", nullable = false)
     private Member member;
