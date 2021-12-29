@@ -2,6 +2,7 @@ package com.example.LibraryManagement.components.controllers;
 
 import com.example.LibraryManagement.components.services.AccountServiceImp;
 import com.example.LibraryManagement.models.accounts.LibraryCard;
+import com.example.LibraryManagement.models.io.requests.account_requests.BarcodeValidationRequest;
 import com.example.LibraryManagement.models.io.requests.account_requests.LoginRequest;
 import com.example.LibraryManagement.models.io.requests.account_requests.SignupRequest;
 import lombok.AllArgsConstructor;
@@ -25,6 +26,12 @@ public class AccountController
 {
     @Autowired
     private final AccountServiceImp accountService;
+
+    @GetMapping("/details")
+    public ResponseEntity<Object> viewAccountDetails(@Valid @RequestBody BarcodeValidationRequest barcodeValidationRequest)
+    {
+        return accountService.getAccountDetails(barcodeValidationRequest.getBarcode());
+    }
 
     /*
      * Authentication POST request.

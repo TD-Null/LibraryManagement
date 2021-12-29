@@ -54,7 +54,10 @@ public class Member extends Account implements MemberMethods
     private Date dateOfMembership;
 
     @Column(name = "Issued_Books_Total")
-    private int issuedBooksTotal;
+    private int issuedBooksTotal = 0;
+
+    @Column(name = "Total_Fines")
+    private int totalFines = 0;
 
     @JsonIgnore
     @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.ALL)

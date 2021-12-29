@@ -7,8 +7,8 @@ package com.example.LibraryManagement.models.enums.accounts;
  * be ACTIVE and will stay ACTIVE unless the user's status
  * gets updated.
  *
- * CLOSED: A user's account will be CLOSED when they have
- * a fine that needs to be paid.
+ * CLOSED: A user's account will be CLOSED when they are
+ * unable to make transactions.
  *
  * CANCELLED: A user's account is CANCELLED when they've
  * requested to cancel their library membership.
@@ -17,8 +17,8 @@ package com.example.LibraryManagement.models.enums.accounts;
  * librarian has blocked their account for miscellaneous
  * reasons.
  *
- * NONE: Status used in the case unable to identify the
- * under any of the other statuses.
+ * NONE: Status used in the case of being unable to identify
+ * the account under any of the other statuses.
  */
 public enum AccountStatus
 {

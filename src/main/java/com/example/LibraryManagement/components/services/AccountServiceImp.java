@@ -3,12 +3,14 @@ package com.example.LibraryManagement.components.services;
 import com.example.LibraryManagement.components.repositories.accounts.LibrarianRepository;
 import com.example.LibraryManagement.components.repositories.accounts.LibraryCardRepository;
 import com.example.LibraryManagement.components.repositories.accounts.MemberRepository;
+import com.example.LibraryManagement.models.accounts.types.Librarian;
 import com.example.LibraryManagement.models.accounts.types.Member;
 import com.example.LibraryManagement.models.accounts.LibraryCard;
 import com.example.LibraryManagement.models.datatypes.Address;
 import com.example.LibraryManagement.models.enums.accounts.AccountStatus;
 import com.example.LibraryManagement.models.enums.accounts.AccountType;
 import com.example.LibraryManagement.models.interfaces.services.accounts.AccountService;
+import com.example.LibraryManagement.models.io.responses.MessageResponse;
 import com.example.LibraryManagement.models.io.responses.exceptions.ApiRequestException;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +35,42 @@ public class AccountServiceImp implements AccountService
     @Autowired
     private final LibraryCardRepository libraryCardRepository;
     @Autowired
+    private final LibrarianRepository librarianRepository;
+    @Autowired
     private final MemberRepository memberRepository;
+
+    // Returns the user's account details using their library card's barcode.
+    public ResponseEntity<Object> getAccountDetails(String barcode)
+    {
+        Optional<LibraryCard> cardValidation = libraryCardRepository.findById(barcode);
+
+        /*
+         * Ensure that the card exists within the database of the system using its barcode.
+         * Afterwards, get the account user associated with the given library card and if
+         * available, return the user's details.
+         */
+        if(cardValidation.isPresent())
+        {
+            LibraryCard card = cardValidation.get();
+            AccountType type = card.getType();
+
+            if(type == AccountType.MEMBER && card.getMember() != null)
+            {
+                return ResponseEntity.ok(card.getMember());
+            }
+
+            else if(type == AccountType.LIBRARIAN && card.getLibrarian() != null)
+            {
+                return ResponseEntity.ok(card.getLibrarian());
+            }
+        }
+
+        /*
+         * Else, the user is not found within the database as either
+         * a MEMBER or LIBRARIAN and unable to return any account details.
+         */
+        throw new ApiRequestException("Unable to find user's details within the system.");
+    }
 
     // Authenticates the users credentials with their given library card number and password to login into their account.
     public ResponseEntity<LibraryCard> authenticateUser(String libraryCardNumber, String password)
@@ -103,6 +140,68 @@ public class AccountServiceImp implements AccountService
         return ResponseEntity.ok(libraryCard);
     }
 
+    // Registers a new librarian using the user's inputted details to create an account.
+    @Transactional
+    public ResponseEntity<MessageResponse> registerLibrarian(String name, String password, String email,
+                                                             String streetAddress, String city, String zipcode,
+                                                             String country, String phoneNumber)
+    {
+        // First, validate that the user's email isn't already being used in the website's other user accounts.
+        if(librarianRepository.findLibrarianByEmail(email).isPresent())
+        {
+            throw new ApiRequestException("Failed to create the account with the given credentials.");
+        }
+
+        // Get the current date when creating this account.
+        Date currDate = new Date();
+
+        // Use the given details of the user to create an account and save to the repository.
+        Address address = new Address(streetAddress, city, zipcode, country);
+        Librarian librarian = new Librarian(name, password, AccountStatus.ACTIVE,
+                address, email, phoneNumber);
+        librarianRepository.save(librarian);
+
+        // Create a new library card for the user.
+        String cardNumber = generateCardNumber();
+        LibraryCard libraryCard = new LibraryCard(AccountType.LIBRARIAN, cardNumber, currDate, true);
+        libraryCardRepository.save(libraryCard);
+
+        // Link the library card to the user's account.
+        librarian.setLibraryCard(libraryCard);
+
+        // Return the details of the user's library card after the account has been successfully created.
+        return ResponseEntity.ok(new MessageResponse("Librarian account has been successfully created."));
+    }
+
+    // Updates a member's account status using the member's ID and the given status update.
+    @Transactional
+    public ResponseEntity<MessageResponse> updateMemberStatus(String memberID, AccountStatus status)
+    {
+        Optional<Member> memberValidation = memberRepository.findById(memberID);
+
+        // First, validate that the given user is a member within the system.
+        if(memberValidation.isPresent())
+        {
+            Member member = memberValidation.get();
+
+            // If the member's account is already CANCELLED, its status cannot be updated.
+            if(member.getStatus() == AccountStatus.CANCELLED)
+            {
+                throw new ApiRequestException("The member's account has already been cancelled. The account's status cannot be updated.");
+            }
+
+            // Else, update the member's account status and return a response.
+            else
+            {
+                member.setStatus(status);
+                return ResponseEntity.ok(new MessageResponse("Member's account status has been updated successfully."));
+            }
+        }
+
+        // Else, the account's status cannot be updated as it cannot be found.
+        throw new ApiRequestException("Unable to find member's account within the system.");
+    }
+
     /*
      * A barcode reader method that validates the library card of the user and their account.
      * This is also used to verify that the right type of account is being validated before
@@ -110,7 +209,7 @@ public class AccountServiceImp implements AccountService
      *
      * For example, only librarians can be able to add and modify books.
      */
-    public boolean barcodeReader(String barcode, AccountType type)
+    public void barcodeReader(String barcode, AccountType type, AccountStatus status)
     {
         Optional<LibraryCard> cardValidation = libraryCardRepository.findById(barcode);
 
@@ -119,23 +218,25 @@ public class AccountServiceImp implements AccountService
         {
             LibraryCard card = cardValidation.get();
 
-            // Ensure that the right type of account is associated with the library card.
-            if(card.getType() != type) return false;
-
             /*
-             * Check if the card is active. If so, check that the user's account is
-             * still active, either of a MEMBER or LIBRARIAN. If the both library
-             * card and user's account is still active, then the user may proceed.
+             * Check if the card is active and the account type matches to what is
+             * expected. If so, check that the user's account is still active, either
+             * of a MEMBER or LIBRARIAN. If both the library card and user's account is
+             * still active, then the user may proceed.
              */
-            return card.isActive() && (
-                    (type == AccountType.MEMBER && card.getMember() != null
-                            && card.getMember().getStatus() == AccountStatus.ACTIVE) ||
+            if (card.isActive() &&
+                    card.getType() == type &&
+                    ((type == AccountType.MEMBER && card.getMember() != null
+                            && card.getMember().getStatus() == status) ||
                     (type == AccountType.LIBRARIAN && card.getLibrarian() != null
-                            && card.getLibrarian().getStatus() == AccountStatus.ACTIVE));
+                            && card.getLibrarian().getStatus() == status)))
+            {
+                return;
+            }
         }
 
         // Else, the user will be unable to proceed with any action.
-        return false;
+        throw new ApiRequestException("User is not allowed to perform this action");
     }
 
     /*

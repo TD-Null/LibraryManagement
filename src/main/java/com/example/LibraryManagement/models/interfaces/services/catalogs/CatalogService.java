@@ -8,7 +8,7 @@ import java.sql.Date;
 import java.util.List;
 
 // Methods used in a service component relating to the catalog.
-public interface ViewCatalogService
+public interface CatalogService
 {
     ResponseEntity<List<BookItem>> listAllBooks();
 
