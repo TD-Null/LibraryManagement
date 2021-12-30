@@ -10,8 +10,11 @@ import com.example.LibraryManagement.models.enums.books.BookStatus;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
@@ -25,8 +28,9 @@ import java.util.Set;
  * placed on different racks as well as be associated to different or the
  * same authors.
  */
-@Data
-@EqualsAndHashCode(callSuper = true)
+@Getter
+@Setter
+//@EqualsAndHashCode(callSuper = true)
 @Entity
 @Table
 public class BookItem extends Book
@@ -65,6 +69,19 @@ public class BookItem extends Book
     @Column(name = "Reference")
     private boolean isReferenceOnly;
 
+    @Column(name = "Borrowed_Date")
+    private Date borrowed;
+
+    @Column(name = "Due_Date")
+    private Date dueDate;
+
+    @Column(name = "Price")
+    private double price;
+
+    @Temporal(TemporalType.DATE)
+    @Column(name = "Date_of_Purchase")
+    private Date dateOfPurchase;
+
     @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "member_id", nullable = false)
@@ -83,16 +100,15 @@ public class BookItem extends Book
     @OneToMany(mappedBy = "bookItem", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Set<BookReservation> reservationRecords = new HashSet<>();
 
-    @Column(name = "Borrowed_Date")
-    private Date borrowed;
-
-    @Column(name = "Due_Date")
-    private Date dueDate;
-
-    @Column(name = "Price")
-    private double price;
-
-    @Temporal(TemporalType.DATE)
-    @Column(name = "Date_of_Purchase")
-    private Date dateOfPurchase;
+    public BookItem(String ISBN, String title, String publisher, String language,
+                    int numberOfPages, BookFormat format, BookStatus status, Date publicationDate,
+                    boolean isReferenceOnly, double price)
+    {
+        super(ISBN, title, publisher, language, numberOfPages);
+        this.format = format;
+        this.status = status;
+        this.publicationDate = publicationDate;
+        this.isReferenceOnly = isReferenceOnly;
+        this.price = price;
+    }
 }

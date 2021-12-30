@@ -2,7 +2,9 @@ package com.example.LibraryManagement.components.controllers;
 
 import com.example.LibraryManagement.components.services.CatalogServiceImp;
 import com.example.LibraryManagement.models.books.libraries.Library;
+import com.example.LibraryManagement.models.books.properties.Author;
 import com.example.LibraryManagement.models.books.properties.BookItem;
+import com.example.LibraryManagement.models.books.properties.Subject;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -24,12 +26,6 @@ public class CatalogController
     @Autowired
     private final CatalogServiceImp catalogService;
 
-    @GetMapping
-    public ResponseEntity<List<BookItem>> viewAllBooks()
-    {
-        return catalogService.listAllBooks();
-    }
-
     @GetMapping("/library")
     public ResponseEntity<List<Library>> viewAllLibraries() { return catalogService.listAllLibraries(); }
 
@@ -43,15 +39,27 @@ public class CatalogController
         return catalogService.listLibraryRackBooks(libraryName, rackNumber);
     }
 
-    @GetMapping("/title")
-    public ResponseEntity<List<BookItem>> viewBooksByTitle(@RequestParam String title) { return catalogService.searchBooksByTitle(title); }
+    @GetMapping
+    public ResponseEntity<List<BookItem>> viewAllBooks()
+    {
+        return catalogService.listAllBooks();
+    }
+
+    @GetMapping("/subjects")
+    public ResponseEntity<List<Subject>> viewAllSubjects() { return catalogService.listAllSubjects(); }
 
     @GetMapping("/author")
+    public ResponseEntity<List<Author>> viewAllAuthors() { return catalogService.listAllAuthors(); }
+
+    @GetMapping("/filter/title")
+    public ResponseEntity<List<BookItem>> viewBooksByTitle(@RequestParam String title) { return catalogService.searchBooksByTitle(title); }
+
+    @GetMapping("filter/author")
     public ResponseEntity<List<BookItem>> viewBooksByAuthor(@RequestParam String name) { return catalogService.searchBooksByAuthor(name); }
 
-    @GetMapping("/subject")
+    @GetMapping("filter/subjects")
     public ResponseEntity<List<BookItem>> viewBooksBySubject(@RequestParam String subject) { return catalogService.searchBooksBySubject(subject); }
 
-    @GetMapping("/publication_date")
+    @GetMapping("filter/publication_date")
     public ResponseEntity<List<BookItem>> viewBooksByPubDate(@RequestParam Date publicationDate) { return catalogService.searchBooksByPubDate(publicationDate); }
 }

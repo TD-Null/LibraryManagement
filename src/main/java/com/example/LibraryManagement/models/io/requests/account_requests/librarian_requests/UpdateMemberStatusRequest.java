@@ -1,6 +1,7 @@
 package com.example.LibraryManagement.models.io.requests.account_requests.librarian_requests;
 
 import com.example.LibraryManagement.models.enums.accounts.AccountStatus;
+import com.example.LibraryManagement.models.io.requests.account_requests.BarcodeValidationRequest;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -8,12 +9,14 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 @Getter
-@AllArgsConstructor
-public class UpdateMemberStatusRequest
+public class UpdateMemberStatusRequest extends BarcodeValidationRequest
 {
-    @NotBlank
-    private final String barcode;
-
     @NotNull
     private final AccountStatus status;
+
+    public UpdateMemberStatusRequest(@NotBlank String barcode, AccountStatus status)
+    {
+        super(barcode);
+        this.status = status;
+    }
 }

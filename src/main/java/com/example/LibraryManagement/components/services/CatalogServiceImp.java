@@ -32,8 +32,6 @@ public class CatalogServiceImp implements CatalogService
     @Autowired
     private final SubjectRepository subjectRepository;
 
-    public ResponseEntity<List<BookItem>> listAllBooks() { return ResponseEntity.ok(bookItemRepository.findAll()); }
-
     public ResponseEntity<List<Library>> listAllLibraries() { return ResponseEntity.ok(libraryRepository.findAll()); }
 
     public ResponseEntity<List<BookItem>> listLibraryBooks(String name)
@@ -86,6 +84,12 @@ public class CatalogServiceImp implements CatalogService
 
         return ResponseEntity.ok(currBooks);
     }
+
+    public ResponseEntity<List<BookItem>> listAllBooks() { return ResponseEntity.ok(bookItemRepository.findAll()); }
+
+    public ResponseEntity<List<Subject>> listAllSubjects() { return ResponseEntity.ok(subjectRepository.findAll()); }
+
+    public ResponseEntity<List<Author>> listAllAuthors() { return ResponseEntity.ok(authorRepository.findAll()); }
 
     public ResponseEntity<List<BookItem>> searchBooksByTitle(String title)
     {

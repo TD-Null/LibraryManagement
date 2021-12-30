@@ -1,5 +1,6 @@
 package com.example.LibraryManagement.models.io.requests.account_requests.librarian_requests;
 
+import com.example.LibraryManagement.models.io.requests.account_requests.BarcodeValidationRequest;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -8,12 +9,8 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
 @Getter
-@AllArgsConstructor
-public class AddLibrarianRequest
+public class AddLibrarianRequest extends BarcodeValidationRequest
 {
-    @NotBlank
-    private final String barcode;
-
     @NotBlank
     private final String name;
 
@@ -40,4 +37,19 @@ public class AddLibrarianRequest
 
     @NotBlank
     private final String phoneNumber;
+
+    public AddLibrarianRequest(String barcode, String name, String password,
+                               String email, String streetAddress, String city,
+                               String zipcode, String country, String phoneNumber)
+    {
+        super(barcode);
+        this.name = name;
+        this.password = password;
+        this.email = email;
+        this.streetAddress = streetAddress;
+        this.city = city;
+        this.zipcode = zipcode;
+        this.country = country;
+        this.phoneNumber = phoneNumber;
+    }
 }

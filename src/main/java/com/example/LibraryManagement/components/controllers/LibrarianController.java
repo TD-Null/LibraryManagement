@@ -84,8 +84,8 @@ public class LibrarianController
         return accountService.updateMemberStatus(memberID, request.getStatus());
     }
 
-//    @PostMapping("/catalog")
-//    public ResponseEntity<MessageResponse> addBookItem()
+//    @PostMapping("/catalog/add")
+//    public ResponseEntity<MessageResponse> addBookItem(@Valid @RequestBody AddBookItemRequest request)
 //    {
 //
 //    }
