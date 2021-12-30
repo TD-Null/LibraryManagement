@@ -183,11 +183,12 @@ public class AccountServiceImp implements AccountService
         if(memberValidation.isPresent())
         {
             Member member = memberValidation.get();
+            AccountStatus currStatus = member.getStatus();
 
-            // If the member's account is already CANCELLED, its status cannot be updated.
-            if(member.getStatus() == AccountStatus.CANCELLED)
+            // If the member's account is already CLOSED or CANCELLED, its status cannot be updated.
+            if(currStatus == AccountStatus.CLOSED || currStatus == AccountStatus.CANCELLED)
             {
-                throw new ApiRequestException("The member's account has already been cancelled. The account's status cannot be updated.");
+                throw new ApiRequestException("The member's account is inactive. The account's status cannot be updated.");
             }
 
             // Else, update the member's account status and return a response.
