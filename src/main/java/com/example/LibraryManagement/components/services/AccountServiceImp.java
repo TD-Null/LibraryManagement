@@ -6,6 +6,7 @@ import com.example.LibraryManagement.components.repositories.accounts.MemberRepo
 import com.example.LibraryManagement.models.accounts.types.Librarian;
 import com.example.LibraryManagement.models.accounts.types.Member;
 import com.example.LibraryManagement.models.accounts.LibraryCard;
+import com.example.LibraryManagement.models.books.libraries.Library;
 import com.example.LibraryManagement.models.datatypes.Address;
 import com.example.LibraryManagement.models.enums.accounts.AccountStatus;
 import com.example.LibraryManagement.models.enums.accounts.AccountType;
@@ -42,27 +43,110 @@ public class AccountServiceImp implements AccountService
     // Returns the user's account details using their library card's barcode.
     public ResponseEntity<Object> getAccountDetails(String barcode)
     {
-        Optional<LibraryCard> cardValidation = libraryCardRepository.findById(barcode);
-
         /*
          * Ensure that the card exists within the database of the system using its barcode.
          * Afterwards, get the account user associated with the given library card and if
          * available, return the user's details.
          */
-        if(cardValidation.isPresent())
+        LibraryCard card = cardValidation(barcode);
+        AccountType type = card.getType();
+
+        if(type == AccountType.MEMBER && card.getMember() != null)
         {
-            LibraryCard card = cardValidation.get();
-            AccountType type = card.getType();
+            return ResponseEntity.ok(card.getMember());
+        }
 
-            if(type == AccountType.MEMBER && card.getMember() != null)
+        else if(type == AccountType.LIBRARIAN && card.getLibrarian() != null)
+        {
+            return ResponseEntity.ok(card.getLibrarian());
+        }
+
+        /*
+         * Else, the user is not found within the database as either
+         * a MEMBER or LIBRARIAN and unable to return any account details.
+         */
+        throw new ApiRequestException("Unable to find user's details within the system.");
+    }
+
+    @Transactional
+    public ResponseEntity<MessageResponse> updateAccountDetails(String barcode, String name, String streetAddress,
+                                                                String city, String zipcode, String country,
+                                                                String email, String phoneNumber)
+    {
+        /*
+         * Ensure that the card exists within the database of the system using its barcode.
+         * Afterwards, get the account user associated with the given library card and if
+         * available, edit the user's details.
+         */
+        LibraryCard card = cardValidation(barcode);
+        AccountType type = card.getType();
+
+        if(type == AccountType.MEMBER && card.getMember() != null)
+        {
+            Member member = card.getMember();
+            member.setName(name);
+            member.setAddress(new Address(streetAddress, city, zipcode, country));
+            member.setEmail(email);
+            member.setPhoneNumber(phoneNumber);
+
+            return ResponseEntity.ok(new MessageResponse("Successfully updated user's details within the system."));
+        }
+
+        else if(type == AccountType.LIBRARIAN && card.getLibrarian() != null)
+        {
+            Librarian librarian = card.getLibrarian();
+            librarian.setName(name);
+            librarian.setAddress(new Address(streetAddress, city, zipcode, country));
+            librarian.setEmail(email);
+            librarian.setPhoneNumber(phoneNumber);
+
+            return ResponseEntity.ok(new MessageResponse("Successfully updated user's details within the system."));
+        }
+
+        /*
+         * Else, the user is not found within the database as either
+         * a MEMBER or LIBRARIAN and unable to return any account details.
+         */
+        throw new ApiRequestException("Unable to find user's details within the system.");
+    }
+
+    @Transactional
+    public ResponseEntity<MessageResponse> changePassword(String barcode, String originalPassword, String newPassword)
+    {
+        /*
+         * Ensure that the card exists within the database of the system using its barcode.
+         * Afterwards, get the account user associated with the given library card and if
+         * available, change the user's password.
+         */
+        LibraryCard card = cardValidation(barcode);
+        AccountType type = card.getType();
+
+        if(type == AccountType.MEMBER && card.getMember() != null)
+        {
+            Member member = card.getMember();
+
+            if(!member.getPassword().equals(originalPassword))
             {
-                return ResponseEntity.ok(card.getMember());
+                throw new ApiRequestException("Invalid Password.");
             }
 
-            else if(type == AccountType.LIBRARIAN && card.getLibrarian() != null)
+            member.setPassword(newPassword);
+
+            return ResponseEntity.ok(new MessageResponse("Successfully changed user;s password within the system."));
+        }
+
+        else if(type == AccountType.LIBRARIAN && card.getLibrarian() != null)
+        {
+            Librarian librarian = card.getLibrarian();
+
+            if(!librarian.getPassword().equals(originalPassword))
             {
-                return ResponseEntity.ok(card.getLibrarian());
+                throw new ApiRequestException("Invalid Password.");
             }
+
+            librarian.setPassword(newPassword);
+
+            return ResponseEntity.ok(new MessageResponse("Successfully changed user;s password within the system."));
         }
 
         /*
@@ -104,7 +188,7 @@ public class AccountServiceImp implements AccountService
         }
 
         // Else, throw an API request exception stating that the given credentials were invalid.
-        throw new ApiRequestException("Invalid credentials. (Wrong library card number of password)");
+        throw new ApiRequestException("Invalid credentials. (Wrong library card number or password)");
     }
 
     // Registers a new member using the user's inputted details to create an account.
@@ -240,6 +324,16 @@ public class AccountServiceImp implements AccountService
         throw new ApiRequestException("User is not allowed to perform this action");
     }
 
+    public LibraryCard cardValidation(String barcode)
+    {
+        Optional<LibraryCard> card = libraryCardRepository.findById(barcode);
+
+        if(card.isEmpty())
+            throw new ApiRequestException("Unable to find library card within the system.");
+
+        return card.get();
+    }
+
     /*
      * Generates a random 6-digit card number to create a new library card.
      * Also ensures that the generated card number is unique across all
@@ -257,4 +351,5 @@ public class AccountServiceImp implements AccountService
 
         return generatedCardNumber;
     }
+
 }

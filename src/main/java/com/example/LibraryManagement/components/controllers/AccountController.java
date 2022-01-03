@@ -2,9 +2,9 @@ package com.example.LibraryManagement.components.controllers;
 
 import com.example.LibraryManagement.components.services.AccountServiceImp;
 import com.example.LibraryManagement.models.accounts.LibraryCard;
-import com.example.LibraryManagement.models.io.requests.account_requests.BarcodeValidationRequest;
-import com.example.LibraryManagement.models.io.requests.account_requests.LoginRequest;
-import com.example.LibraryManagement.models.io.requests.account_requests.SignupRequest;
+import com.example.LibraryManagement.models.enums.accounts.AccountStatus;
+import com.example.LibraryManagement.models.io.requests.account_requests.*;
+import com.example.LibraryManagement.models.io.responses.MessageResponse;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -30,9 +30,22 @@ public class AccountController
     private final AccountServiceImp accountService;
 
     @GetMapping("/details")
-    public ResponseEntity<Object> viewAccountDetails(@Valid @RequestBody BarcodeValidationRequest barcodeValidationRequest)
+    public ResponseEntity<Object> viewAccountDetails(@Valid @RequestBody BarcodeValidationRequest request)
     {
-        return accountService.getAccountDetails(barcodeValidationRequest.getBarcode());
+        return accountService.getAccountDetails(request.getBarcode());
+    }
+
+    @PutMapping("/update")
+    public ResponseEntity<MessageResponse> editAccountDetails(@Valid @RequestBody UpdateAccountRequest request)
+    {
+        return accountService.updateAccountDetails(request.getBarcode(), request.getName(), request.getStreetAddress(),
+                request.getCity(), request.getZipcode(), request.getCountry(), request.getEmail(), request.getPhoneNumber());
+    }
+
+    @PutMapping("/update")
+    public ResponseEntity<MessageResponse> changePassowrd(@Valid @RequestBody ChangePasswordRequest request)
+    {
+        return accountService.changePassword(request.getBarcode(), request.getOriginalPassword(), request.getNewPassword());
     }
 
     /*
