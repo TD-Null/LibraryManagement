@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
@@ -86,6 +87,61 @@ public class UpdateCatalogServiceImp implements UpdateCatalogService
         return ResponseEntity.ok(new MessageResponse("Book has been successfully added to the system."));
     }
 
+    @Transactional
+    public ResponseEntity<MessageResponse> modifyBookItem(String barcode, String ISBN, String title,
+                                                          String publisher, String language, int numberOfPages,
+                                                          String authorName, Set<String> subjects, BookFormat format,
+                                                          Date publicationDate, boolean isReferenceOnly, double price)
+    {
+        BookItem bookItem = bookValidation(barcode);
+
+        bookItem.setISBN(ISBN);
+        bookItem.setTitle(title);
+        bookItem.setPublisher(publisher);
+        bookItem.setLanguage(language);
+        bookItem.setNumberOfPages(numberOfPages);
+        bookItem.setFormat(format);
+        bookItem.setPublicationDate(publicationDate);
+        bookItem.setReferenceOnly(isReferenceOnly);
+        bookItem.setPrice(price);
+
+        Author author = authorValidation(authorName);
+        Author prevAuthor = bookItem.getAuthor();
+
+        if(!prevAuthor.equals(author))
+        {
+            prevAuthor.removeBookItem(bookItem);
+            author.addBookItem(bookItem);
+        }
+
+        Set<Subject> newSubjects = new HashSet<>();
+
+        for(String s: subjects)
+        {
+            newSubjects.add(subjectValidation(s));
+        }
+
+        Set<Subject> prevSubjects = bookItem.getSubjects();
+
+        for(Subject s: prevSubjects)
+        {
+            if(!newSubjects.contains(s))
+            {
+                s.removeBookItem(bookItem);
+            }
+        }
+
+        for(Subject s: newSubjects)
+        {
+            if(!prevSubjects.contains(s))
+            {
+                s.addBookItem(bookItem);
+            }
+        }
+
+        return ResponseEntity.ok(new MessageResponse("Book has been successful updated within the system."));
+    }
+
     private Library libraryValidation(String name)
     {
         Optional<Library> library = libraryRepository.findById(name);
@@ -112,6 +168,16 @@ public class UpdateCatalogServiceImp implements UpdateCatalogService
             throw new ApiRequestException("This rack is not present within this library.");
 
         return rack;
+    }
+
+    private BookItem bookValidation(String barcode)
+    {
+        Optional<BookItem> bookItem = bookItemRepository.findById(barcode);
+
+        if(bookItem.isEmpty())
+            throw new ApiRequestException("Unable to find book within the system.");
+
+        return bookItem.get();
     }
 
     private Author authorValidation(String name)

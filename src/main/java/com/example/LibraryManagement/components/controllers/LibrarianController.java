@@ -109,10 +109,13 @@ public class LibrarianController
                 request.isReferenceOnly(), request.getPrice());
     }
 
-//    @PutMapping("/catalog/update")
-//    public ResponseEntity<MessageResponse> updateBookItem(@Valid @RequestBody UpdateBookItemRequest request)
-//    {
-//        accountService.barcodeReader(request.getBarcode(), AccountType.LIBRARIAN, AccountStatus.ACTIVE);
-//
-//    }
+    @PutMapping("/catalog/update")
+    public ResponseEntity<MessageResponse> updateBookItem(@RequestParam String barcode,
+                                                          @Valid @RequestBody UpdateBookItemRequest request)
+    {
+        accountService.barcodeReader(request.getBarcode(), AccountType.LIBRARIAN, AccountStatus.ACTIVE);
+        return updateCatalogService.modifyBookItem(barcode, request.getISBN(), request.getTitle(), request.getPublisher(),
+                request.getLanguage(), request.getNumberOfPages(), request.getAuthorName(), request.getSubjectNames(),
+                request.getFormat(), request.getPublicationDate(), request.isReferenceOnly(), request.getPrice());
+    }
 }

@@ -19,4 +19,9 @@ public interface UpdateCatalogService
                                                 int numberOfPages, String authorName, Set<String> subjects,
                                                 BookFormat format, Date publicationDate, boolean isReferenceOnly,
                                                 double price);
+
+    ResponseEntity<MessageResponse> modifyBookItem(String barcode, String ISBN, String title,
+                                                          String publisher, String language, int numberOfPages,
+                                                          String authorName, Set<String> subjects, BookFormat format,
+                                                          Date publicationDate, boolean isReferenceOnly, double price);
 }
