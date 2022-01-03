@@ -2,6 +2,9 @@ package com.example.LibraryManagement.models.books.properties;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
@@ -18,7 +21,9 @@ import java.util.Set;
  * Each author can have multiple Book/BooKItem objects associated
  * to them.
  */
-@Data
+@Getter
+@Setter
+@EqualsAndHashCode
 @Entity
 @Table
 public class Author
@@ -34,4 +39,16 @@ public class Author
     @JsonIgnore
     @OneToMany(mappedBy = "author", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Set<BookItem> books = new HashSet<>();
+
+    public Author(String name) { this.name = name; }
+
+    public Author(String name, String description)
+    {
+        this.name = name;
+        this.description = description;
+    }
+
+    public void addBookItem(BookItem b) { books.add(b); }
+
+    public void removeBookItem(BookItem b) { books.remove(b); }
 }

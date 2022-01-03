@@ -4,9 +4,13 @@ import com.example.LibraryManagement.models.books.properties.BookItem;
 import com.example.LibraryManagement.models.datatypes.Address;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -22,7 +26,9 @@ import java.util.Set;
  * Librarians can also modify libraries to add book items and additional racks
  * to a given library.
  */
-@Data
+@Getter
+@Setter
+@EqualsAndHashCode
 @Entity
 @Table(uniqueConstraints = {
         @UniqueConstraint(columnNames = "Name")
@@ -34,7 +40,7 @@ public class Library
     @Column(name = "Name")
     private String name;
 
-    @NotBlank
+    @NotNull
     @Column(name = "Address")
     private Address address;
 
@@ -45,11 +51,17 @@ public class Library
     @OneToMany(mappedBy = "library", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Set<Rack> racks = new HashSet<>();
 
+    public Library(String name, Address address)
+    {
+        this.name = name;
+        this.address = address;
+    }
+
     public void addBookItem(BookItem b) { books.add(b); }
 
     public void addRack(Rack r) { racks.add(r); }
 
-    public boolean removeBookItem(BookItem b) { return books.remove(b); }
+    public void removeBookItem(BookItem b) { books.remove(b); }
 
-    public boolean removeRack(Rack r) { return racks.remove(r); }
+    public void removeRack(Rack r) { racks.remove(r); }
 }

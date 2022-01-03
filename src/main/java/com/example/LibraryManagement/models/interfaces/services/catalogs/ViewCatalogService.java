@@ -4,19 +4,20 @@ import com.example.LibraryManagement.models.books.libraries.Library;
 import com.example.LibraryManagement.models.books.properties.Author;
 import com.example.LibraryManagement.models.books.properties.BookItem;
 import com.example.LibraryManagement.models.books.properties.Subject;
+import com.example.LibraryManagement.models.enums.books.BookFormat;
+import com.example.LibraryManagement.models.io.responses.MessageResponse;
 import org.springframework.http.ResponseEntity;
 
-import java.sql.Date;
+import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 // Methods used in a service component relating to the catalog.
-public interface CatalogService
+public interface ViewCatalogService
 {
     ResponseEntity<List<Library>> listAllLibraries();
 
     ResponseEntity<List<BookItem>> listLibraryBooks(String name);
-
-    ResponseEntity<List<BookItem>> listLibraryRackBooks(String name, int number);
 
     ResponseEntity<List<BookItem>> listAllBooks();
 

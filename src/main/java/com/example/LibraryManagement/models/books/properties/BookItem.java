@@ -101,8 +101,8 @@ public class BookItem extends Book
     private Set<BookReservation> reservationRecords = new HashSet<>();
 
     public BookItem(String ISBN, String title, String publisher, String language,
-                    int numberOfPages, BookFormat format, BookStatus status, Date publicationDate,
-                    boolean isReferenceOnly, double price)
+                    int numberOfPages, BookFormat format, BookStatus status,
+                    Date publicationDate, boolean isReferenceOnly, double price)
     {
         super(ISBN, title, publisher, language, numberOfPages);
         this.format = format;

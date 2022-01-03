@@ -9,19 +9,23 @@ import com.example.LibraryManagement.models.books.libraries.Rack;
 import com.example.LibraryManagement.models.books.properties.Author;
 import com.example.LibraryManagement.models.books.properties.BookItem;
 import com.example.LibraryManagement.models.books.properties.Subject;
-import com.example.LibraryManagement.models.interfaces.services.catalogs.CatalogService;
+import com.example.LibraryManagement.models.enums.books.BookFormat;
+import com.example.LibraryManagement.models.enums.books.BookStatus;
+import com.example.LibraryManagement.models.interfaces.services.catalogs.ViewCatalogService;
+import com.example.LibraryManagement.models.io.responses.MessageResponse;
 import com.example.LibraryManagement.models.io.responses.exceptions.ApiRequestException;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.sql.Date;
+import javax.transaction.Transactional;
+import java.util.Date;
 import java.util.*;
 
 @AllArgsConstructor
 @Service
-public class CatalogServiceImp implements CatalogService
+public class ViewCatalogServiceImp implements ViewCatalogService
 {
     @Autowired
     private final BookItemRepository bookItemRepository;
@@ -36,51 +40,13 @@ public class CatalogServiceImp implements CatalogService
 
     public ResponseEntity<List<BookItem>> listLibraryBooks(String name)
     {
-        Optional<Library> library = libraryRepository.findById(name);
+        Library library = libraryValidation(name);
 
-        if(library.isEmpty())
-            throw new ApiRequestException("Unable to find this library.");
-
-        Set<BookItem> libraryBooks = library.get().getBooks();
+        Set<BookItem> libraryBooks = library.getBooks();
         List<BookItem> currBooks = new ArrayList<>(libraryBooks);
 
         if(currBooks.isEmpty())
             throw new ApiRequestException("There are no books currently available in this library.");
-
-        return ResponseEntity.ok(currBooks);
-    }
-
-    public ResponseEntity<List<BookItem>> listLibraryRackBooks(String name, int number)
-    {
-        Optional<Library> library = libraryRepository.findById(name);
-
-        if(library.isEmpty())
-            throw new ApiRequestException("Unable to find this library.");
-
-        Set<Rack> libraryRacks = library.get().getRacks();
-
-        if(libraryRacks.isEmpty())
-            throw new ApiRequestException("There are no racks available in this library");
-
-        Rack currRack = null;
-
-        for(Rack r: libraryRacks)
-        {
-            if(r.getNumber() == number)
-            {
-                currRack = r;
-                break;
-            }
-        }
-
-        if(currRack == null)
-            throw new ApiRequestException("This rack is not present within this library.");
-
-        Set<BookItem> libraryBooks = library.get().getBooks();
-        List<BookItem> currBooks = new ArrayList<>(libraryBooks);
-
-        if(currBooks.isEmpty())
-            throw new ApiRequestException("There are no books available on this rack.");
 
         return ResponseEntity.ok(currBooks);
     }
@@ -103,12 +69,9 @@ public class CatalogServiceImp implements CatalogService
 
     public ResponseEntity<List<BookItem>> searchBooksByAuthor(String name)
     {
-        Optional<Author> author = authorRepository.findById(name);
+        Author author = authorValidation(name);
 
-        if(author.isEmpty())
-            throw new ApiRequestException("Unable to find books by author's name.");
-
-        Set<BookItem> authorBooks = author.get().getBooks();
+        Set<BookItem> authorBooks = author.getBooks();
         List<BookItem> currBooks = new ArrayList<>(authorBooks);
 
         if(currBooks.isEmpty())
@@ -117,14 +80,11 @@ public class CatalogServiceImp implements CatalogService
         return ResponseEntity.ok(currBooks);
     }
 
-    public ResponseEntity<List<BookItem>> searchBooksBySubject(String subjectName)
+    public ResponseEntity<List<BookItem>> searchBooksBySubject(String name)
     {
-        Optional<Subject> subject = subjectRepository.findById(subjectName);
+        Subject subject = subjectValidation(name);
 
-        if(subject.isEmpty())
-            throw new ApiRequestException("Unable to find books by author's name.");
-
-        Set<BookItem> subjectBooks = subject.get().getBooks();
+        Set<BookItem> subjectBooks = subject.getBooks();
         List<BookItem> currBooks = new ArrayList<>(subjectBooks);
 
         if(currBooks.isEmpty())
@@ -141,5 +101,35 @@ public class CatalogServiceImp implements CatalogService
             throw new ApiRequestException("There are no books available within this publication date.");
 
         return ResponseEntity.ok(currBooks);
+    }
+
+    private Library libraryValidation(String name)
+    {
+        Optional<Library> library = libraryRepository.findById(name);
+
+        if(library.isEmpty())
+            throw new ApiRequestException("Unable to find this library.");
+
+        return library.get();
+    }
+
+    private Author authorValidation(String name)
+    {
+        if(!authorRepository.existsById(name))
+        {
+            authorRepository.save(new Author(name));
+        }
+
+        return authorRepository.getById(name);
+    }
+
+    private Subject subjectValidation(String name)
+    {
+        if(!subjectRepository.existsById(name))
+        {
+            subjectRepository.save(new Subject(name));
+        }
+
+        return subjectRepository.getById(name);
     }
 }

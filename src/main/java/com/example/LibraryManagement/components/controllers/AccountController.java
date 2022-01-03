@@ -17,6 +17,8 @@ import javax.validation.Valid;
  *
  * - Logging in
  * - Signing up for a new account
+ * - Viewing user's account details
+ * - TODO: Add API requests for updating user's account details
  */
 @CrossOrigin(origins = "*", maxAge = 3600)
 @AllArgsConstructor
