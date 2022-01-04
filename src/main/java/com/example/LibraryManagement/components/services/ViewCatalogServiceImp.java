@@ -16,6 +16,7 @@ import com.example.LibraryManagement.models.io.responses.MessageResponse;
 import com.example.LibraryManagement.models.io.responses.exceptions.ApiRequestException;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -46,7 +47,8 @@ public class ViewCatalogServiceImp implements ViewCatalogService
         List<BookItem> currBooks = new ArrayList<>(libraryBooks);
 
         if(currBooks.isEmpty())
-            throw new ApiRequestException("There are no books currently available in this library.");
+            throw new ApiRequestException("There are no books currently available in this library.",
+                    HttpStatus.NO_CONTENT);
 
         return ResponseEntity.ok(currBooks);
     }
@@ -62,7 +64,8 @@ public class ViewCatalogServiceImp implements ViewCatalogService
         List<BookItem> currBooks = bookItemRepository.findAllByTitleContaining(title);
 
         if(currBooks.isEmpty())
-            throw new ApiRequestException("There are no books available under this title.");
+            throw new ApiRequestException("There are no books available under this title.",
+                    HttpStatus.NO_CONTENT);
 
         return ResponseEntity.ok(currBooks);
     }
@@ -75,7 +78,8 @@ public class ViewCatalogServiceImp implements ViewCatalogService
         List<BookItem> currBooks = new ArrayList<>(authorBooks);
 
         if(currBooks.isEmpty())
-            throw new ApiRequestException("The author does not have any books available in this library.");
+            throw new ApiRequestException("The author does not have any books available in this library.",
+                    HttpStatus.NO_CONTENT);
 
         return ResponseEntity.ok(currBooks);
     }
@@ -88,7 +92,8 @@ public class ViewCatalogServiceImp implements ViewCatalogService
         List<BookItem> currBooks = new ArrayList<>(subjectBooks);
 
         if(currBooks.isEmpty())
-            throw new ApiRequestException("There are no books available under this subject.");
+            throw new ApiRequestException("There are no books available under this subject.",
+                    HttpStatus.NO_CONTENT);
 
         return ResponseEntity.ok(currBooks);
     }
@@ -98,7 +103,8 @@ public class ViewCatalogServiceImp implements ViewCatalogService
         List<BookItem> currBooks = bookItemRepository.findAllByPublicationDate(publicationDate);
 
         if(currBooks.isEmpty())
-            throw new ApiRequestException("There are no books available within this publication date.");
+            throw new ApiRequestException("There are no books available within this publication date.",
+                    HttpStatus.NO_CONTENT);
 
         return ResponseEntity.ok(currBooks);
     }
@@ -108,7 +114,8 @@ public class ViewCatalogServiceImp implements ViewCatalogService
         Optional<Library> library = libraryRepository.findById(name);
 
         if(library.isEmpty())
-            throw new ApiRequestException("Unable to find this library.");
+            throw new ApiRequestException("Unable to find this library.",
+                    HttpStatus.NO_CONTENT);
 
         return library.get();
     }

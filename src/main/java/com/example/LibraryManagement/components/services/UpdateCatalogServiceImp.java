@@ -14,6 +14,7 @@ import com.example.LibraryManagement.models.io.responses.MessageResponse;
 import com.example.LibraryManagement.models.io.responses.exceptions.ApiRequestException;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -42,7 +43,8 @@ public class UpdateCatalogServiceImp implements UpdateCatalogService
                                                       String zipcode, String country)
     {
         if(libraryRepository.existsById(name))
-            throw new ApiRequestException("Library already exists within the system.");
+            throw new ApiRequestException("Library already exists within the system.",
+                    HttpStatus.BAD_REQUEST);
 
         libraryRepository.save(new Library(name, new Address(streetAddress, city, zipcode, country)));
         return ResponseEntity.ok(new MessageResponse("Library has been successfully added to the system."));
@@ -147,7 +149,8 @@ public class UpdateCatalogServiceImp implements UpdateCatalogService
         Optional<Library> library = libraryRepository.findById(name);
 
         if(library.isEmpty())
-            throw new ApiRequestException("Unable to find this library.");
+            throw new ApiRequestException("Unable to find this library.",
+                    HttpStatus.BAD_REQUEST);
 
         return library.get();
     }
@@ -155,27 +158,31 @@ public class UpdateCatalogServiceImp implements UpdateCatalogService
     private Rack rackValidation(Library library, long rackID)
     {
         if(!rackRepository.existsById(rackID))
-            throw new ApiRequestException("This rack does not exist within the system");
+            throw new ApiRequestException("This rack does not exist within the system",
+                    HttpStatus.BAD_REQUEST);
 
         Rack rack = rackRepository.getById(rackID);
 
         Set<Rack> libraryRacks = library.getRacks();
 
         if(libraryRacks.isEmpty())
-            throw new ApiRequestException("There are no racks available in this library");
+            throw new ApiRequestException("There are no racks available in this library",
+                    HttpStatus.BAD_REQUEST);
 
         else if(!libraryRacks.contains(rack))
-            throw new ApiRequestException("This rack is not present within this library.");
+            throw new ApiRequestException("This rack is not present within this library.",
+                    HttpStatus.BAD_REQUEST);
 
         return rack;
     }
 
-    private BookItem bookValidation(String barcode)
+    public BookItem bookValidation(String barcode)
     {
         Optional<BookItem> bookItem = bookItemRepository.findById(barcode);
 
         if(bookItem.isEmpty())
-            throw new ApiRequestException("Unable to find book within the system.");
+            throw new ApiRequestException("Unable to find book within the system.",
+                    HttpStatus.BAD_REQUEST);
 
         return bookItem.get();
     }

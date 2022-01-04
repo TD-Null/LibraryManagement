@@ -2,6 +2,7 @@ package com.example.LibraryManagement.components.controllers;
 
 import com.example.LibraryManagement.components.services.AccountServiceImp;
 import com.example.LibraryManagement.components.services.MemberServiceImp;
+import com.example.LibraryManagement.components.services.UpdateCatalogServiceImp;
 import com.example.LibraryManagement.models.accounts.types.Member;
 import com.example.LibraryManagement.models.books.actions.BookLending;
 import com.example.LibraryManagement.models.books.actions.BookReservation;
@@ -12,6 +13,7 @@ import com.example.LibraryManagement.models.books.properties.Book;
 import com.example.LibraryManagement.models.books.properties.BookItem;
 import com.example.LibraryManagement.models.enums.accounts.AccountStatus;
 import com.example.LibraryManagement.models.enums.accounts.AccountType;
+import com.example.LibraryManagement.models.interfaces.services.catalogs.UpdateCatalogService;
 import com.example.LibraryManagement.models.io.requests.account_requests.BarcodeValidationRequest;
 import com.example.LibraryManagement.models.io.responses.MessageResponse;
 import com.example.LibraryManagement.models.io.responses.exceptions.ApiRequestException;
@@ -36,6 +38,8 @@ public class MemberController
 {
     @Autowired
     private final AccountServiceImp accountService;
+    @Autowired
+    private final UpdateCatalogServiceImp updateCatalogService;
     @Autowired
     private final MemberServiceImp memberService;
 
@@ -134,39 +138,56 @@ public class MemberController
         return ResponseEntity.ok(reservationRecords);
     }
 
-//    @PutMapping("/checkout")
-//    public ResponseEntity<BookItem> checkoutBook()
-//    {
-//
-//    }
-//
-//    @PutMapping("/return")
-//    public ResponseEntity<MessageResponse> returnBook()
-//    {
-//
-//    }
-//
-//    @PutMapping("/reserve")
-//    public ResponseEntity<MessageResponse> reserveBook()
-//    {
-//
-//    }
-//
-//    @PutMapping("/reserve/cancel")
-//    public ResponseEntity<MessageResponse> cancelReservation()
-//    {
-//
-//    }
-//
-//    @PutMapping("/renew")
-//    public ResponseEntity<MessageResponse> renewBook()
-//    {
-//
-//    }
-//
-//    @PutMapping("/fines/transaction")
-//    public ResponseEntity<MessageResponse> payFines()
-//    {
-//
-//    }
+    @PutMapping("/checkout")
+    public ResponseEntity<BookItem> checkoutBook(@Valid @RequestBody BarcodeValidationRequest request,
+                                                 @RequestParam String bookBarcode)
+    {
+        Member member = (Member) accountService.barcodeReader(request.getBarcode(), AccountType.MEMBER, AccountStatus.ACTIVE);
+        BookItem book = updateCatalogService.bookValidation(bookBarcode);
+        return memberService.checkoutBook(member, book);
+    }
+
+    @PutMapping("/return")
+    public ResponseEntity<MessageResponse> returnBook(@Valid @RequestBody BarcodeValidationRequest request,
+                                                      @RequestParam String bookBarcode)
+    {
+        Member member = (Member) accountService.barcodeReader(request.getBarcode(), AccountType.MEMBER, AccountStatus.ACTIVE);
+        BookItem book = updateCatalogService.bookValidation(bookBarcode);
+        return memberService.returnBook(member, book);
+    }
+
+    @PutMapping("/reserve")
+    public ResponseEntity<MessageResponse> reserveBook(@Valid @RequestBody BarcodeValidationRequest request,
+                                                       @RequestParam String bookBarcode)
+    {
+        Member member = (Member) accountService.barcodeReader(request.getBarcode(), AccountType.MEMBER, AccountStatus.ACTIVE);
+        BookItem book = updateCatalogService.bookValidation(bookBarcode);
+        return memberService.reserveBook(member, book);
+    }
+
+    @PutMapping("/reserve/cancel")
+    public ResponseEntity<MessageResponse> cancelReservation(@Valid @RequestBody BarcodeValidationRequest request,
+                                                             @RequestParam String bookBarcode)
+    {
+        Member member = (Member) accountService.barcodeReader(request.getBarcode(), AccountType.MEMBER, AccountStatus.ACTIVE);
+        BookItem book = updateCatalogService.bookValidation(bookBarcode);
+        return memberService.cancelReservation(member, book);
+    }
+
+    @PutMapping("/renew")
+    public ResponseEntity<MessageResponse> renewBook(@Valid @RequestBody BarcodeValidationRequest request,
+                                                     @RequestParam String bookBarcode)
+    {
+        Member member = (Member) accountService.barcodeReader(request.getBarcode(), AccountType.MEMBER, AccountStatus.ACTIVE);
+        BookItem book = updateCatalogService.bookValidation(bookBarcode);
+        return memberService.renewBook(member, book);
+    }
+
+    @PutMapping("/fines/transaction")
+    public ResponseEntity<MessageResponse> payFines(@Valid @RequestBody BarcodeValidationRequest request,
+                                                    @RequestParam Long fineID)
+    {
+        Member member = (Member) accountService.barcodeReader(request.getBarcode(), AccountType.MEMBER, AccountStatus.ACTIVE);
+        return memberService.payFine(member, fineID);
+    }
 }
