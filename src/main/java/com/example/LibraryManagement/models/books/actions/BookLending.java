@@ -1,5 +1,6 @@
 package com.example.LibraryManagement.models.books.actions;
 
+import com.example.LibraryManagement.models.accounts.types.Member;
 import com.example.LibraryManagement.models.books.libraries.Library;
 import com.example.LibraryManagement.models.books.libraries.Rack;
 import com.example.LibraryManagement.models.books.properties.BookItem;
@@ -7,7 +8,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
 import javax.persistence.*;
-import java.lang.reflect.Member;
 import java.sql.Date;
 
 @Data
