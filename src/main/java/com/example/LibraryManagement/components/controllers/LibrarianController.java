@@ -2,12 +2,12 @@ package com.example.LibraryManagement.components.controllers;
 
 import com.example.LibraryManagement.components.services.AccountServiceImp;
 import com.example.LibraryManagement.components.services.UpdateCatalogServiceImp;
-import com.example.LibraryManagement.components.services.ViewCatalogServiceImp;
 import com.example.LibraryManagement.components.services.LibrarianServiceImp;
 import com.example.LibraryManagement.models.accounts.types.Librarian;
 import com.example.LibraryManagement.models.accounts.types.Member;
 import com.example.LibraryManagement.models.books.actions.BookLending;
 import com.example.LibraryManagement.models.books.actions.BookReservation;
+import com.example.LibraryManagement.models.books.fines.Fine;
 import com.example.LibraryManagement.models.enums.accounts.AccountStatus;
 import com.example.LibraryManagement.models.enums.accounts.AccountType;
 import com.example.LibraryManagement.models.io.requests.account_requests.librarian_requests.*;
@@ -22,7 +22,7 @@ import javax.validation.Valid;
 import java.util.List;
 
 /*
- * TODO: Add functions for adding and modifying book items, blocking members, and checking other member accounts.
+ *
  */
 @CrossOrigin(origins = "*", maxAge = 3600)
 @AllArgsConstructor
@@ -33,9 +33,9 @@ public class LibrarianController
     @Autowired
     private final AccountServiceImp accountService;
     @Autowired
-    private final UpdateCatalogServiceImp updateCatalogService;
-    @Autowired
     private final LibrarianServiceImp librarianService;
+    @Autowired
+    private final UpdateCatalogServiceImp updateCatalogService;
 
     @GetMapping("/account/librarian")
     public ResponseEntity<List<Librarian>> viewAllLibrarians(@Valid @RequestBody BarcodeValidationRequest request)
@@ -60,10 +60,10 @@ public class LibrarianController
     }
 
     @GetMapping("/records/book_loans")
-    public ResponseEntity<List<BookLending>> viewAllBookLendings(@Valid @RequestBody BarcodeValidationRequest request)
+    public ResponseEntity<List<BookLending>> viewAllBookLoans(@Valid @RequestBody BarcodeValidationRequest request)
     {
         accountService.barcodeReader(request.getBarcode(), AccountType.LIBRARIAN, AccountStatus.ACTIVE);
-        return librarianService.listAllBookLendings();
+        return librarianService.listAllBookLoans();
     }
 
     @GetMapping("/records/book_reservations")
@@ -71,6 +71,13 @@ public class LibrarianController
     {
         accountService.barcodeReader(request.getBarcode(), AccountType.LIBRARIAN, AccountStatus.ACTIVE);
         return librarianService.listAllBookReservations();
+    }
+
+    @GetMapping("/record/fines")
+    public ResponseEntity<List<Fine>> viewAllFines(@Valid @RequestBody BarcodeValidationRequest request)
+    {
+        accountService.barcodeReader(request.getBarcode(), AccountType.LIBRARIAN, AccountStatus.ACTIVE);
+        return librarianService.listAllFines();
     }
 
     @PostMapping("/account/librarian")

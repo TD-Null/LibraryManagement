@@ -19,5 +19,5 @@ public interface AccountService
 
     ResponseEntity<MessageResponse> updateMemberStatus(String memberID, AccountStatus status);
 
-    void barcodeReader(String barcode, AccountType type, AccountStatus status);
+    Object barcodeReader(String barcode, AccountType type, AccountStatus status);
 }

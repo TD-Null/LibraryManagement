@@ -3,6 +3,9 @@ package com.example.LibraryManagement.models.books.fines;
 import com.example.LibraryManagement.models.enums.fines.TransactionType;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.persistence.*;
 import java.sql.Date;
@@ -13,7 +16,9 @@ import java.sql.Date;
  * check, or cash. The amount paid in the transaction must be at
  * least the value of the fine the user must pay.
  */
-@Data
+@Getter
+@Setter
+@EqualsAndHashCode
 @Entity
 @Table
 public class FineTransaction
@@ -38,4 +43,12 @@ public class FineTransaction
 
     @Column(name = "Amount", nullable = false)
     private double amount;
+
+    public FineTransaction(TransactionType type, Object transaction, Date creationDate, double amount)
+    {
+        this.type = type;
+        this.transaction = transaction;
+        this.creationDate = creationDate;
+        this.amount = amount;
+    }
 }

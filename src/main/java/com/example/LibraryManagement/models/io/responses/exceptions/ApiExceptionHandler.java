@@ -24,7 +24,7 @@ public class ApiExceptionHandler
     @ExceptionHandler(value = {ApiRequestException.class})
     public ResponseEntity<Object> handleApiRequestException(ApiRequestException e)
     {
-        HttpStatus badRequest = HttpStatus.BAD_REQUEST;
+        HttpStatus badRequest = e.getStatus();
         ApiException apiException = new ApiException(
                 new MessageResponse(e.getMessage()),
                 badRequest,

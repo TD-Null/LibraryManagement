@@ -120,4 +120,8 @@ public class Member extends Account implements MemberMethods
         removeBookItem(b);
         addBookItem(b);
     }
+
+    public void incTotalFine() { totalFines++; }
+
+    public void decTotalFines() { totalFines--; }
 }

@@ -43,7 +43,7 @@ public class AccountController
     }
 
     @PutMapping("/update")
-    public ResponseEntity<MessageResponse> changePassowrd(@Valid @RequestBody ChangePasswordRequest request)
+    public ResponseEntity<MessageResponse> changePassword(@Valid @RequestBody ChangePasswordRequest request)
     {
         return accountService.changePassword(request.getBarcode(), request.getOriginalPassword(), request.getNewPassword());
     }
