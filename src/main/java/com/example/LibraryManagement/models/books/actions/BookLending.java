@@ -21,7 +21,7 @@ public class BookLending
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "book_item_id", nullable = false)
+    @JoinColumn(name = "barcode", nullable = false)
     private BookItem bookItem;
 
     @JsonIgnore
