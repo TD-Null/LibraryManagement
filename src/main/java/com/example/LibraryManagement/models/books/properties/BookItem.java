@@ -30,7 +30,7 @@ import java.util.Set;
  */
 @Getter
 @Setter
-//@EqualsAndHashCode(callSuper = true)
+@EqualsAndHashCode(callSuper = true)
 @Entity
 @Table
 public class BookItem extends Book

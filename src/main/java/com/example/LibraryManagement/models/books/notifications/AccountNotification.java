@@ -1,11 +1,11 @@
 package com.example.LibraryManagement.models.books.notifications;
 
+import com.example.LibraryManagement.models.accounts.types.Member;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
-import java.lang.reflect.Member;
 import java.sql.Date;
 
 @Data

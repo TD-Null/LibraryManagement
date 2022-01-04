@@ -1,10 +1,10 @@
 package com.example.LibraryManagement.models.books.fines;
 
+import com.example.LibraryManagement.models.accounts.types.Member;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
 import javax.persistence.*;
-import java.lang.reflect.Member;
 
 /*
  * Contains a table of fines records that can be associated with
