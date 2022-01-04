@@ -3,12 +3,17 @@ package com.example.LibraryManagement.models.books.notifications;
 import com.example.LibraryManagement.models.accounts.types.Member;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import java.sql.Date;
 
-@Data
+@Getter
+@Setter
+@EqualsAndHashCode
 @Entity
 @Table
 public class AccountNotification
@@ -34,4 +39,12 @@ public class AccountNotification
     @NotBlank
     @Column(name = "Content")
     private String content;
+
+    public AccountNotification(Date createdOn, String email, String address, String content)
+    {
+        this.createdOn = createdOn;
+        this.email = email;
+        this.address = address;
+        this.content = content;
+    }
 }

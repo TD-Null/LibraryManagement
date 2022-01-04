@@ -3,6 +3,9 @@ package com.example.LibraryManagement.models.books.fines;
 import com.example.LibraryManagement.models.accounts.types.Member;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.persistence.*;
 
@@ -11,7 +14,9 @@ import javax.persistence.*;
  * users in the case of returning books past their due dates. Each
  * fine can be paid with a single transaction.
  */
-@Data
+@Getter
+@Setter
+@EqualsAndHashCode
 @Entity
 @Table
 public class Fine
@@ -35,4 +40,10 @@ public class Fine
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "fineTransaction_id")
     private FineTransaction fineTransaction;
+
+    public Fine(double amount, boolean paid)
+    {
+        this.amount = amount;
+        this.paid = paid;
+    }
 }

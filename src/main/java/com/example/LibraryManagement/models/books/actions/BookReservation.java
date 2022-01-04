@@ -5,11 +5,16 @@ import com.example.LibraryManagement.models.books.properties.BookItem;
 import com.example.LibraryManagement.models.enums.reservations.ReservationStatus;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.persistence.*;
 import java.sql.Date;
 
-@Data
+@Getter
+@Setter
+@EqualsAndHashCode
 @Table
 @Entity
 public class BookReservation
@@ -32,4 +37,12 @@ public class BookReservation
 
     @Column(name = "Status", nullable = false)
     private ReservationStatus status;
+
+    public BookReservation(BookItem bookItem, Member member, Date creationDate, ReservationStatus status)
+    {
+        this.bookItem = bookItem;
+        this.member = member;
+        this.creationDate = creationDate;
+        this.status = status;
+    }
 }
