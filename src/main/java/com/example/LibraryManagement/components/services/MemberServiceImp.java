@@ -3,15 +3,19 @@ package com.example.LibraryManagement.components.services;
 import com.example.LibraryManagement.components.repositories.accounts.MemberRepository;
 import com.example.LibraryManagement.components.repositories.books.BookLendingRepository;
 import com.example.LibraryManagement.components.repositories.books.BookReservationRepository;
+import com.example.LibraryManagement.components.repositories.books.FineRepository;
+import com.example.LibraryManagement.components.repositories.books.FineTransactionRepository;
 import com.example.LibraryManagement.models.accounts.types.Member;
 import com.example.LibraryManagement.models.books.actions.BookLending;
 import com.example.LibraryManagement.models.books.actions.BookReservation;
 import com.example.LibraryManagement.models.books.fines.Fine;
+import com.example.LibraryManagement.models.books.fines.FineTransaction;
 import com.example.LibraryManagement.models.books.notifications.AccountNotification;
 import com.example.LibraryManagement.models.books.properties.Book;
 import com.example.LibraryManagement.models.books.properties.BookItem;
 import com.example.LibraryManagement.models.books.properties.Limitations;
 import com.example.LibraryManagement.models.enums.books.BookStatus;
+import com.example.LibraryManagement.models.enums.fines.TransactionType;
 import com.example.LibraryManagement.models.enums.reservations.ReservationStatus;
 import com.example.LibraryManagement.models.interfaces.services.accounts.MemberService;
 import com.example.LibraryManagement.models.io.responses.MessageResponse;
@@ -24,6 +28,7 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.Date;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 @AllArgsConstructor
@@ -34,6 +39,10 @@ public class MemberServiceImp implements MemberService
     private final BookLendingRepository bookLendingRepository;
     @Autowired
     private final BookReservationRepository bookReservationRepository;
+    @Autowired
+    private final FineRepository fineRepository;
+    @Autowired
+    private final FineTransactionRepository fineTransactionRepository;
 
     private static final double finePerDay = 1.0;
 
@@ -313,8 +322,36 @@ public class MemberServiceImp implements MemberService
         return ResponseEntity.ok(new MessageResponse("Book has been renewed for the user."));
     }
 
-    public ResponseEntity<MessageResponse> payFine(Member member, Long fineID)
+    @Transactional
+    public ResponseEntity<MessageResponse> payFine(Member member, Long fineID,
+                                                   TransactionType type, Object transaction, double amount)
     {
+        Fine fine = fineValidation(fineID);
+
+        if(!fine.getMember().equals(member))
+            throw new ApiRequestException("Fine is not issued to this user.", HttpStatus.BAD_REQUEST);
+
+        else if(fine.getAmount() > amount)
+            throw new ApiRequestException("Given amount is not enough to pay for the fine.", HttpStatus.BAD_REQUEST);
+
+        FineTransaction fineTransaction = new FineTransaction(type, transaction, new Date(), amount);
+        fineTransactionRepository.save(fineTransaction);
+
+        fineTransaction.setFine(fine);
+        fine.setFineTransaction(fineTransaction);
+        fine.setPaid(true);
+        member.payFine();
+
         return ResponseEntity.ok(new MessageResponse("User has successfully paid their fine."));
+    }
+
+    private Fine fineValidation(Long ID)
+    {
+        Optional<Fine> fine = fineRepository.findById(ID);
+
+        if(fine.isEmpty())
+            throw new ApiRequestException("Unable to find fine within the system.", HttpStatus.BAD_REQUEST);
+
+        return fine.get();
     }
 }

@@ -7,6 +7,7 @@ import com.example.LibraryManagement.models.books.fines.Fine;
 import com.example.LibraryManagement.models.books.fines.FineTransaction;
 import com.example.LibraryManagement.models.books.notifications.AccountNotification;
 import com.example.LibraryManagement.models.books.properties.BookItem;
+import com.example.LibraryManagement.models.enums.fines.TransactionType;
 import com.example.LibraryManagement.models.io.responses.MessageResponse;
 import org.springframework.http.ResponseEntity;
 
@@ -26,5 +27,5 @@ public interface MemberService
 
     ResponseEntity<MessageResponse> renewBook(Member member, BookItem book);
 
-    ResponseEntity<MessageResponse> payFine(Member member, Long fineID);
+    ResponseEntity<MessageResponse> payFine(Member member, Long fineID, TransactionType type, Object Transaction, double amount);
 }

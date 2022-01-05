@@ -187,8 +187,5 @@ public class Member extends Account
         totalFines++;
     }
 
-    public void decTotalFines(Fine f, FineTransaction ft)
-    {
-        totalFines--;
-    }
+    public void payFine() { totalFines--; }
 }

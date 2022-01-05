@@ -8,13 +8,20 @@ import com.example.LibraryManagement.models.books.actions.BookLending;
 import com.example.LibraryManagement.models.books.actions.BookReservation;
 import com.example.LibraryManagement.models.books.fines.Fine;
 import com.example.LibraryManagement.models.books.fines.FineTransaction;
+import com.example.LibraryManagement.models.books.fines.transactions.CashTransaction;
+import com.example.LibraryManagement.models.books.fines.transactions.CheckTransaction;
+import com.example.LibraryManagement.models.books.fines.transactions.CreditCardTransaction;
 import com.example.LibraryManagement.models.books.notifications.AccountNotification;
 import com.example.LibraryManagement.models.books.properties.Book;
 import com.example.LibraryManagement.models.books.properties.BookItem;
 import com.example.LibraryManagement.models.enums.accounts.AccountStatus;
 import com.example.LibraryManagement.models.enums.accounts.AccountType;
+import com.example.LibraryManagement.models.enums.fines.TransactionType;
 import com.example.LibraryManagement.models.interfaces.services.catalogs.UpdateCatalogService;
 import com.example.LibraryManagement.models.io.requests.account_requests.BarcodeValidationRequest;
+import com.example.LibraryManagement.models.io.requests.account_requests.member_requests.CardTransactionRequest;
+import com.example.LibraryManagement.models.io.requests.account_requests.member_requests.CashTransactionRequest;
+import com.example.LibraryManagement.models.io.requests.account_requests.member_requests.CheckTransactionRequest;
 import com.example.LibraryManagement.models.io.responses.MessageResponse;
 import com.example.LibraryManagement.models.io.responses.exceptions.ApiRequestException;
 import lombok.AllArgsConstructor;
@@ -183,11 +190,30 @@ public class MemberController
         return memberService.renewBook(member, book);
     }
 
-    @PutMapping("/fines/transaction")
-    public ResponseEntity<MessageResponse> payFines(@Valid @RequestBody BarcodeValidationRequest request,
-                                                    @RequestParam Long fineID)
+    @PutMapping("/fines/transaction/card")
+    public ResponseEntity<MessageResponse> cardTransaction(@Valid @RequestBody CardTransactionRequest request,
+                                                           @RequestParam Long fineID)
     {
         Member member = (Member) accountService.barcodeReader(request.getBarcode(), AccountType.MEMBER, AccountStatus.ACTIVE);
-        return memberService.payFine(member, fineID);
+        return memberService.payFine(member, fineID, TransactionType.CREDIT_CARD,
+                new CreditCardTransaction(request.getName()), request.getAmount());
+    }
+
+    @PutMapping("/fines/transaction/check")
+    public ResponseEntity<MessageResponse> checkTransaction(@Valid @RequestBody CheckTransactionRequest request,
+                                                            @RequestParam Long fineID)
+    {
+        Member member = (Member) accountService.barcodeReader(request.getBarcode(), AccountType.MEMBER, AccountStatus.ACTIVE);
+        return memberService.payFine(member, fineID, TransactionType.CHECK,
+                new CheckTransaction(request.getBankName(), request.getCheckNumber()), request.getAmount());
+    }
+
+    @PutMapping("/fines/transaction/cash")
+    public ResponseEntity<MessageResponse> cashTransaction(@Valid @RequestBody CashTransactionRequest request,
+                                                           @RequestParam Long fineID)
+    {
+        Member member = (Member) accountService.barcodeReader(request.getBarcode(), AccountType.MEMBER, AccountStatus.ACTIVE);
+        return memberService.payFine(member, fineID, TransactionType.CASH,
+                new CashTransaction(request.getCashTendered()), request.getCashTendered());
     }
 }

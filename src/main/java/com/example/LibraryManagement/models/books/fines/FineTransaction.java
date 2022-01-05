@@ -8,7 +8,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
-import java.sql.Date;
+import java.util.Date;
 
 /*
  * Contains a table of records of transactions made by users to
@@ -38,6 +38,7 @@ public class FineTransaction
     @Column(name = "Transaction", nullable = false)
     private Object transaction;
 
+    @Temporal(TemporalType.DATE)
     @Column(name = "Creation_Date", nullable = false)
     private Date creationDate;
 
