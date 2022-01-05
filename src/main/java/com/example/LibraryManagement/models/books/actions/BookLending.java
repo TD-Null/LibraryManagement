@@ -9,7 +9,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
-import java.sql.Date;
+import java.util.Date;
 
 @Getter
 @Setter
@@ -38,15 +38,14 @@ public class BookLending
     @Column(name = "Due_Date", nullable = false)
     private Date dueDate;
 
-    @Column(name = "Return_Date", nullable = false)
+    @Column(name = "Return_Date")
     private Date returnDate;
 
-    public BookLending(BookItem bookItem, Member member, Date creationDate, Date dueDate, Date returnDate)
+    public BookLending(BookItem bookItem, Member member, Date creationDate, Date dueDate)
     {
         this.bookItem = bookItem;
         this.member = member;
         this.creationDate = creationDate;
         this.dueDate = dueDate;
-        this.returnDate = returnDate;
     }
 }

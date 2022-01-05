@@ -1,15 +1,15 @@
 package com.example.LibraryManagement.models.books.notifications;
 
 import com.example.LibraryManagement.models.accounts.types.Member;
+import com.example.LibraryManagement.models.datatypes.Address;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
-import java.sql.Date;
+import java.util.Date;
 
 @Getter
 @Setter
@@ -34,13 +34,13 @@ public class AccountNotification
     private String email;
 
     @Column(name = "Address")
-    private String address;
+    private Address address;
 
     @NotBlank
     @Column(name = "Content")
     private String content;
 
-    public AccountNotification(Date createdOn, String email, String address, String content)
+    public AccountNotification(Date createdOn, String email, Address address, String content)
     {
         this.createdOn = createdOn;
         this.email = email;

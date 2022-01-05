@@ -5,10 +5,12 @@ import com.example.LibraryManagement.models.accounts.LibraryCard;
 import com.example.LibraryManagement.models.books.actions.BookLending;
 import com.example.LibraryManagement.models.books.actions.BookReservation;
 import com.example.LibraryManagement.models.books.fines.Fine;
+import com.example.LibraryManagement.models.books.fines.FineTransaction;
 import com.example.LibraryManagement.models.books.notifications.AccountNotification;
 import com.example.LibraryManagement.models.books.properties.BookItem;
 import com.example.LibraryManagement.models.datatypes.Address;
 import com.example.LibraryManagement.models.enums.accounts.AccountStatus;
+import com.example.LibraryManagement.models.enums.reservations.ReservationStatus;
 import com.example.LibraryManagement.models.interfaces.methods.MemberMethods;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.EqualsAndHashCode;
@@ -43,7 +45,7 @@ import java.util.Set;
 @Table(uniqueConstraints = {
         @UniqueConstraint(columnNames = "Email")
 })
-public class Member extends Account implements MemberMethods
+public class Member extends Account
 {
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "barcode", nullable = false)
@@ -91,37 +93,102 @@ public class Member extends Account implements MemberMethods
         this.dateOfMembership = dateOfMembership;
     }
 
-    public void addBookItem(BookItem b)
+    public void checkoutBookItem(BookItem b, BookLending bl)
     {
         checkedOutBooks.add(b);
+        bookLoans.add(bl);
         issuedBooksTotal++;
     }
 
-    public void removeBookItem(BookItem b)
+    public void returnBookItem(BookItem b, Date returnDate)
     {
         checkedOutBooks.remove(b);
+
+        for(BookLending bl: bookLoans)
+        {
+            if(bl.getBookItem().equals(b) && bl.getDueDate().equals(b.getDueDate()))
+            {
+                bl.setReturnDate(returnDate);
+                break;
+            }
+        }
+
         issuedBooksTotal--;
     }
 
-    public void reserveBookItem(BookItem b)
+    public void reserveBookItem(BookItem b, BookReservation br)
     {
         reservedBooks.add(b);
+        bookReservations.add(br);
         issuedBooksTotal++;
     }
 
-    public void removeReservedBookItem(BookItem b)
+    public void checkoutReservedBookItem(BookItem b, BookLending bl)
     {
         reservedBooks.remove(b);
+
+        for(BookReservation br: bookReservations)
+        {
+            if(br.getBookItem().equals(b) && br.getStatus() == ReservationStatus.PENDING)
+            {
+                br.setStatus(ReservationStatus.COMPLETED);
+            }
+        }
+
+        issuedBooksTotal--;
+        checkoutBookItem(b, bl);
+    }
+
+    public void updatedPendingReservation(BookItem b)
+    {
+        for(BookReservation br: bookReservations)
+        {
+            if(br.getBookItem().equals(b) && br.getStatus() == ReservationStatus.WAITING)
+            {
+                br.setStatus(ReservationStatus.PENDING);
+            }
+        }
+    }
+
+    public void cancelReservedBookItem(BookItem b)
+    {
+        reservedBooks.remove(b);
+
+        for(BookReservation br: bookReservations)
+        {
+            if(br.getBookItem().equals(b) &&
+                    (br.getStatus() == ReservationStatus.WAITING
+                            || br.getStatus() == ReservationStatus.PENDING))
+            {
+                br.setStatus(ReservationStatus.CANCELLED);
+            }
+        }
+
         issuedBooksTotal--;
     }
 
-    public void addReservedBookItem(BookItem b)
+    public void renewBookItem(BookItem b, Date dueDate, Date newDueDate)
     {
-        removeBookItem(b);
-        addBookItem(b);
+        for(BookLending bl: bookLoans)
+        {
+            if(bl.getBookItem().equals(b) && bl.getDueDate().equals(b.getDueDate()))
+            {
+                bl.setDueDate(newDueDate);
+                break;
+            }
+        }
     }
 
-    public void incTotalFine() { totalFines++; }
+    public void sendNotification(AccountNotification notification) { notifications.add(notification); }
 
-    public void decTotalFines() { totalFines--; }
+    public void addFine(Fine f)
+    {
+        fines.add(f);
+        totalFines++;
+    }
+
+    public void decTotalFines(Fine f, FineTransaction ft)
+    {
+        totalFines--;
+    }
 }

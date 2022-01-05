@@ -1,51 +1,320 @@
 package com.example.LibraryManagement.components.services;
 
 import com.example.LibraryManagement.components.repositories.accounts.MemberRepository;
+import com.example.LibraryManagement.components.repositories.books.BookLendingRepository;
+import com.example.LibraryManagement.components.repositories.books.BookReservationRepository;
 import com.example.LibraryManagement.models.accounts.types.Member;
+import com.example.LibraryManagement.models.books.actions.BookLending;
+import com.example.LibraryManagement.models.books.actions.BookReservation;
+import com.example.LibraryManagement.models.books.fines.Fine;
+import com.example.LibraryManagement.models.books.notifications.AccountNotification;
+import com.example.LibraryManagement.models.books.properties.Book;
 import com.example.LibraryManagement.models.books.properties.BookItem;
+import com.example.LibraryManagement.models.books.properties.Limitations;
+import com.example.LibraryManagement.models.enums.books.BookStatus;
+import com.example.LibraryManagement.models.enums.reservations.ReservationStatus;
 import com.example.LibraryManagement.models.interfaces.services.accounts.MemberService;
 import com.example.LibraryManagement.models.io.responses.MessageResponse;
+import com.example.LibraryManagement.models.io.responses.exceptions.ApiRequestException;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import javax.transaction.Transactional;
+import java.util.Date;
+import java.util.concurrent.TimeUnit;
 
 @AllArgsConstructor
 @Service
 public class MemberServiceImp implements MemberService
 {
     @Autowired
-    private final MemberRepository memberRepository;
+    private final BookLendingRepository bookLendingRepository;
+    @Autowired
+    private final BookReservationRepository bookReservationRepository;
 
+    private static final double finePerDay = 1.0;
+
+    @Transactional
     public ResponseEntity<BookItem> checkoutBook(Member member, BookItem book)
     {
-        return null;
+        Date currDate = new Date();
+        Date dueDate = new Date(currDate.getTime() + Limitations.MAX_LENDING_DAYS * (1000 * 60 * 60 * 24));
+        AccountNotification notification = new AccountNotification(currDate, member.getEmail(), member.getAddress(),
+                "User has been loaned the book " + book.getTitle() + ".");
+        BookLending bookLoan = new BookLending(book, member, currDate, dueDate);
+
+        if(book.isReferenceOnly())
+            throw new ApiRequestException("Sorry, but this book is only for reference and cannot be borrowed.",
+                    HttpStatus.ACCEPTED);
+
+        else if(member.getIssuedBooksTotal() >= Limitations.MAX_ISSUED_BOOKS)
+            throw new ApiRequestException("Sorry, but the user is currently at the maximum limit on how many books can be issued to them.",
+                    HttpStatus.ACCEPTED);
+
+        else if(book.getCurrReservedMember() != null)
+        {
+            Member reservedMember = book.getCurrReservedMember();
+
+            if(!reservedMember.equals(member))
+                throw new ApiRequestException("Sorry, but this book is currently reserved for another member",
+                        HttpStatus.ACCEPTED);
+
+            bookLendingRepository.save(bookLoan);
+            member.checkoutReservedBookItem(book, bookLoan);
+            member.sendNotification(notification);
+
+            book.setStatus(BookStatus.LOANED);
+            book.setBorrowed(currDate);
+            book.setDueDate(dueDate);
+            book.setCurrLoanMember(member);
+            book.setCurrReservedMember(null);
+            book.addLoanRecord(bookLoan);
+
+            return ResponseEntity.ok(book);
+        }
+
+        else if(book.getStatus() == BookStatus.LOANED && book.getCurrLoanMember() != null)
+        {
+            Member loanedMember = book.getCurrLoanMember();
+
+            if(!loanedMember.equals(member))
+                throw new ApiRequestException("Sorry, but this book is currently reserved for another member",
+                        HttpStatus.ACCEPTED);
+
+            throw new ApiRequestException("This user is already borrowing this book.",
+                    HttpStatus.ACCEPTED);
+        }
+
+        else if(book.getStatus() == BookStatus.LOST)
+            throw new ApiRequestException("Sorry, but the book is lost and cannot be found at the time.",
+                    HttpStatus.ACCEPTED);
+
+        bookLendingRepository.save(bookLoan);
+        member.checkoutBookItem(book, bookLoan);
+        member.sendNotification(notification);
+
+        book.setStatus(BookStatus.LOANED);
+        book.setBorrowed(currDate);
+        book.setDueDate(dueDate);
+        book.setCurrLoanMember(member);
+        book.addLoanRecord(bookLoan);
+
+        return ResponseEntity.ok(book);
     }
 
+    @Transactional
     public ResponseEntity<MessageResponse> returnBook(Member member, BookItem book)
     {
-        return null;
+        Date returnDate = new Date();
+        Date dueDate = book.getDueDate();
+        AccountNotification notification = new AccountNotification(returnDate, member.getEmail(), member.getAddress(),
+            "User has returned the book " + book.getTitle() + " on time.");
+        MessageResponse response = new MessageResponse("Book has been returned to the library.");
+
+        if(book.getStatus() != BookStatus.LOANED || book.getCurrLoanMember() == null)
+            throw new ApiRequestException("Book cannot be returned as it is not currently being loaned to a member.",
+                    HttpStatus.BAD_REQUEST);
+
+        else if(!book.getCurrLoanMember().equals(member))
+            throw new ApiRequestException("This book is not issued to this user.",
+                    HttpStatus.BAD_REQUEST);
+
+
+        member.returnBookItem(book, returnDate);
+
+        if(dueDate.compareTo(returnDate) < 0)
+        {
+            long diffInMillies = Math.abs(returnDate.getTime() - dueDate.getTime());
+            long diff = TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS);
+            double fine = finePerDay * diff;
+
+            response = new MessageResponse("Book has been returned late to the library. User must pay a fine.");
+            AccountNotification fineNotification = new AccountNotification(returnDate, member.getEmail(), member.getAddress(),
+                    "User has been issued a fine of " + fine
+                            + " for returning the book " + book.getTitle()
+                            + " late.");
+
+            member.addFine(new Fine(fine));
+            member.sendNotification(fineNotification);
+        }
+
+        else
+        {
+            member.sendNotification(notification);
+        }
+
+        book.setCurrLoanMember(null);
+        book.setBorrowed(null);
+        book.setDueDate(null);
+
+        if(book.getCurrReservedMember() != null)
+        {
+            Member reservedMember = book.getCurrReservedMember();
+            reservedMember.updatedPendingReservation(book);
+            reservedMember.sendNotification(new AccountNotification(returnDate, reservedMember.getEmail(), reservedMember.getAddress(),
+                    "Reservation for book " + book.getTitle() + " is now available."));
+            book.setStatus(BookStatus.RESERVED);
+        }
+
+        else
+        {
+            book.setStatus(BookStatus.AVAILABLE);
+        }
+
+        return ResponseEntity.ok(response);
     }
 
+    @Transactional
     public ResponseEntity<MessageResponse> reserveBook(Member member, BookItem book)
     {
-        return null;
+        Date currDate = new Date();
+        AccountNotification notification = new AccountNotification(currDate, member.getEmail(), member.getAddress(),
+                "User has made a reservation for the book " + book.getTitle() + ".");
+        BookReservation bookReservation = new BookReservation(book, member, currDate, ReservationStatus.WAITING);
+
+        if(book.isReferenceOnly())
+            throw new ApiRequestException("Sorry, but this book is only for reference and cannot be borrowed.",
+                    HttpStatus.ACCEPTED);
+
+        else if(member.getIssuedBooksTotal() >= Limitations.MAX_ISSUED_BOOKS)
+            throw new ApiRequestException("Sorry, but the user is currently at the maximum limit on how many books can be issued to them.",
+                    HttpStatus.ACCEPTED);
+
+        else if(book.getCurrReservedMember() != null)
+        {
+            Member reservedMember = book.getCurrReservedMember();
+
+            if(!reservedMember.equals(member))
+                throw new ApiRequestException("Sorry, but this book is currently reserved for another member",
+                        HttpStatus.ACCEPTED);
+
+            throw new ApiRequestException("This user has already reserved this book.", HttpStatus.ACCEPTED);
+        }
+
+        else if(book.getStatus() == BookStatus.LOST)
+            throw new ApiRequestException("Sorry, but the book is lost and cannot be found at the time.",
+                    HttpStatus.ACCEPTED);
+
+        else if(book.getStatus() == BookStatus.AVAILABLE)
+        {
+            book.setStatus(BookStatus.RESERVED);
+            bookReservation.setStatus(ReservationStatus.PENDING);
+        }
+
+        bookReservationRepository.save(bookReservation);
+        member.reserveBookItem(book, bookReservation);
+        member.sendNotification(notification);
+
+        book.setCurrReservedMember(member);
+        book.addReservationRecord(bookReservation);
+
+        return ResponseEntity.ok(new MessageResponse("Book has been reserved for user."));
     }
 
+    @Transactional
     public ResponseEntity<MessageResponse> cancelReservation(Member member, BookItem book)
     {
-        return null;
+        Date currDate = new Date();
+        AccountNotification notification = new AccountNotification(currDate, member.getEmail(), member.getAddress(),
+                "User has cancelled their reservation for the book " + book.getTitle() + ".");
+        Member reservedMember = book.getCurrReservedMember();
+
+        if(reservedMember == null)
+            throw new ApiRequestException("This book is not being reserved by anyone.", HttpStatus.BAD_REQUEST);
+
+        else if(!reservedMember.equals(member))
+            throw new ApiRequestException("This book is being reserved by another user.", HttpStatus.BAD_REQUEST);
+
+        member.sendNotification(notification);
+        member.cancelReservedBookItem(book);
+
+        if(book.getStatus() == BookStatus.RESERVED)
+            book.setStatus(BookStatus.AVAILABLE);
+
+        book.setCurrReservedMember(null);
+
+        return ResponseEntity.ok(new MessageResponse("User has cancelled their reservation for this book."));
     }
 
+    @Transactional
     public ResponseEntity<MessageResponse> renewBook(Member member, BookItem book)
     {
-        return null;
+        Date returnDate = new Date();
+        Date dueDate = book.getDueDate();
+        Date newDueDate = new Date(dueDate.getTime() + Limitations.MAX_LENDING_DAYS * (1000 * 60 * 60 * 24));
+        AccountNotification notification = new AccountNotification(returnDate, member.getEmail(), member.getAddress(),
+                "User has renewed the book " + book.getTitle() + ".");
+
+        if(book.getStatus() != BookStatus.LOANED || book.getCurrLoanMember() == null)
+            throw new ApiRequestException("Book cannot be renewed as it is not currently being loaned to a member.",
+                    HttpStatus.BAD_REQUEST);
+
+        else if(!book.getCurrLoanMember().equals(member))
+            throw new ApiRequestException("This book is not issued to this user.",
+                    HttpStatus.BAD_REQUEST);
+
+        if(dueDate.compareTo(returnDate) < 0)
+        {
+            long diffInMillies = Math.abs(returnDate.getTime() - dueDate.getTime());
+            long diff = TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS);
+            double fine = finePerDay * diff;
+
+            AccountNotification fineNotification = new AccountNotification(returnDate, member.getEmail(), member.getAddress(),
+                    "User has been issued a fine of " + fine
+                            + " for returning the book " + book.getTitle()
+                            + " late.");
+
+            member.addFine(new Fine(fine));
+            member.sendNotification(fineNotification);
+
+            book.setCurrLoanMember(null);
+            book.setBorrowed(null);
+            book.setDueDate(null);
+
+            if(book.getCurrReservedMember() != null)
+            {
+                Member reservedMember = book.getCurrReservedMember();
+                reservedMember.updatedPendingReservation(book);
+                reservedMember.sendNotification(new AccountNotification(returnDate, reservedMember.getEmail(), reservedMember.getAddress(),
+                        "Reservation for book " + book.getTitle() + " is now available."));
+                book.setStatus(BookStatus.RESERVED);
+            }
+
+            else
+            {
+                book.setStatus(BookStatus.AVAILABLE);
+            }
+
+            return ResponseEntity.ok(new MessageResponse
+                    ("Book has been returned late to the library. User cannot renew the book and must pay a fine."));
+        }
+
+        else if(book.getCurrReservedMember() != null)
+        {
+            Member reservedMember = book.getCurrReservedMember();
+            reservedMember.updatedPendingReservation(book);
+            reservedMember.sendNotification(new AccountNotification(returnDate, reservedMember.getEmail(), reservedMember.getAddress(),
+                    "Reservation for book " + book.getTitle() + " is now available."));
+            book.setStatus(BookStatus.RESERVED);
+
+            book.setCurrLoanMember(null);
+            book.setBorrowed(null);
+            book.setDueDate(null);
+
+            return ResponseEntity.ok(new MessageResponse
+                    ("Book is currently reserved for another member and cannot be renewed."));
+        }
+
+        member.sendNotification(notification);
+        member.renewBookItem(book, dueDate, newDueDate);
+        return ResponseEntity.ok(new MessageResponse("Book has been renewed for the user."));
     }
 
     public ResponseEntity<MessageResponse> payFine(Member member, Long fineID)
     {
-        return null;
+        return ResponseEntity.ok(new MessageResponse("User has successfully paid their fine."));
     }
 }

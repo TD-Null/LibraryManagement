@@ -72,6 +72,7 @@ public class BookItem extends Book
     @Column(name = "Borrowed_Date")
     private Date borrowed;
 
+    @Temporal(TemporalType.DATE)
     @Column(name = "Due_Date")
     private Date dueDate;
 
@@ -111,4 +112,11 @@ public class BookItem extends Book
         this.isReferenceOnly = isReferenceOnly;
         this.price = price;
     }
+
+    public void addLoanRecord(BookLending bl)
+    {
+        lendingRecords.add(bl);
+    }
+
+    public void addReservationRecord(BookReservation br) { reservationRecords.add(br); }
 }
