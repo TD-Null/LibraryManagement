@@ -106,7 +106,7 @@ public class Member extends Account
 
         for(BookLending bl: bookLoans)
         {
-            if(bl.getBookItem().equals(b) && bl.getDueDate().equals(b.getDueDate()))
+            if(bl.getBookItem().equals(b) && bl.getDueDate().compareTo(b.getDueDate()) == 0)
             {
                 bl.setReturnDate(returnDate);
                 break;
@@ -171,7 +171,7 @@ public class Member extends Account
     {
         for(BookLending bl: bookLoans)
         {
-            if(bl.getBookItem().equals(b) && bl.getDueDate().equals(b.getDueDate()))
+            if(bl.getBookItem().equals(b) && bl.getDueDate().compareTo(dueDate) == 0)
             {
                 bl.setDueDate(newDueDate);
                 break;
