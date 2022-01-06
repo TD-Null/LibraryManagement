@@ -62,11 +62,11 @@ public class Member extends Account
     private int totalFines = 0;
 
     @JsonIgnore
-    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "currLoanMember", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Set<BookItem> checkedOutBooks = new HashSet<>();
 
     @JsonIgnore
-    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "currReservedMember", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Set<BookItem> reservedBooks = new HashSet<>();
 
     @JsonIgnore

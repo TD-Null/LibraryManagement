@@ -25,7 +25,7 @@ public class Subject
     private String name;
 
     @JsonIgnore
-    @OneToMany(mappedBy = "subject", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToMany(mappedBy = "subjects", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Set<BookItem> books = new HashSet<>();
 
     public Subject(String name) { this.name = name; }

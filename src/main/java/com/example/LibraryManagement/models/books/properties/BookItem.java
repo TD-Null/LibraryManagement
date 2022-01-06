@@ -52,8 +52,11 @@ public class BookItem extends Book
     @JoinColumn(name = "author_name", nullable = false)
     private Author author;
 
-    @ManyToOne
-    @JoinColumn(name = "subject_name", nullable = false)
+    @ManyToMany
+    @JoinTable(
+            name = "subjects",
+            joinColumns = @JoinColumn(name = "subject_name"),
+            inverseJoinColumns = @JoinColumn(name = "book_barcode"))
     private Set<Subject> subjects = new HashSet<>();
 
     @Column(name = "Format", nullable = false)
