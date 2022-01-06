@@ -12,12 +12,10 @@ import com.example.LibraryManagement.models.books.fines.transactions.CashTransac
 import com.example.LibraryManagement.models.books.fines.transactions.CheckTransaction;
 import com.example.LibraryManagement.models.books.fines.transactions.CreditCardTransaction;
 import com.example.LibraryManagement.models.books.notifications.AccountNotification;
-import com.example.LibraryManagement.models.books.properties.Book;
 import com.example.LibraryManagement.models.books.properties.BookItem;
 import com.example.LibraryManagement.models.enums.accounts.AccountStatus;
 import com.example.LibraryManagement.models.enums.accounts.AccountType;
 import com.example.LibraryManagement.models.enums.fines.TransactionType;
-import com.example.LibraryManagement.models.interfaces.services.catalogs.UpdateCatalogService;
 import com.example.LibraryManagement.models.io.requests.account_requests.BarcodeValidationRequest;
 import com.example.LibraryManagement.models.io.requests.account_requests.member_requests.CardTransactionRequest;
 import com.example.LibraryManagement.models.io.requests.account_requests.member_requests.CashTransactionRequest;

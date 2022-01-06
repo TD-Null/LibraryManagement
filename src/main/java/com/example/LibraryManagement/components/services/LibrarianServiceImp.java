@@ -2,10 +2,9 @@ package com.example.LibraryManagement.components.services;
 
 import com.example.LibraryManagement.components.repositories.accounts.LibrarianRepository;
 import com.example.LibraryManagement.components.repositories.accounts.MemberRepository;
-import com.example.LibraryManagement.components.repositories.books.BookItemRepository;
 import com.example.LibraryManagement.components.repositories.books.BookLendingRepository;
 import com.example.LibraryManagement.components.repositories.books.BookReservationRepository;
-import com.example.LibraryManagement.components.repositories.books.FineRepository;
+import com.example.LibraryManagement.components.repositories.books.fines.FineRepository;
 import com.example.LibraryManagement.models.accounts.types.Librarian;
 import com.example.LibraryManagement.models.accounts.types.Member;
 import com.example.LibraryManagement.models.books.actions.BookLending;

@@ -15,7 +15,7 @@ import java.util.Date;
 @Setter
 @EqualsAndHashCode
 @Entity
-@Table
+@Table(name = "loans")
 public class BookLending
 {
     @Id

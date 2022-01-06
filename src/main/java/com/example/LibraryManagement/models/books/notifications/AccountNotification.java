@@ -15,12 +15,12 @@ import java.util.Date;
 @Setter
 @EqualsAndHashCode
 @Entity
-@Table
+@Table(name = "notifications")
 public class AccountNotification
 {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long notificationId;
+    private Long id;
 
     @JsonIgnore
     @ManyToOne
@@ -33,8 +33,25 @@ public class AccountNotification
     @Column(name = "Email")
     private String email;
 
-    @Column(name = "Address")
-    private Address address;
+//    @NotNull
+//    @Column(name = "Address")
+//    private Address address;
+
+    @NotBlank
+    @Column(name = "Street")
+    private String streetAddress;
+
+    @NotBlank
+    @Column(name = "City")
+    private String city;
+
+    @NotBlank
+    @Column(name = "Zipcode")
+    private String zipcode;
+
+    @NotBlank
+    @Column(name = "Country")
+    private String country;
 
     @NotBlank
     @Column(name = "Content")
@@ -44,7 +61,20 @@ public class AccountNotification
     {
         this.createdOn = createdOn;
         this.email = email;
-        this.address = address;
+        setAddress(address);
         this.content = content;
+    }
+
+    public void setAddress(Address address)
+    {
+        streetAddress = address.getStreetAddress();
+        city = address.getCity();
+        zipcode = address.getZipcode();
+        country = address.getCountry();
+    }
+
+    public Address getAddress()
+    {
+        return new Address(streetAddress, city, zipcode, country);
     }
 }

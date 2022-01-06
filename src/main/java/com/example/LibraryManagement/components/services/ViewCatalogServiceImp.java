@@ -2,17 +2,13 @@ package com.example.LibraryManagement.components.services;
 
 import com.example.LibraryManagement.components.repositories.books.AuthorRepository;
 import com.example.LibraryManagement.components.repositories.books.BookItemRepository;
-import com.example.LibraryManagement.components.repositories.books.LibraryRepository;
+import com.example.LibraryManagement.components.repositories.books.libraries.LibraryRepository;
 import com.example.LibraryManagement.components.repositories.books.SubjectRepository;
 import com.example.LibraryManagement.models.books.libraries.Library;
-import com.example.LibraryManagement.models.books.libraries.Rack;
 import com.example.LibraryManagement.models.books.properties.Author;
 import com.example.LibraryManagement.models.books.properties.BookItem;
 import com.example.LibraryManagement.models.books.properties.Subject;
-import com.example.LibraryManagement.models.enums.books.BookFormat;
-import com.example.LibraryManagement.models.enums.books.BookStatus;
 import com.example.LibraryManagement.models.interfaces.services.catalogs.ViewCatalogService;
-import com.example.LibraryManagement.models.io.responses.MessageResponse;
 import com.example.LibraryManagement.models.io.responses.exceptions.ApiRequestException;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +16,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import javax.transaction.Transactional;
 import java.util.Date;
 import java.util.*;
 

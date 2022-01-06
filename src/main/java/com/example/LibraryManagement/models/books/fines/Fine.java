@@ -2,7 +2,6 @@ package com.example.LibraryManagement.models.books.fines;
 
 import com.example.LibraryManagement.models.accounts.types.Member;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -38,7 +37,7 @@ public class Fine
     private Member member;
 
     @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "fineTransaction_id")
+    @JoinColumn(name = "fineTransaction")
     private FineTransaction fineTransaction;
 
     public Fine(double amount) { this.amount = amount; }

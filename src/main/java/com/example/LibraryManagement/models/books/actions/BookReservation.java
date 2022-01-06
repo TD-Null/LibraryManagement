@@ -15,8 +15,8 @@ import java.util.Date;
 @Getter
 @Setter
 @EqualsAndHashCode
-@Table
 @Entity
+@Table(name = "reservations")
 public class BookReservation
 {
     @Id

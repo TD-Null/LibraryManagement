@@ -40,9 +40,25 @@ public class Library
     @Column(name = "Name")
     private String name;
 
-    @NotNull
-    @Column(name = "Address")
-    private Address address;
+//    @NotNull
+//    @Column(name = "Address")
+//    private Address address;
+
+    @NotBlank
+    @Column(name = "Street")
+    private String streetAddress;
+
+    @NotBlank
+    @Column(name = "City")
+    private String city;
+
+    @NotBlank
+    @Column(name = "Zipcode")
+    private String zipcode;
+
+    @NotBlank
+    @Column(name = "Country")
+    private String country;
 
     @JsonIgnore
     @OneToMany(mappedBy = "library", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
@@ -54,7 +70,20 @@ public class Library
     public Library(String name, Address address)
     {
         this.name = name;
-        this.address = address;
+        setAddress(address);
+    }
+
+    public void setAddress(Address address)
+    {
+        streetAddress = address.getStreetAddress();
+        city = address.getCity();
+        zipcode = address.getZipcode();
+        country = address.getCountry();
+    }
+
+    public Address getAddress()
+    {
+        return new Address(streetAddress, city, zipcode, country);
     }
 
     public void addBookItem(BookItem b) { books.add(b); }

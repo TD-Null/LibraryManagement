@@ -4,6 +4,7 @@ import com.example.LibraryManagement.models.accounts.Account;
 import com.example.LibraryManagement.models.accounts.LibraryCard;
 import com.example.LibraryManagement.models.datatypes.Address;
 import com.example.LibraryManagement.models.enums.accounts.AccountStatus;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -18,6 +19,7 @@ import javax.persistence.*;
  */
 @Getter
 @Setter
+@EqualsAndHashCode(callSuper = true)
 @Entity
 @Table(uniqueConstraints = {
         @UniqueConstraint(columnNames = "Email")

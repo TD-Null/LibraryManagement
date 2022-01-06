@@ -43,9 +43,25 @@ public class Account
     @Column(name = "Status", nullable = false)
     private AccountStatus status;
 
-    @NotNull
-    @Column(name = "Address")
-    private Address address;
+//    @NotNull
+//    @Column(name = "Address")
+//    private Address address;
+
+    @NotBlank
+    @Column(name = "Street")
+    private String streetAddress;
+
+    @NotBlank
+    @Column(name = "City")
+    private String city;
+
+    @NotBlank
+    @Column(name = "Zipcode")
+    private String zipcode;
+
+    @NotBlank
+    @Column(name = "Country")
+    private String country;
 
     @NotBlank
     @Column(name = "Email")
@@ -61,8 +77,21 @@ public class Account
         this.name = name;
         this.password = password;
         this.status = status;
-        this.address = address;
+        setAddress(address);
         this.email = email;
         this.phoneNumber = phoneNumber;
+    }
+
+    public void setAddress(Address address)
+    {
+        streetAddress = address.getStreetAddress();
+        city = address.getCity();
+        zipcode = address.getZipcode();
+        country = address.getCountry();
+    }
+
+    public Address getAddress()
+    {
+        return new Address(streetAddress, city, zipcode, country);
     }
 }

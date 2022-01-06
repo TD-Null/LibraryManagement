@@ -1,17 +1,17 @@
 package com.example.LibraryManagement.components.services;
 
-import com.example.LibraryManagement.components.repositories.accounts.MemberRepository;
 import com.example.LibraryManagement.components.repositories.books.BookLendingRepository;
 import com.example.LibraryManagement.components.repositories.books.BookReservationRepository;
-import com.example.LibraryManagement.components.repositories.books.FineRepository;
-import com.example.LibraryManagement.components.repositories.books.FineTransactionRepository;
+import com.example.LibraryManagement.components.repositories.books.fines.*;
 import com.example.LibraryManagement.models.accounts.types.Member;
 import com.example.LibraryManagement.models.books.actions.BookLending;
 import com.example.LibraryManagement.models.books.actions.BookReservation;
 import com.example.LibraryManagement.models.books.fines.Fine;
 import com.example.LibraryManagement.models.books.fines.FineTransaction;
+import com.example.LibraryManagement.models.books.fines.transactions.CashTransaction;
+import com.example.LibraryManagement.models.books.fines.transactions.CheckTransaction;
+import com.example.LibraryManagement.models.books.fines.transactions.CreditCardTransaction;
 import com.example.LibraryManagement.models.books.notifications.AccountNotification;
-import com.example.LibraryManagement.models.books.properties.Book;
 import com.example.LibraryManagement.models.books.properties.BookItem;
 import com.example.LibraryManagement.models.books.properties.Limitations;
 import com.example.LibraryManagement.models.enums.books.BookStatus;
@@ -43,6 +43,12 @@ public class MemberServiceImp implements MemberService
     private final FineRepository fineRepository;
     @Autowired
     private final FineTransactionRepository fineTransactionRepository;
+    @Autowired
+    private final CreditCardTransactionRepository creditCardTransactionRepository;
+    @Autowired
+    private final CheckTransactionRepository checkTransactionRepository;
+    @Autowired
+    private final CashTransactionRepository cashTransactionRepository;
 
     private static final double finePerDay = 1.0;
 
@@ -334,8 +340,43 @@ public class MemberServiceImp implements MemberService
         else if(fine.getAmount() > amount)
             throw new ApiRequestException("Given amount is not enough to pay for the fine.", HttpStatus.BAD_REQUEST);
 
-        FineTransaction fineTransaction = new FineTransaction(type, transaction, new Date(), amount);
+        FineTransaction fineTransaction = new FineTransaction(type, new Date(), amount);
         fineTransactionRepository.save(fineTransaction);
+
+        switch (type) {
+            case CREDIT_CARD:
+                if(transaction instanceof CreditCardTransaction)
+                {
+                    CreditCardTransaction cardTransaction = (CreditCardTransaction) transaction;
+                    creditCardTransactionRepository.save(cardTransaction);
+                    fineTransaction.setCreditCardTransaction(cardTransaction);
+                }
+
+                break;
+
+            case CHECK:
+                if(transaction instanceof CheckTransaction)
+                {
+                    CheckTransaction checkTransaction = (CheckTransaction) transaction;
+                    checkTransactionRepository.save(checkTransaction);
+                    fineTransaction.setCheckTransaction(checkTransaction);
+                }
+
+                break;
+
+            case CASH:
+                if(transaction instanceof CashTransaction)
+                {
+                    CashTransaction cashTransaction = (CashTransaction) transaction;
+                    cashTransactionRepository.save(cashTransaction);
+                    fineTransaction.setCashTransaction(cashTransaction);
+                }
+
+                break;
+
+            default:
+                throw new ApiRequestException("Transaction cannot be used.", HttpStatus.BAD_REQUEST);
+        }
 
         fineTransaction.setFine(fine);
         fine.setFineTransaction(fineTransaction);

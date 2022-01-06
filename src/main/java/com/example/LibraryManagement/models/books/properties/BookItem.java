@@ -88,12 +88,12 @@ public class BookItem extends Book
 
     @JsonIgnore
     @ManyToOne
-    @JoinColumn(name = "member_id")
+    @JoinColumn(name = "loanMember")
     private Member currLoanMember;
 
     @JsonIgnore
     @ManyToOne
-    @JoinColumn(name = "member_id")
+    @JoinColumn(name = "reservedMember")
     private Member currReservedMember;
 
     @JsonIgnore
