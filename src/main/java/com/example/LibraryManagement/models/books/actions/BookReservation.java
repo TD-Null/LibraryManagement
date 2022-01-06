@@ -16,7 +16,7 @@ import java.util.Date;
 @Setter
 @EqualsAndHashCode
 @Entity
-@Table(name = "reservations")
+@Table
 public class BookReservation
 {
     @Id
@@ -32,7 +32,7 @@ public class BookReservation
     @JoinColumn(name = "member_id", nullable = false)
     private Member member;
 
-    @Column(name = "Creation_Date", nullable = false)
+    @Column(name = "CreationDate", nullable = false)
     private Date creationDate;
 
     @Column(name = "Status", nullable = false)

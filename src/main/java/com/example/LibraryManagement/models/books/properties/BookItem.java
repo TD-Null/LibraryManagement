@@ -66,24 +66,24 @@ public class BookItem extends Book
     private BookStatus status;
 
     @Temporal(TemporalType.DATE)
-    @Column(name = "Publication_Date", nullable = false)
+    @Column(name = "Publication", nullable = false)
     private Date publicationDate;
 
     @Column(name = "Reference")
     private boolean isReferenceOnly;
 
-    @Column(name = "Borrowed_Date")
+    @Column(name = "BorrowedDate")
     private Date borrowed;
 
     @Temporal(TemporalType.DATE)
-    @Column(name = "Due_Date")
+    @Column(name = "DueDate")
     private Date dueDate;
 
     @Column(name = "Price")
     private double price;
 
     @Temporal(TemporalType.DATE)
-    @Column(name = "Date_of_Purchase")
+    @Column(name = "Purchase")
     private Date dateOfPurchase;
 
     @JsonIgnore

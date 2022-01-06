@@ -52,13 +52,13 @@ public class Member extends Account
     private LibraryCard libraryCard;
 
     @NotBlank
-    @Column(name = "Date_of_Membership")
+    @Column(name = "Date")
     private Date dateOfMembership;
 
-    @Column(name = "Issued_Books_Total")
+    @Column(name = "IssuedBooks")
     private int issuedBooksTotal = 0;
 
-    @Column(name = "Total_Fines")
+    @Column(name = "Fines")
     private int totalFines = 0;
 
     @JsonIgnore

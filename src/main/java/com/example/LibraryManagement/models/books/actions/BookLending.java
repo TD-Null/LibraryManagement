@@ -15,7 +15,7 @@ import java.util.Date;
 @Setter
 @EqualsAndHashCode
 @Entity
-@Table(name = "loans")
+@Table
 public class BookLending
 {
     @Id
@@ -32,13 +32,13 @@ public class BookLending
     @JoinColumn(name = "member_id", nullable = false)
     private Member member;
 
-    @Column(name = "Creation_Date", nullable = false)
+    @Column(name = "CreationDate", nullable = false)
     private Date creationDate;
 
-    @Column(name = "Due_Date", nullable = false)
+    @Column(name = "DueDate", nullable = false)
     private Date dueDate;
 
-    @Column(name = "Return_Date")
+    @Column(name = "ReturnDate")
     private Date returnDate;
 
     public BookLending(BookItem bookItem, Member member, Date creationDate, Date dueDate)

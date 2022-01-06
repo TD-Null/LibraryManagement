@@ -15,7 +15,7 @@ import java.util.Date;
 @Setter
 @EqualsAndHashCode
 @Entity
-@Table(name = "notifications")
+@Table
 public class AccountNotification
 {
     @Id
@@ -32,10 +32,6 @@ public class AccountNotification
 
     @Column(name = "Email")
     private String email;
-
-//    @NotNull
-//    @Column(name = "Address")
-//    private Address address;
 
     @NotBlank
     @Column(name = "Street")
