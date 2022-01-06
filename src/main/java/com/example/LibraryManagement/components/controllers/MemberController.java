@@ -145,7 +145,7 @@ public class MemberController
 
     @PutMapping("/checkout")
     public ResponseEntity<BookItem> checkoutBook(@Valid @RequestBody BarcodeValidationRequest request,
-                                                 @RequestParam String bookBarcode)
+                                                 @RequestParam Long bookBarcode)
     {
         Member member = (Member) accountService.barcodeReader(request.getBarcode(), AccountType.MEMBER, AccountStatus.ACTIVE);
         BookItem book = updateCatalogService.bookValidation(bookBarcode);
@@ -154,7 +154,7 @@ public class MemberController
 
     @PutMapping("/return")
     public ResponseEntity<MessageResponse> returnBook(@Valid @RequestBody BarcodeValidationRequest request,
-                                                      @RequestParam String bookBarcode)
+                                                      @RequestParam Long bookBarcode)
     {
         Member member = (Member) accountService.barcodeReader(request.getBarcode(), AccountType.MEMBER, AccountStatus.ACTIVE);
         BookItem book = updateCatalogService.bookValidation(bookBarcode);
@@ -163,7 +163,7 @@ public class MemberController
 
     @PutMapping("/reserve")
     public ResponseEntity<MessageResponse> reserveBook(@Valid @RequestBody BarcodeValidationRequest request,
-                                                       @RequestParam String bookBarcode)
+                                                       @RequestParam Long bookBarcode)
     {
         Member member = (Member) accountService.barcodeReader(request.getBarcode(), AccountType.MEMBER, AccountStatus.ACTIVE);
         BookItem book = updateCatalogService.bookValidation(bookBarcode);
@@ -172,7 +172,7 @@ public class MemberController
 
     @PutMapping("/reserve/cancel")
     public ResponseEntity<MessageResponse> cancelReservation(@Valid @RequestBody BarcodeValidationRequest request,
-                                                             @RequestParam String bookBarcode)
+                                                             @RequestParam Long bookBarcode)
     {
         Member member = (Member) accountService.barcodeReader(request.getBarcode(), AccountType.MEMBER, AccountStatus.ACTIVE);
         BookItem book = updateCatalogService.bookValidation(bookBarcode);
@@ -181,7 +181,7 @@ public class MemberController
 
     @PutMapping("/renew")
     public ResponseEntity<MessageResponse> renewBook(@Valid @RequestBody BarcodeValidationRequest request,
-                                                     @RequestParam String bookBarcode)
+                                                     @RequestParam Long bookBarcode)
     {
         Member member = (Member) accountService.barcodeReader(request.getBarcode(), AccountType.MEMBER, AccountStatus.ACTIVE);
         BookItem book = updateCatalogService.bookValidation(bookBarcode);

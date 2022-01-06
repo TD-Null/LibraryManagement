@@ -12,7 +12,7 @@ public class CashTransactionRequest extends BarcodeValidationRequest
     @NotNull
     private double cashTendered;
 
-    public CashTransactionRequest(String barcode, double cashTendered)
+    public CashTransactionRequest(Long barcode, double cashTendered)
     {
         super(barcode);
         this.cashTendered = cashTendered;

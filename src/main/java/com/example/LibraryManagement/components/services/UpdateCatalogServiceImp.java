@@ -92,7 +92,7 @@ public class UpdateCatalogServiceImp implements UpdateCatalogService
     }
 
     @Transactional
-    public ResponseEntity<MessageResponse> modifyBookItem(String barcode, String ISBN, String title,
+    public ResponseEntity<MessageResponse> modifyBookItem(Long barcode, String ISBN, String title,
                                                           String publisher, String language, int numberOfPages,
                                                           String authorName, Set<String> subjects, BookFormat format,
                                                           Date publicationDate, boolean isReferenceOnly, double price)
@@ -178,7 +178,7 @@ public class UpdateCatalogServiceImp implements UpdateCatalogService
         return rack;
     }
 
-    public BookItem bookValidation(String barcode)
+    public BookItem bookValidation(Long barcode)
     {
         Optional<BookItem> bookItem = bookItemRepository.findById(barcode);
 

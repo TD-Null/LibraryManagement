@@ -38,7 +38,7 @@ public class BookItem extends Book
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "Barcode")
-    private String barcode;
+    private Long barcode;
 
     @ManyToOne
     @JoinColumn(name = "library_name", nullable = false)
@@ -55,8 +55,8 @@ public class BookItem extends Book
     @ManyToMany
     @JoinTable(
             name = "subjects",
-            joinColumns = @JoinColumn(name = "subject_name"),
-            inverseJoinColumns = @JoinColumn(name = "book_barcode"))
+            joinColumns = @JoinColumn(name = "name"),
+            inverseJoinColumns = @JoinColumn(name = "barcode"))
     private Set<Subject> subjects = new HashSet<>();
 
     @Column(name = "Format", nullable = false)
@@ -88,12 +88,12 @@ public class BookItem extends Book
 
     @JsonIgnore
     @ManyToOne
-    @JoinColumn(name = "loanMember")
+    @JoinColumn(name = "loan_member")
     private Member currLoanMember;
 
     @JsonIgnore
     @ManyToOne
-    @JoinColumn(name = "reservedMember")
+    @JoinColumn(name = "reserved_member")
     private Member currReservedMember;
 
     @JsonIgnore

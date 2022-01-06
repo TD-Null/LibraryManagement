@@ -8,7 +8,7 @@ import java.util.Date;
 import java.util.List;
 
 @Repository
-public interface BookItemRepository extends JpaRepository<BookItem, String>
+public interface BookItemRepository extends JpaRepository<BookItem, Long>
 {
     List<BookItem> findAllByTitleContaining(String title);
     List<BookItem> findAllByPublicationDate(Date publicationDate);

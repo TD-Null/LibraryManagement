@@ -13,7 +13,7 @@ public class ChangePasswordRequest extends BarcodeValidationRequest
     @NotBlank
     private String newPassword;
 
-    public ChangePasswordRequest(String barcode, String originalPassword, String newPassword)
+    public ChangePasswordRequest(Long barcode, String originalPassword, String newPassword)
     {
         super(barcode);
         this.originalPassword = originalPassword;

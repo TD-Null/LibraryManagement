@@ -50,7 +50,7 @@ public class AddBookItemRequest extends BarcodeValidationRequest
 
     private double price;
 
-    public AddBookItemRequest(String barcode, String libraryName, long rackID,
+    public AddBookItemRequest(Long barcode, String libraryName, long rackID,
                               String ISBN, String title, String publisher, String language,
                               int numberOfPages, String authorName, Set<String> subjectNames,
                               BookFormat format, Date publicationDate, boolean isReferenceOnly,

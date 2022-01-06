@@ -14,7 +14,7 @@ public class UpdateMemberStatusRequest extends BarcodeValidationRequest
     @NotNull
     private final AccountStatus status;
 
-    public UpdateMemberStatusRequest(@NotBlank String barcode, AccountStatus status)
+    public UpdateMemberStatusRequest(Long barcode, AccountStatus status)
     {
         super(barcode);
         this.status = status;

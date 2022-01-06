@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface LibrarianRepository extends JpaRepository<Librarian, String>
+public interface LibrarianRepository extends JpaRepository<Librarian, Long>
 {
     Optional<Librarian> findLibrarianByEmail(String email);
 }

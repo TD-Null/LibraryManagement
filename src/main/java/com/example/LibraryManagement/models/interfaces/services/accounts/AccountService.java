@@ -9,15 +9,15 @@ import org.springframework.http.ResponseEntity;
 // Methods used in a service component relating to accounts.
 public interface AccountService
 {
-    ResponseEntity<Object> getAccountDetails(String barcode);
+    ResponseEntity<Object> getAccountDetails(Long barcode);
 
     ResponseEntity<LibraryCard> authenticateUser(String libraryCardNumber, String password);
 
     ResponseEntity<LibraryCard> registerMember(String name, String password, String email,
-                                                    String streetAddress, String city, String zipcode,
-                                                    String country, String phoneNumber);
+                                               String streetAddress, String city, String zipcode,
+                                               String country, String phoneNumber);
 
-    ResponseEntity<MessageResponse> updateMemberStatus(String memberID, AccountStatus status);
+    ResponseEntity<MessageResponse> updateMemberStatus(Long memberID, AccountStatus status);
 
-    Object barcodeReader(String barcode, AccountType type, AccountStatus status);
+    Object barcodeReader(Long barcode, AccountType type, AccountStatus status);
 }

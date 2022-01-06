@@ -26,6 +26,14 @@
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
 
+		<!--	Dependencies for Swagger API start	-->
+		<dependency>
+			<groupId>io.springfox</groupId>
+			<artifactId>springfox-swagger2</artifactId>
+			<version>3.0.0</version>
+		</dependency>
+		<!--	Dependencies for Swagger API end	-->
+
 		<!--	Dependencies for SQL databases start	-->
 		<dependency>
 			<groupId>mysql</groupId>

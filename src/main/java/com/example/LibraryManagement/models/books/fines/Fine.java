@@ -33,7 +33,7 @@ public class Fine
 
     @JsonIgnore
     @ManyToOne
-    @JoinColumn(name = "member_id", nullable = false)
+    @JoinColumn(name = "member", nullable = false)
     private Member member;
 
     @OneToOne(cascade = CascadeType.ALL)

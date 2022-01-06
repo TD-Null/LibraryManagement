@@ -42,7 +42,7 @@ public class AccountServiceImp implements AccountService
     private final MemberRepository memberRepository;
 
     // Returns the user's account details using their library card's barcode.
-    public ResponseEntity<Object> getAccountDetails(String barcode)
+    public ResponseEntity<Object> getAccountDetails(Long barcode)
     {
         /*
          * Ensure that the card exists within the database of the system using its barcode.
@@ -71,7 +71,7 @@ public class AccountServiceImp implements AccountService
     }
 
     @Transactional
-    public ResponseEntity<MessageResponse> updateAccountDetails(String barcode, String name, String streetAddress,
+    public ResponseEntity<MessageResponse> updateAccountDetails(Long barcode, String name, String streetAddress,
                                                                 String city, String zipcode, String country,
                                                                 String email, String phoneNumber)
     {
@@ -113,7 +113,7 @@ public class AccountServiceImp implements AccountService
     }
 
     @Transactional
-    public ResponseEntity<MessageResponse> changePassword(String barcode, String originalPassword, String newPassword)
+    public ResponseEntity<MessageResponse> changePassword(Long barcode, String originalPassword, String newPassword)
     {
         /*
          * Ensure that the card exists within the database of the system using its barcode.
@@ -265,7 +265,7 @@ public class AccountServiceImp implements AccountService
 
     // Updates a member's account status using the member's ID and the given status update.
     @Transactional
-    public ResponseEntity<MessageResponse> updateMemberStatus(String memberID, AccountStatus status)
+    public ResponseEntity<MessageResponse> updateMemberStatus(Long memberID, AccountStatus status)
     {
         Optional<Member> memberValidation = memberRepository.findById(memberID);
 
@@ -302,7 +302,7 @@ public class AccountServiceImp implements AccountService
      *
      * For example, only librarians can be able to add and modify books.
      */
-    public Object barcodeReader(String barcode, AccountType type, AccountStatus status)
+    public Object barcodeReader(Long barcode, AccountType type, AccountStatus status)
     {
         Optional<LibraryCard> cardValidation = libraryCardRepository.findById(barcode);
 
@@ -338,7 +338,7 @@ public class AccountServiceImp implements AccountService
                 HttpStatus.UNAUTHORIZED);
     }
 
-    public LibraryCard cardValidation(String barcode)
+    public LibraryCard cardValidation(Long barcode)
     {
         Optional<LibraryCard> card = libraryCardRepository.findById(barcode);
 

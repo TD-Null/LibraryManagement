@@ -38,7 +38,7 @@ public class AddLibrarianRequest extends BarcodeValidationRequest
     @NotBlank
     private final String phoneNumber;
 
-    public AddLibrarianRequest(String barcode, String name, String password,
+    public AddLibrarianRequest(Long barcode, String name, String password,
                                String email, String streetAddress, String city,
                                String zipcode, String country, String phoneNumber)
     {

@@ -23,7 +23,7 @@ public class AddLibraryRequest extends BarcodeValidationRequest
     @NotBlank
     private String country;
 
-    public AddLibraryRequest(String barcode, String libraryName, String streetAddress,
+    public AddLibraryRequest(Long barcode, String libraryName, String streetAddress,
                              String city, String zipcode, String country)
     {
         super(barcode);

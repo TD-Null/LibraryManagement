@@ -14,7 +14,7 @@ public class CardTransactionRequest extends BarcodeValidationRequest
     @NotNull
     private double amount;
 
-    public CardTransactionRequest(@NotBlank String barcode, String name, double amount)
+    public CardTransactionRequest(Long barcode, String name, double amount)
     {
         super(barcode);
         this.name = name;

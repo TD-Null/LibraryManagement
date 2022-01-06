@@ -45,7 +45,7 @@ public class UpdateBookItemRequest extends BarcodeValidationRequest
 
     private double price;
 
-    public UpdateBookItemRequest(String barcode, String ISBN, String title,
+    public UpdateBookItemRequest(Long barcode, String ISBN, String title,
                                  String publisher, String language, int numberOfPages,
                                  String authorName, Set<String> subjectNames, BookFormat format,
                                  Date publicationDate, boolean isReferenceOnly, double price)

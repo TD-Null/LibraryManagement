@@ -31,7 +31,7 @@ public class LibraryCard
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "barcode")
-    private String barcode;
+    private Long barcode;
 
     @JsonIgnore
     @OneToOne(mappedBy = "libraryCard")

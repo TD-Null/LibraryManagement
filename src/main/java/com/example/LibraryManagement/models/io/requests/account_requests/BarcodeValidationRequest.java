@@ -15,5 +15,5 @@ import javax.validation.constraints.NotBlank;
 public class BarcodeValidationRequest
 {
     @NotBlank
-    private final String barcode;
+    private final Long barcode;
 }

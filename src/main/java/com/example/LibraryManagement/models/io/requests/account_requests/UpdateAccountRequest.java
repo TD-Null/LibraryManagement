@@ -33,7 +33,7 @@ public class UpdateAccountRequest extends BarcodeValidationRequest
     @NotBlank
     private String phoneNumber;
 
-    public UpdateAccountRequest(String barcode, String name, String streetAddress,
+    public UpdateAccountRequest(Long barcode, String name, String streetAddress,
                                 String city, String zipcode, String country, String email,
                                 String phoneNumber)
     {

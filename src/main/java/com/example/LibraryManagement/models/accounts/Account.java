@@ -29,7 +29,7 @@ public class Account
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ID")
-    private String id;
+    private Long id;
 
     @NotBlank
     @Column(name = "Name")
@@ -42,10 +42,6 @@ public class Account
 
     @Column(name = "Status", nullable = false)
     private AccountStatus status;
-
-//    @NotNull
-//    @Column(name = "Address")
-//    private Address address;
 
     @NotBlank
     @Column(name = "Street")

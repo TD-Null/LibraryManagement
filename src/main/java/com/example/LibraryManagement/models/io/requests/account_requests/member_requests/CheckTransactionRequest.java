@@ -16,7 +16,7 @@ public class CheckTransactionRequest extends BarcodeValidationRequest
     @NotNull
     private double amount;
 
-    public CheckTransactionRequest(@NotBlank String barcode, String bankName, String checkNumber, double amount)
+    public CheckTransactionRequest(Long barcode, String bankName, String checkNumber, double amount)
     {
         super(barcode);
         this.bankName = bankName;

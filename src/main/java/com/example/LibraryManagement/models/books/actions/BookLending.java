@@ -29,7 +29,7 @@ public class BookLending
 
     @JsonIgnore
     @ManyToOne
-    @JoinColumn(name = "member_id", nullable = false)
+    @JoinColumn(name = "member", nullable = false)
     private Member member;
 
     @Column(name = "CreationDate", nullable = false)

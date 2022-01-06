@@ -52,7 +52,7 @@ public class LibrarianController
     }
 
     @PutMapping("/account/member/{id}")
-    public ResponseEntity<MessageResponse> updateMemberStatus(@PathVariable("id") String memberID,
+    public ResponseEntity<MessageResponse> updateMemberStatus(@PathVariable("id") Long memberID,
                                                               @Valid @RequestBody UpdateMemberStatusRequest request)
     {
         accountService.barcodeReader(request.getBarcode(), AccountType.LIBRARIAN, AccountStatus.ACTIVE);
@@ -117,8 +117,8 @@ public class LibrarianController
     }
 
     @PutMapping("/catalog/update")
-    public ResponseEntity<MessageResponse> updateBookItem(@RequestParam String barcode,
-                                                          @Valid @RequestBody UpdateBookItemRequest request)
+    public ResponseEntity<MessageResponse> updateBookItem(@Valid @RequestBody UpdateBookItemRequest request,
+                                                          @RequestParam Long barcode)
     {
         accountService.barcodeReader(request.getBarcode(), AccountType.LIBRARIAN, AccountStatus.ACTIVE);
         return updateCatalogService.modifyBookItem(barcode, request.getISBN(), request.getTitle(), request.getPublisher(),

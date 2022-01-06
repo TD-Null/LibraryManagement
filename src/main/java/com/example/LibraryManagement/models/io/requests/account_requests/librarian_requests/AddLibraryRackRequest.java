@@ -16,7 +16,7 @@ public class AddLibraryRackRequest extends BarcodeValidationRequest
     @NotBlank
     private String locationIdentifier;
 
-    public AddLibraryRackRequest(String barcode, String libraryName, int number, String locationIdentifier)
+    public AddLibraryRackRequest(Long barcode, String libraryName, int number, String locationIdentifier)
     {
         super(barcode);
         this.libraryName = libraryName;

@@ -42,7 +42,7 @@ public class AccountController
                 request.getCity(), request.getZipcode(), request.getCountry(), request.getEmail(), request.getPhoneNumber());
     }
 
-    @PutMapping("/update")
+    @PutMapping("/update/password")
     public ResponseEntity<MessageResponse> changePassword(@Valid @RequestBody ChangePasswordRequest request)
     {
         return accountService.changePassword(request.getBarcode(), request.getOriginalPassword(), request.getNewPassword());
