@@ -1,4 +1,4 @@
-package com.example.LibraryManagement.models.io.requests.account_requests;
+package com.example.LibraryManagement.models.io.requests;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

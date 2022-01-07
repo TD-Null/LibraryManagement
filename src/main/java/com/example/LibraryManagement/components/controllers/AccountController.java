@@ -2,8 +2,10 @@ package com.example.LibraryManagement.components.controllers;
 
 import com.example.LibraryManagement.components.services.AccountServiceImp;
 import com.example.LibraryManagement.models.accounts.LibraryCard;
-import com.example.LibraryManagement.models.enums.accounts.AccountStatus;
-import com.example.LibraryManagement.models.io.requests.account_requests.*;
+import com.example.LibraryManagement.models.io.requests.ChangePasswordRequest;
+import com.example.LibraryManagement.models.io.requests.LoginRequest;
+import com.example.LibraryManagement.models.io.requests.SignupRequest;
+import com.example.LibraryManagement.models.io.requests.UpdateAccountRequest;
 import com.example.LibraryManagement.models.io.responses.MessageResponse;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,10 +69,18 @@ public class AccountController
                 signUpRequest.getCountry(), signUpRequest.getPhoneNumber());
     }
 
+//    @PutMapping("/update")
+//    public ResponseEntity<MessageResponse> editAccountDetails(@Valid @RequestBody UpdateAccountRequest request)
+//    {
+//        return accountService.updateAccountDetails(request.getBarcode(), request.getName(), request.getStreetAddress(),
+//                request.getCity(), request.getZipcode(), request.getCountry(), request.getEmail(), request.getPhoneNumber());
+//    }
+
     @PutMapping("/update")
-    public ResponseEntity<MessageResponse> editAccountDetails(@Valid @RequestBody UpdateAccountRequest request)
+    public ResponseEntity<MessageResponse> editAccountDetails(@Valid @RequestBody UpdateAccountRequest request,
+                                                              @RequestParam Long barcode)
     {
-        return accountService.updateAccountDetails(request.getBarcode(), request.getName(), request.getStreetAddress(),
+        return accountService.updateAccountDetails(barcode, request.getName(), request.getStreetAddress(),
                 request.getCity(), request.getZipcode(), request.getCountry(), request.getEmail(), request.getPhoneNumber());
     }
 
