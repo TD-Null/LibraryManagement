@@ -35,19 +35,6 @@ public class AccountController
         return accountService.getAccountDetails(request.getBarcode());
     }
 
-    @PutMapping("/update")
-    public ResponseEntity<MessageResponse> editAccountDetails(@Valid @RequestBody UpdateAccountRequest request)
-    {
-        return accountService.updateAccountDetails(request.getBarcode(), request.getName(), request.getStreetAddress(),
-                request.getCity(), request.getZipcode(), request.getCountry(), request.getEmail(), request.getPhoneNumber());
-    }
-
-    @PutMapping("/update/password")
-    public ResponseEntity<MessageResponse> changePassword(@Valid @RequestBody ChangePasswordRequest request)
-    {
-        return accountService.changePassword(request.getBarcode(), request.getOriginalPassword(), request.getNewPassword());
-    }
-
     /*
      * Authentication POST request.
      * Expects a valid LoginRequest in the body including the tags {libraryCardNumber, password}.
@@ -72,5 +59,18 @@ public class AccountController
                 signUpRequest.getEmail(), signUpRequest.getStreetAddress(),
                 signUpRequest.getCity(), signUpRequest.getZipcode(),
                 signUpRequest.getCountry(), signUpRequest.getPhoneNumber());
+    }
+
+    @PutMapping("/update")
+    public ResponseEntity<MessageResponse> editAccountDetails(@Valid @RequestBody UpdateAccountRequest request)
+    {
+        return accountService.updateAccountDetails(request.getBarcode(), request.getName(), request.getStreetAddress(),
+                request.getCity(), request.getZipcode(), request.getCountry(), request.getEmail(), request.getPhoneNumber());
+    }
+
+    @PutMapping("/update/password")
+    public ResponseEntity<MessageResponse> changePassword(@Valid @RequestBody ChangePasswordRequest request)
+    {
+        return accountService.changePassword(request.getBarcode(), request.getOriginalPassword(), request.getNewPassword());
     }
 }
