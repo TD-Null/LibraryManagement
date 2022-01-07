@@ -52,6 +52,7 @@ public class Member extends Account
     @JoinColumn(name = "card")
     private LibraryCard libraryCard;
 
+    @Temporal(TemporalType.DATE)
     @NotNull
     @Column(name = "Date")
     private Date dateOfMembership;
