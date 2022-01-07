@@ -3,10 +3,7 @@ package com.example.LibraryManagement.models.books.libraries;
 import com.example.LibraryManagement.models.books.properties.BookItem;
 import com.example.LibraryManagement.models.datatypes.Address;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
@@ -29,6 +26,7 @@ import java.util.Set;
 @Getter
 @Setter
 @EqualsAndHashCode
+@NoArgsConstructor
 @Entity
 @Table(uniqueConstraints = {
         @UniqueConstraint(columnNames = "Name")
@@ -39,10 +37,6 @@ public class Library
     @NotBlank
     @Column(name = "Name")
     private String name;
-
-//    @NotNull
-//    @Column(name = "Address")
-//    private Address address;
 
     @NotBlank
     @Column(name = "Street")

@@ -4,10 +4,7 @@ import com.example.LibraryManagement.models.accounts.types.Member;
 import com.example.LibraryManagement.models.books.properties.BookItem;
 import com.example.LibraryManagement.models.enums.reservations.ReservationStatus;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -15,6 +12,7 @@ import java.util.Date;
 @Getter
 @Setter
 @EqualsAndHashCode
+@NoArgsConstructor
 @Entity
 @Table
 public class BookReservation

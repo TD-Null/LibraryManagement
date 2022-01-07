@@ -3,18 +3,17 @@ package com.example.LibraryManagement.models.books.fines.transactions;
 import com.example.LibraryManagement.models.accounts.types.Librarian;
 import com.example.LibraryManagement.models.books.fines.FineTransaction;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 // Type of transaction that uses cash to pay a fine.
 @Getter
 @Setter
 @EqualsAndHashCode
+@NoArgsConstructor
 @Entity
 @Table
 public class CashTransaction

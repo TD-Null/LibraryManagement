@@ -22,6 +22,7 @@ import java.util.Date;
 @Getter
 @Setter
 @EqualsAndHashCode
+@NoArgsConstructor
 @Entity
 @Table(uniqueConstraints = {
         @UniqueConstraint(columnNames = "Card_Number")

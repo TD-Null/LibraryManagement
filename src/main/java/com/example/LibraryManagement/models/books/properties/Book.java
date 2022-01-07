@@ -1,9 +1,6 @@
 package com.example.LibraryManagement.models.books.properties;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.Column;
 import javax.persistence.MappedSuperclass;
@@ -17,6 +14,7 @@ import javax.validation.constraints.NotBlank;
 @Getter
 @Setter
 @AllArgsConstructor
+@NoArgsConstructor
 @MappedSuperclass
 public class Book
 {

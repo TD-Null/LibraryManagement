@@ -17,6 +17,7 @@ import javax.validation.constraints.NotBlank;
 @Setter
 @EqualsAndHashCode
 @AllArgsConstructor
+@NoArgsConstructor
 public class Address
 {
     @NotBlank

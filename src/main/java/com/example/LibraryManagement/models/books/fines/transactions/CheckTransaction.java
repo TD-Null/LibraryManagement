@@ -11,6 +11,7 @@ import javax.validation.constraints.NotBlank;
 @Getter
 @Setter
 @EqualsAndHashCode
+@NoArgsConstructor
 @Entity
 @Table
 public class CheckTransaction

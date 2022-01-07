@@ -23,6 +23,7 @@ import javax.validation.constraints.Size;
 @Getter
 @Setter
 @EqualsAndHashCode
+@NoArgsConstructor
 @MappedSuperclass
 public class Account
 {

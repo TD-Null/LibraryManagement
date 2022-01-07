@@ -8,10 +8,7 @@ import com.example.LibraryManagement.models.books.libraries.Rack;
 import com.example.LibraryManagement.models.enums.books.BookFormat;
 import com.example.LibraryManagement.models.enums.books.BookStatus;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
@@ -31,6 +28,7 @@ import java.util.Set;
 @Getter
 @Setter
 @EqualsAndHashCode(callSuper = true)
+@NoArgsConstructor
 @Entity
 @Table
 public class BookItem extends Book

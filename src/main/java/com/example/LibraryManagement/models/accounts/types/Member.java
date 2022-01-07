@@ -15,6 +15,7 @@ import com.example.LibraryManagement.models.interfaces.methods.MemberMethods;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
@@ -42,6 +43,7 @@ import java.util.Set;
 @Getter
 @Setter
 @EqualsAndHashCode(callSuper = true)
+@NoArgsConstructor
 @Entity
 @Table(uniqueConstraints = {
         @UniqueConstraint(columnNames = "Email")
