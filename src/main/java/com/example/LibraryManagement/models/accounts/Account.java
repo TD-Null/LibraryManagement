@@ -2,6 +2,7 @@ package com.example.LibraryManagement.models.accounts;
 
 import com.example.LibraryManagement.models.datatypes.Address;
 import com.example.LibraryManagement.models.enums.accounts.AccountStatus;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 import javax.persistence.*;
@@ -44,18 +45,22 @@ public class Account
     @Column(name = "Status", nullable = false)
     private AccountStatus status;
 
+    @JsonIgnore
     @NotBlank
     @Column(name = "Street")
     private String streetAddress;
 
+    @JsonIgnore
     @NotBlank
     @Column(name = "City")
     private String city;
 
+    @JsonIgnore
     @NotBlank
     @Column(name = "Zipcode")
     private String zipcode;
 
+    @JsonIgnore
     @NotBlank
     @Column(name = "Country")
     private String country;
@@ -79,16 +84,16 @@ public class Account
         this.phoneNumber = phoneNumber;
     }
 
+    public Address getAddress()
+    {
+        return new Address(streetAddress, city, zipcode, country);
+    }
+
     public void setAddress(Address address)
     {
         streetAddress = address.getStreetAddress();
         city = address.getCity();
         zipcode = address.getZipcode();
         country = address.getCountry();
-    }
-
-    public Address getAddress()
-    {
-        return new Address(streetAddress, city, zipcode, country);
     }
 }

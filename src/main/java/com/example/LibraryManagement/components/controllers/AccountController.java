@@ -29,10 +29,16 @@ public class AccountController
     @Autowired
     private final AccountServiceImp accountService;
 
+//    @GetMapping("/details")
+//    public ResponseEntity<Object> viewAccountDetails(@Valid @RequestBody BarcodeValidationRequest request)
+//    {
+//        return accountService.getAccountDetails(request.getBarcode());
+//    }
+
     @GetMapping("/details")
-    public ResponseEntity<Object> viewAccountDetails(@Valid @RequestBody BarcodeValidationRequest request)
+    public ResponseEntity<Object> viewAccountDetails(@RequestParam Long barcode)
     {
-        return accountService.getAccountDetails(request.getBarcode());
+        return accountService.getAccountDetails(barcode);
     }
 
     /*
@@ -68,9 +74,16 @@ public class AccountController
                 request.getCity(), request.getZipcode(), request.getCountry(), request.getEmail(), request.getPhoneNumber());
     }
 
-    @PutMapping("/update/password")
-    public ResponseEntity<MessageResponse> changePassword(@Valid @RequestBody ChangePasswordRequest request)
+//    @PutMapping("/update/password")
+//    public ResponseEntity<MessageResponse> changePassword(@Valid @RequestBody ChangePasswordRequest request)
+//    {
+//        return accountService.changePassword(request.getBarcode(), request.getOriginalPassword(), request.getNewPassword());
+//    }
+
+        @PutMapping("/update/password")
+    public ResponseEntity<MessageResponse> changePassword(@Valid @RequestBody ChangePasswordRequest request,
+                                                          @RequestParam Long barcode)
     {
-        return accountService.changePassword(request.getBarcode(), request.getOriginalPassword(), request.getNewPassword());
+        return accountService.changePassword(barcode, request.getOriginalPassword(), request.getNewPassword());
     }
 }

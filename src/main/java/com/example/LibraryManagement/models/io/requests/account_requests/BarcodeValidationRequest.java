@@ -3,7 +3,7 @@ package com.example.LibraryManagement.models.io.requests.account_requests;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 /*
  * Class containing a single required input for executing some
@@ -14,6 +14,6 @@ import javax.validation.constraints.NotBlank;
 @AllArgsConstructor
 public class BarcodeValidationRequest
 {
-    @NotBlank
+    @NotNull
     private final Long barcode;
 }
