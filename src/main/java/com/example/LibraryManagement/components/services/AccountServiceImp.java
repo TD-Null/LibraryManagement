@@ -134,7 +134,7 @@ public class AccountServiceImp implements AccountService
 
             member.setPassword(newPassword);
 
-            return ResponseEntity.ok(new MessageResponse("Successfully changed user;s password within the system."));
+            return ResponseEntity.ok(new MessageResponse("Successfully changed user's password within the system."));
         }
 
         else if(type == AccountType.LIBRARIAN && card.getLibrarian() != null)
