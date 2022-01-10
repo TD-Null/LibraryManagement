@@ -3,6 +3,7 @@ package com.example.LibraryManagement.components.controllers;
 import com.example.LibraryManagement.components.services.AccountServiceImp;
 import com.example.LibraryManagement.components.services.UpdateCatalogServiceImp;
 import com.example.LibraryManagement.components.services.LibrarianServiceImp;
+import com.example.LibraryManagement.models.accounts.LibraryCard;
 import com.example.LibraryManagement.models.accounts.types.Librarian;
 import com.example.LibraryManagement.models.accounts.types.Member;
 import com.example.LibraryManagement.models.books.actions.BookLending;
@@ -37,13 +38,6 @@ public class LibrarianController
     @Autowired
     private final UpdateCatalogServiceImp updateCatalogService;
 
-    @GetMapping("/account/librarian")
-    public ResponseEntity<List<Librarian>> viewAllLibrarians(@Valid @RequestBody BarcodeValidationRequest request)
-    {
-        accountService.barcodeReader(request.getBarcode(), AccountType.LIBRARIAN, AccountStatus.ACTIVE);
-        return librarianService.listAllLibrarians();
-    }
-
     @GetMapping("/account/member")
     public ResponseEntity<List<Member>> viewAllMembers(@Valid @RequestBody BarcodeValidationRequest request)
     {
@@ -51,12 +45,19 @@ public class LibrarianController
         return librarianService.listAllMembers();
     }
 
-    @PutMapping("/account/member/{id}")
-    public ResponseEntity<MessageResponse> updateMemberStatus(@PathVariable("id") Long memberID,
+    @GetMapping("/account/librarian")
+    public ResponseEntity<List<Librarian>> viewAllLibrarians(@Valid @RequestBody BarcodeValidationRequest request)
+    {
+        accountService.barcodeReader(request.getBarcode(), AccountType.LIBRARIAN, AccountStatus.ACTIVE);
+        return librarianService.listAllLibrarians();
+    }
+
+    @PutMapping("/account/member")
+    public ResponseEntity<MessageResponse> updateMemberStatus(@RequestParam(name = "id") Long ID,
                                                               @Valid @RequestBody UpdateMemberStatusRequest request)
     {
         accountService.barcodeReader(request.getBarcode(), AccountType.LIBRARIAN, AccountStatus.ACTIVE);
-        return accountService.updateMemberStatus(memberID, request.getStatus());
+        return accountService.updateMemberStatus(ID, request.getStatus());
     }
 
     @GetMapping("/records/book_loans")
@@ -80,8 +81,18 @@ public class LibrarianController
         return librarianService.listAllFines();
     }
 
-    @PostMapping("/account/librarian")
-    public ResponseEntity<MessageResponse> addLibrarian(@Valid @RequestBody AddLibrarianRequest request)
+    @PostMapping("/account/librarian/register")
+    public ResponseEntity<LibraryCard> registerLibrarian(@Valid @RequestBody AddLibrarianRequest request)
+    {
+        return accountService.registerLibrarian(
+                request.getName(), request.getPassword(),
+                request.getEmail(), request.getStreetAddress(),
+                request.getCity(), request.getZipcode(),
+                request.getCountry(), request.getPhoneNumber());
+    }
+
+    @PostMapping("/account/librarian/add")
+    public ResponseEntity<LibraryCard> addLibrarian(@Valid @RequestBody AddLibrarianRequest request)
     {
         accountService.barcodeReader(request.getBarcode(), AccountType.LIBRARIAN, AccountStatus.ACTIVE);
         return accountService.registerLibrarian(
@@ -124,5 +135,13 @@ public class LibrarianController
         return updateCatalogService.modifyBookItem(barcode, request.getISBN(), request.getTitle(), request.getPublisher(),
                 request.getLanguage(), request.getNumberOfPages(), request.getAuthorName(), request.getSubjectNames(),
                 request.getFormat(), request.getPublicationDate(), request.isReferenceOnly(), request.getPrice());
+    }
+
+    @DeleteMapping("/catalog/remove")
+    public ResponseEntity<MessageResponse> removeBookItem(@Valid @RequestBody BarcodeValidationRequest request,
+                                                          @RequestParam Long barcode)
+    {
+        accountService.barcodeReader(request.getBarcode(), AccountType.LIBRARIAN, AccountStatus.ACTIVE);
+        return updateCatalogService.removeBookItem(barcode);
     }
 }

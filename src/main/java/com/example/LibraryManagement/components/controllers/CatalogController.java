@@ -44,6 +44,15 @@ public class CatalogController
     @GetMapping("/author")
     public ResponseEntity<List<Author>> viewAllAuthors() { return viewCatalogService.listAllAuthors(); }
 
+//    @GetMapping("/search")
+//    public ResponseEntity<List<BookItem>> searchBooks(@RequestParam(required = false) String title,
+//                                                      @RequestParam(required = false) String author,
+//                                                      @RequestParam(required = false) List<String> subjects,
+//                                                      @RequestParam(required = false) Date publicationDate)
+//    {
+//
+//    }
+
     @GetMapping("/filter/title")
     public ResponseEntity<List<BookItem>> viewBooksByTitle(@RequestParam String title) { return viewCatalogService.searchBooksByTitle(title); }
 

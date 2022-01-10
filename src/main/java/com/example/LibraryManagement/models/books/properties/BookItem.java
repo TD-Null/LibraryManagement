@@ -39,7 +39,7 @@ public class BookItem extends Book
     private Long barcode;
 
     @ManyToOne
-    @JoinColumn(name = "library_name", nullable = false)
+    @JoinColumn(name = "library_name")
     private Library library;
 
     @ManyToOne
@@ -47,7 +47,7 @@ public class BookItem extends Book
     private Rack rack;
 
     @ManyToOne
-    @JoinColumn(name = "author_name", nullable = false)
+    @JoinColumn(name = "author_name")
     private Author author;
 
     @ManyToMany

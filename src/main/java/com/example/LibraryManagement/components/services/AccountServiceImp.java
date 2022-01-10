@@ -231,7 +231,7 @@ public class AccountServiceImp implements AccountService
 
     // Registers a new librarian using the user's inputted details to create an account.
     @Transactional
-    public ResponseEntity<MessageResponse> registerLibrarian(String name, String password, String email,
+    public ResponseEntity<LibraryCard> registerLibrarian(String name, String password, String email,
                                                              String streetAddress, String city, String zipcode,
                                                              String country, String phoneNumber)
     {
@@ -260,7 +260,7 @@ public class AccountServiceImp implements AccountService
         librarian.setLibraryCard(libraryCard);
 
         // Return the details of the user's library card after the account has been successfully created.
-        return ResponseEntity.ok(new MessageResponse("Librarian account has been successfully created."));
+        return ResponseEntity.ok(libraryCard);
     }
 
     // Updates a member's account status using the member's ID and the given status update.

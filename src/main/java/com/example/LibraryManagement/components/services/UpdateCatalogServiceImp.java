@@ -143,7 +143,19 @@ public class UpdateCatalogServiceImp implements UpdateCatalogService
             }
         }
 
-        return ResponseEntity.ok(new MessageResponse("Book has been successful updated within the system."));
+        return ResponseEntity.ok(new MessageResponse("Book has been successfully updated within the system."));
+    }
+
+    @Transactional
+    public ResponseEntity<MessageResponse> removeBookItem(Long barcode)
+    {
+        BookItem book = bookValidation(barcode);
+
+        if(book.getCurrLoanMember() != null && book.getStatus() == BookStatus.LOANED)
+            throw new ApiRequestException("This book is currently not available and is loaned to a member.", HttpStatus.ACCEPTED);
+
+        bookItemRepository.delete(book);
+        return ResponseEntity.ok(new MessageResponse("Book has been successfully removed from the system."));
     }
 
     private Library libraryValidation(String name)
