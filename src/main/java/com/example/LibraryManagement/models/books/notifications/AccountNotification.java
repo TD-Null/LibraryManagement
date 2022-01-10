@@ -63,16 +63,16 @@ public class AccountNotification
         this.content = content;
     }
 
+    public Address getAddress()
+    {
+        return new Address(streetAddress, city, zipcode, country);
+    }
+
     public void setAddress(Address address)
     {
         streetAddress = address.getStreetAddress();
         city = address.getCity();
         zipcode = address.getZipcode();
         country = address.getCountry();
-    }
-
-    public Address getAddress()
-    {
-        return new Address(streetAddress, city, zipcode, country);
     }
 }

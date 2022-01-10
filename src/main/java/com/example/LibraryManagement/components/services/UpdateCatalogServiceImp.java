@@ -166,7 +166,10 @@ public class UpdateCatalogServiceImp implements UpdateCatalogService
         else if(book.getCurrReservedMember() != null && book.getStatus() == BookStatus.RESERVED)
         {
             Member member = book.getCurrReservedMember();
-            member.sendNotification(new AccountNotification());
+            member.cancelReservedBookItem(book);
+            member.sendNotification(new AccountNotification(new Date(), member.getEmail(), member.getAddress(),
+                    "Sorry, but this book is being removed and cannot be reserved for this user. " +
+                            "We apologize for this inconvenience."));
         }
 
         Library library = book.getLibrary();
