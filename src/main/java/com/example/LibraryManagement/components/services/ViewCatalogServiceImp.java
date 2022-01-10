@@ -2,7 +2,7 @@ package com.example.LibraryManagement.components.services;
 
 import com.example.LibraryManagement.components.repositories.books.AuthorRepository;
 import com.example.LibraryManagement.components.repositories.books.BookItemRepository;
-import com.example.LibraryManagement.components.repositories.books.libraries.LibraryRepository;
+import com.example.LibraryManagement.components.repositories.books.LibraryRepository;
 import com.example.LibraryManagement.components.repositories.books.SubjectRepository;
 import com.example.LibraryManagement.models.books.libraries.Library;
 import com.example.LibraryManagement.models.books.properties.Author;
@@ -31,12 +31,14 @@ public class ViewCatalogServiceImp implements ViewCatalogService
     private final AuthorRepository authorRepository;
     @Autowired
     private final SubjectRepository subjectRepository;
+    @Autowired
+    private final ValidationService validationService;
 
     public ResponseEntity<List<Library>> listAllLibraries() { return ResponseEntity.ok(libraryRepository.findAll()); }
 
     public ResponseEntity<List<BookItem>> listLibraryBooks(String name)
     {
-        Library library = libraryValidation(name);
+        Library library = validationService.libraryValidation(name);
 
         Set<BookItem> libraryBooks = library.getBooks();
         List<BookItem> currBooks = new ArrayList<>(libraryBooks);
@@ -67,7 +69,7 @@ public class ViewCatalogServiceImp implements ViewCatalogService
 
     public ResponseEntity<List<BookItem>> searchBooksByAuthor(String name)
     {
-        Author author = authorValidation(name);
+        Author author = validationService.authorValidation(name);
 
         Set<BookItem> authorBooks = author.getBooks();
         List<BookItem> currBooks = new ArrayList<>(authorBooks);
@@ -81,7 +83,7 @@ public class ViewCatalogServiceImp implements ViewCatalogService
 
     public ResponseEntity<List<BookItem>> searchBooksBySubject(String name)
     {
-        Subject subject = subjectValidation(name);
+        Subject subject = validationService.subjectValidation(name);
 
         Set<BookItem> subjectBooks = subject.getBooks();
         List<BookItem> currBooks = new ArrayList<>(subjectBooks);
@@ -102,36 +104,5 @@ public class ViewCatalogServiceImp implements ViewCatalogService
                     HttpStatus.NO_CONTENT);
 
         return ResponseEntity.ok(currBooks);
-    }
-
-    private Library libraryValidation(String name)
-    {
-        Optional<Library> library = libraryRepository.findById(name);
-
-        if(library.isEmpty())
-            throw new ApiRequestException("Unable to find this library.",
-                    HttpStatus.NO_CONTENT);
-
-        return library.get();
-    }
-
-    private Author authorValidation(String name)
-    {
-        if(!authorRepository.existsById(name))
-        {
-            authorRepository.save(new Author(name));
-        }
-
-        return authorRepository.getById(name);
-    }
-
-    private Subject subjectValidation(String name)
-    {
-        if(!subjectRepository.existsById(name))
-        {
-            subjectRepository.save(new Subject(name));
-        }
-
-        return subjectRepository.getById(name);
     }
 }

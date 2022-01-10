@@ -9,6 +9,7 @@ import com.example.LibraryManagement.models.accounts.types.Member;
 import com.example.LibraryManagement.models.books.actions.BookLending;
 import com.example.LibraryManagement.models.books.actions.BookReservation;
 import com.example.LibraryManagement.models.books.fines.Fine;
+import com.example.LibraryManagement.models.books.libraries.Rack;
 import com.example.LibraryManagement.models.enums.accounts.AccountStatus;
 import com.example.LibraryManagement.models.enums.accounts.AccountType;
 import com.example.LibraryManagement.models.io.requests.BarcodeValidationRequest;
@@ -110,25 +111,18 @@ public class LibrarianController
                 request.getZipcode(), request.getCountry());
     }
 
-    @PostMapping("/catalog/library/rack")
-    public ResponseEntity<MessageResponse> addLibraryRack(@Valid @RequestBody AddLibraryRackRequest request)
-    {
-        accountService.barcodeReader(request.getBarcode(), AccountType.LIBRARIAN, AccountStatus.ACTIVE);
-        return updateCatalogService.addLibraryRack(request.getLibraryName(), request.getNumber(), request.getLocationIdentifier());
-    }
-
     @PostMapping("/catalog/add")
     public ResponseEntity<MessageResponse> addBookItem(@Valid @RequestBody AddBookItemRequest request)
     {
         accountService.barcodeReader(request.getBarcode(), AccountType.LIBRARIAN, AccountStatus.ACTIVE);
-        return updateCatalogService.addBookItem(request.getLibraryName(), request.getRackID(), request.getISBN(),
-                request.getTitle(), request.getPublisher(), request.getLanguage(), request.getNumberOfPages(),
+        return updateCatalogService.addBookItem(request.getLibraryName(), new Rack(request.getRack(), request.getLocation()),
+                request.getISBN(), request.getTitle(), request.getPublisher(), request.getLanguage(), request.getNumberOfPages(),
                 request.getAuthorName(), request.getSubjectNames(), request.getFormat(), request.getPublicationDate(),
                 request.isReferenceOnly(), request.getPrice());
     }
 
     @PutMapping("/catalog/update")
-    public ResponseEntity<MessageResponse> updateBookItem(@Valid @RequestBody UpdateBookItemRequest request,
+    public ResponseEntity<MessageResponse> updateBookItem(@Valid @RequestBody AddBookItemRequest request,
                                                           @RequestParam Long barcode)
     {
         accountService.barcodeReader(request.getBarcode(), AccountType.LIBRARIAN, AccountStatus.ACTIVE);

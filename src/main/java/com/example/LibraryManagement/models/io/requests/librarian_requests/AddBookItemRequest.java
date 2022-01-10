@@ -16,8 +16,10 @@ public class AddBookItemRequest extends BarcodeValidationRequest
     @NotBlank
     private String libraryName;
 
+    private int rack;
+
     @NotBlank
-    private long rackID;
+    private String location;
 
     @NotBlank
     private String ISBN;
@@ -50,15 +52,15 @@ public class AddBookItemRequest extends BarcodeValidationRequest
 
     private double price;
 
-    public AddBookItemRequest(Long barcode, String libraryName, long rackID,
-                              String ISBN, String title, String publisher, String language,
-                              int numberOfPages, String authorName, Set<String> subjectNames,
-                              BookFormat format, Date publicationDate, boolean isReferenceOnly,
-                              double price)
+    public AddBookItemRequest(Long barcode, String libraryName, int rack, String location,
+                              String ISBN, String title, String publisher, String language, int numberOfPages,
+                              String authorName, Set<String> subjectNames, BookFormat format, Date publicationDate,
+                              boolean isReferenceOnly, double price)
     {
         super(barcode);
         this.libraryName = libraryName;
-        this.rackID = rackID;
+        this.rack = rack;
+        this.location = location;
         this.ISBN = ISBN;
         this.title = title;
         this.publisher = publisher;

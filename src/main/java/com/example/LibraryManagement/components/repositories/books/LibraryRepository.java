@@ -1,4 +1,4 @@
-package com.example.LibraryManagement.components.repositories.books.libraries;
+package com.example.LibraryManagement.components.repositories.books;
 
 import com.example.LibraryManagement.models.books.libraries.Library;
 import org.springframework.data.jpa.repository.JpaRepository;

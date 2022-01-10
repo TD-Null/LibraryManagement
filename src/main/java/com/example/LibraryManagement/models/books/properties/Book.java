@@ -1,5 +1,6 @@
 package com.example.LibraryManagement.models.books.properties;
 
+import com.example.LibraryManagement.models.books.libraries.Rack;
 import lombok.*;
 
 import javax.persistence.Column;

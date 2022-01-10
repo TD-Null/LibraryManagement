@@ -40,6 +40,8 @@ public class AccountServiceImp implements AccountService
     private final LibrarianRepository librarianRepository;
     @Autowired
     private final MemberRepository memberRepository;
+    @Autowired
+    private final ValidationService validationService;
 
     // Returns the user's account details using their library card's barcode.
     public ResponseEntity<Object> getAccountDetails(Long barcode)
@@ -49,7 +51,7 @@ public class AccountServiceImp implements AccountService
          * Afterwards, get the account user associated with the given library card and if
          * available, return the user's details.
          */
-        LibraryCard card = cardValidation(barcode);
+        LibraryCard card = validationService.cardValidation(barcode);
         AccountType type = card.getType();
 
         if(type == AccountType.MEMBER && card.getMember() != null)
@@ -80,7 +82,7 @@ public class AccountServiceImp implements AccountService
          * Afterwards, get the account user associated with the given library card and if
          * available, edit the user's details.
          */
-        LibraryCard card = cardValidation(barcode);
+        LibraryCard card = validationService.cardValidation(barcode);
         AccountType type = card.getType();
 
         if(type == AccountType.MEMBER && card.getMember() != null)
@@ -120,7 +122,7 @@ public class AccountServiceImp implements AccountService
          * Afterwards, get the account user associated with the given library card and if
          * available, change the user's password.
          */
-        LibraryCard card = cardValidation(barcode);
+        LibraryCard card = validationService.cardValidation(barcode);
         AccountType type = card.getType();
 
         if(type == AccountType.MEMBER && card.getMember() != null)
@@ -336,17 +338,6 @@ public class AccountServiceImp implements AccountService
         // Else, the user will be unable to proceed with any action.
         throw new ApiRequestException("User is not allowed to perform this action.",
                 HttpStatus.UNAUTHORIZED);
-    }
-
-    public LibraryCard cardValidation(Long barcode)
-    {
-        Optional<LibraryCard> card = libraryCardRepository.findById(barcode);
-
-        if(card.isEmpty())
-            throw new ApiRequestException("Unable to find library card within the system.",
-                    HttpStatus.UNAUTHORIZED);
-
-        return card.get();
     }
 
     /*

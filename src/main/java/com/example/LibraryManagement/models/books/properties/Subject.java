@@ -23,7 +23,7 @@ public class Subject
     private String name;
 
     @JsonIgnore
-    @ManyToMany(mappedBy = "subjects", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToMany(mappedBy = "subjects", fetch = FetchType.LAZY, cascade = {CascadeType.MERGE, CascadeType.DETACH})
     private Set<BookItem> books = new HashSet<>();
 
     public Subject(String name) { this.name = name; }

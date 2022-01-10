@@ -1,4 +1,4 @@
-package com.example.LibraryManagement.components.repositories.books.fines;
+package com.example.LibraryManagement.components.repositories.fines;
 
 import com.example.LibraryManagement.models.books.fines.transactions.CheckTransaction;
 import org.springframework.data.jpa.repository.JpaRepository;
