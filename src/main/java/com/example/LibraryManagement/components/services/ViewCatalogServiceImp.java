@@ -16,6 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.*;
 
@@ -55,6 +56,51 @@ public class ViewCatalogServiceImp implements ViewCatalogService
     public ResponseEntity<List<Subject>> listAllSubjects() { return ResponseEntity.ok(subjectRepository.findAll()); }
 
     public ResponseEntity<List<Author>> listAllAuthors() { return ResponseEntity.ok(authorRepository.findAll()); }
+
+    public ResponseEntity<List<BookItem>> searchBooks(String title, String author, List<String> subjects, String publicationDate)
+    {
+        List<BookItem> books = new ArrayList<>();
+
+        if(!title.equals("none"))
+        {
+            List<BookItem> booksByTitle = bookItemRepository.findAllByTitleContaining(title);
+
+            for(BookItem b: booksByTitle)
+                if(!books.contains(b)) books.add(b);
+        }
+
+        if(!author.equals("none"))
+        {
+            Author a = validationService.authorValidation(author);
+            Set<BookItem> booksByAuthor = a.getBooks();
+
+            for(BookItem b: booksByAuthor)
+                if(!books.contains(b)) books.add(b);
+        }
+
+        if(subjects.contains("none"))
+        {
+            for(String name: subjects)
+            {
+                Subject subject = validationService.subjectValidation(name);
+                Set<BookItem> booksBySubject = subject.getBooks();
+
+                for(BookItem b: booksBySubject)
+                    if(!books.contains(b)) books.add(b);
+            }
+        }
+
+        if(!publicationDate.equals("none"))
+        {
+
+        }
+
+        if(books.isEmpty())
+            throw new ApiRequestException("There are no books found under this search.",
+                    HttpStatus.NO_CONTENT);
+
+        return ResponseEntity.ok(books);
+    }
 
     public ResponseEntity<List<BookItem>> searchBooksByTitle(String title)
     {

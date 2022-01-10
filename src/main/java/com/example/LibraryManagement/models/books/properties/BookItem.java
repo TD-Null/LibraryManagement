@@ -132,4 +132,10 @@ public class BookItem extends Book
     }
 
     public void addReservationRecord(BookReservation br) { reservationRecords.add(br); }
+
+    public void clearRecords()
+    {
+        lendingRecords.clear();
+        reservationRecords.clear();
+    }
 }

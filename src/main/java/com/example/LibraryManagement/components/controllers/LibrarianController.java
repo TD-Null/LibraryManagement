@@ -131,7 +131,24 @@ public class LibrarianController
                 request.getFormat(), request.getPublicationDate(), request.isReferenceOnly(), request.getPrice());
     }
 
-    @DeleteMapping("/catalog/remove")
+    @PutMapping("/catalog/move")
+    public ResponseEntity<MessageResponse> moveBookItem(@Valid @RequestBody MoveBookItemRequest request,
+                                                        @RequestParam Long barcode)
+    {
+        accountService.barcodeReader(request.getBarcode(), AccountType.LIBRARIAN, AccountStatus.ACTIVE);
+        return updateCatalogService.moveBookItem(barcode, request.getLibraryName(),
+                new Rack(request.getRack(), request.getLocation()));
+    }
+
+    @DeleteMapping("catalog/remove/library")
+    public ResponseEntity<MessageResponse> removeLibrary(@Valid @RequestBody BarcodeValidationRequest request,
+                                                         @RequestParam(name = "library") String name)
+    {
+        accountService.barcodeReader(request.getBarcode(), AccountType.LIBRARIAN, AccountStatus.ACTIVE);
+        return updateCatalogService.removeLibrary(name);
+    }
+
+    @DeleteMapping("/catalog/remove/book")
     public ResponseEntity<MessageResponse> removeBookItem(@Valid @RequestBody BarcodeValidationRequest request,
                                                           @RequestParam Long barcode)
     {

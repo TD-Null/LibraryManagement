@@ -55,7 +55,7 @@ public class Library
     private String country;
 
     @JsonIgnore
-    @OneToMany(mappedBy = "library", fetch = FetchType.LAZY, cascade = {CascadeType.MERGE, CascadeType.DETACH, CascadeType.REMOVE})
+    @OneToMany(mappedBy = "library", fetch = FetchType.LAZY, cascade = {CascadeType.MERGE, CascadeType.DETACH})
     private Set<BookItem> books = new HashSet<>();
 
     public Library(String name, Address address)
@@ -80,4 +80,6 @@ public class Library
     public void addBookItem(BookItem b) { books.add(b); }
 
     public void removeBookItem(BookItem b) { books.remove(b); }
+
+    public void clearLibrary() { books.clear(); }
 }

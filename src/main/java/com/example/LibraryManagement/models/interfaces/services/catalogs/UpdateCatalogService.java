@@ -22,4 +22,10 @@ public interface UpdateCatalogService
                                                    String language, int numberOfPages, String authorName,
                                                    Set<String> subjects, BookFormat format, Date publicationDate,
                                                    boolean isReferenceOnly, double price);
+
+    ResponseEntity<MessageResponse> moveBookItem(Long barcode, String libraryName, Rack r);
+
+    ResponseEntity<MessageResponse> removeLibrary(String libraryName);
+
+    ResponseEntity<MessageResponse> removeBookItem(Long barcode);
 }

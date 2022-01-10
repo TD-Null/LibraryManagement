@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.sql.Date;
+import java.util.ArrayList;
 import java.util.List;
 
 /*
@@ -44,14 +45,14 @@ public class CatalogController
     @GetMapping("/author")
     public ResponseEntity<List<Author>> viewAllAuthors() { return viewCatalogService.listAllAuthors(); }
 
-//    @GetMapping("/search")
-//    public ResponseEntity<List<BookItem>> searchBooks(@RequestParam(required = false) String title,
-//                                                      @RequestParam(required = false) String author,
-//                                                      @RequestParam(required = false) List<String> subjects,
-//                                                      @RequestParam(required = false) Date publicationDate)
-//    {
-//
-//    }
+    @GetMapping("/search")
+    public ResponseEntity<List<BookItem>> searchBooks(@RequestParam(value = "title", required = false, defaultValue = "none") String title,
+                                                      @RequestParam(value = "author", required = false, defaultValue = "none") String author,
+                                                      @RequestParam(value = "subjects", required = false, defaultValue = "none") List<String> subjects,
+                                                      @RequestParam(value = "date", required = false, defaultValue = "none") String publicationDate)
+    {
+        return viewCatalogService.searchBooks(title, author, subjects, publicationDate);
+    }
 
     @GetMapping("/filter/title")
     public ResponseEntity<List<BookItem>> viewBooksByTitle(@RequestParam String title) { return viewCatalogService.searchBooksByTitle(title); }

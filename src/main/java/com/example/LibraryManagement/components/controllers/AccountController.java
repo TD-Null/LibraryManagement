@@ -38,7 +38,7 @@ public class AccountController
 //    }
 
     @GetMapping("/details")
-    public ResponseEntity<Object> viewAccountDetails(@RequestParam Long barcode)
+    public ResponseEntity<Object> viewAccountDetails(@RequestParam(value = "card") Long barcode)
     {
         return accountService.getAccountDetails(barcode);
     }
@@ -78,7 +78,7 @@ public class AccountController
 
     @PutMapping("/update")
     public ResponseEntity<MessageResponse> editAccountDetails(@Valid @RequestBody UpdateAccountRequest request,
-                                                              @RequestParam Long barcode)
+                                                              @RequestParam(value = "card") Long barcode)
     {
         return accountService.updateAccountDetails(barcode, request.getName(), request.getStreetAddress(),
                 request.getCity(), request.getZipcode(), request.getCountry(), request.getEmail(), request.getPhoneNumber());
@@ -92,7 +92,7 @@ public class AccountController
 
     @PutMapping("/update/password")
     public ResponseEntity<MessageResponse> changePassword(@Valid @RequestBody ChangePasswordRequest request,
-                                                          @RequestParam Long barcode)
+                                                          @RequestParam(value = "card") Long barcode)
     {
         return accountService.changePassword(barcode, request.getOriginalPassword(), request.getNewPassword());
     }

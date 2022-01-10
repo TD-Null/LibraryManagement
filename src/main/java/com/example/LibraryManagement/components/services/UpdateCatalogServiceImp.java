@@ -2,8 +2,10 @@ package com.example.LibraryManagement.components.services;
 
 import com.example.LibraryManagement.components.repositories.books.*;
 import com.example.LibraryManagement.components.repositories.books.LibraryRepository;
+import com.example.LibraryManagement.models.accounts.types.Member;
 import com.example.LibraryManagement.models.books.libraries.Library;
 import com.example.LibraryManagement.models.books.libraries.Rack;
+import com.example.LibraryManagement.models.books.notifications.AccountNotification;
 import com.example.LibraryManagement.models.books.properties.Author;
 import com.example.LibraryManagement.models.books.properties.BookItem;
 import com.example.LibraryManagement.models.books.properties.Subject;
@@ -22,7 +24,6 @@ import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 import java.util.Date;
 import java.util.HashSet;
-import java.util.Optional;
 import java.util.Set;
 
 @AllArgsConstructor
@@ -33,10 +34,6 @@ public class UpdateCatalogServiceImp implements UpdateCatalogService
     private final BookItemRepository bookItemRepository;
     @Autowired
     private final LibraryRepository libraryRepository;
-    @Autowired
-    private final AuthorRepository authorRepository;
-    @Autowired
-    private final SubjectRepository subjectRepository;
     @Autowired
     private final ValidationService validationService;
 
@@ -149,6 +146,16 @@ public class UpdateCatalogServiceImp implements UpdateCatalogService
     }
 
     @Transactional
+    public ResponseEntity<MessageResponse> removeLibrary(String libraryName)
+    {
+        Library library = validationService.libraryValidation(libraryName);
+        library.clearLibrary();
+
+        libraryRepository.delete(library);
+        return ResponseEntity.ok(new MessageResponse("Library has been successfully removed from the system."));
+    }
+
+    @Transactional
     public ResponseEntity<MessageResponse> removeBookItem(Long barcode)
     {
         BookItem book = validationService.bookValidation(barcode);
@@ -156,8 +163,24 @@ public class UpdateCatalogServiceImp implements UpdateCatalogService
         if(book.getCurrLoanMember() != null && book.getStatus() == BookStatus.LOANED)
             throw new ApiRequestException("This book is currently not available and is loaned to a member.", HttpStatus.ACCEPTED);
 
+        else if(book.getCurrReservedMember() != null && book.getStatus() == BookStatus.RESERVED)
+        {
+            Member member = book.getCurrReservedMember();
+            member.sendNotification(new AccountNotification());
+        }
+
         Library library = book.getLibrary();
+        Author author = book.getAuthor();
+        Set<Subject> subjects = book.getSubjects();
+
         library.removeBookItem(book);
+        author.removeBookItem(book);
+
+        for(Subject s: subjects)
+            s.removeBookItem(book);
+
+        book.clearRecords();
+
         bookItemRepository.delete(book);
         return ResponseEntity.ok(new MessageResponse("Book has been successfully removed from the system."));
     }
