@@ -82,7 +82,7 @@ public class LibrarianController
         return accountService.updateMemberStatus(memberId, AccountStatus.BLACKLISTED);
     }
 
-    @PutMapping("/account/member/block")
+    @PutMapping("/account/member/unblock")
     public ResponseEntity<MessageResponse> unblockMember(@Valid @RequestBody BarcodeValidationRequest request,
                                                          @RequestParam(name = "member") Long memberId)
     {
@@ -148,7 +148,7 @@ public class LibrarianController
                 new Rack(request.getRack(), request.getLocation()));
     }
 
-    @DeleteMapping("catalog/remove/library")
+    @DeleteMapping("catalog/library/remove")
     public ResponseEntity<MessageResponse> removeLibrary(@Valid @RequestBody BarcodeValidationRequest request,
                                                          @RequestParam(name = "library") String name)
     {
@@ -156,7 +156,7 @@ public class LibrarianController
         return updateCatalogService.removeLibrary(name);
     }
 
-    @DeleteMapping("/catalog/remove/book")
+    @DeleteMapping("/catalog/book/remove")
     public ResponseEntity<MessageResponse> removeBookItem(@Valid @RequestBody BarcodeValidationRequest request,
                                                           @RequestParam Long barcode)
     {
