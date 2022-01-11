@@ -25,7 +25,11 @@ public interface ViewCatalogService
 
     ResponseEntity<List<Author>> listAllAuthors();
 
-    ResponseEntity<List<BookItem>> searchBooks(String title, String author, List<String> subjects, Date publicationDate);
+    ResponseEntity<List<BookItem>> searchBooks(String libraryName,
+                                               String title,
+                                               String authorName,
+                                               List<String> subjects,
+                                               Date publicationDate);
 
     ResponseEntity<List<BookItem>> searchBooksByTitle(String title);
 

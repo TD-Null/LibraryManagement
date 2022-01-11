@@ -1,7 +1,8 @@
-package com.example.LibraryManagement.components.services;
+package com.example.LibraryManagement.components.services.catalogs;
 
 import com.example.LibraryManagement.components.repositories.books.*;
 import com.example.LibraryManagement.components.repositories.books.LibraryRepository;
+import com.example.LibraryManagement.components.services.ValidationService;
 import com.example.LibraryManagement.models.accounts.types.Member;
 import com.example.LibraryManagement.models.books.libraries.Library;
 import com.example.LibraryManagement.models.books.libraries.Rack;

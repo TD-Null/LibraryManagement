@@ -4,10 +4,10 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 @Getter
-@AllArgsConstructor
-public class UpdateAccountRequest
+public class UpdateAccountRequest extends BarcodeValidationRequest
 {
     @NotBlank
     private String name;
@@ -29,4 +29,17 @@ public class UpdateAccountRequest
 
     @NotBlank
     private String phoneNumber;
+
+    public UpdateAccountRequest(Long barcode, String name, String streetAddress, String city,
+                                String zipcode, String country, String email, String phoneNumber)
+    {
+        super(barcode);
+        this.name = name;
+        this.streetAddress = streetAddress;
+        this.city = city;
+        this.zipcode = zipcode;
+        this.country = country;
+        this.email = email;
+        this.phoneNumber = phoneNumber;
+    }
 }

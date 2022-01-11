@@ -1,8 +1,7 @@
 package com.example.LibraryManagement.components.controllers;
 
-import com.example.LibraryManagement.components.services.AccountServiceImp;
-import com.example.LibraryManagement.components.services.MemberServiceImp;
-import com.example.LibraryManagement.components.services.UpdateCatalogServiceImp;
+import com.example.LibraryManagement.components.services.accounts.AccountServiceImp;
+import com.example.LibraryManagement.components.services.accounts.MemberServiceImp;
 import com.example.LibraryManagement.components.services.ValidationService;
 import com.example.LibraryManagement.models.accounts.types.Member;
 import com.example.LibraryManagement.models.books.actions.BookLending;
@@ -35,7 +34,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /*
- * TODO: Add functions for borrowing, reserving, renewing books, as well check their account's details.
+ *
  */
 @CrossOrigin(origins = "*", maxAge = 3600)
 @AllArgsConstructor

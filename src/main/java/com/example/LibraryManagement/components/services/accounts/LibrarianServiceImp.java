@@ -1,4 +1,4 @@
-package com.example.LibraryManagement.components.services;
+package com.example.LibraryManagement.components.services.accounts;
 
 import com.example.LibraryManagement.components.repositories.accounts.LibrarianRepository;
 import com.example.LibraryManagement.components.repositories.accounts.MemberRepository;

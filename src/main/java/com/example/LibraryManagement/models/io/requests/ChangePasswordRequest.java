@@ -6,8 +6,7 @@ import lombok.Getter;
 import javax.validation.constraints.NotBlank;
 
 @Getter
-@AllArgsConstructor
-public class ChangePasswordRequest
+public class ChangePasswordRequest extends BarcodeValidationRequest
 {
     @NotBlank
     private String originalPassword;
@@ -15,9 +14,10 @@ public class ChangePasswordRequest
     @NotBlank
     private String newPassword;
 
-//    public ChangePasswordRequest(Long barcode, String originalPassword, String newPassword)
-//    {
-//        this.originalPassword = originalPassword;
-//        this.newPassword = newPassword;
-//    }
+    public ChangePasswordRequest(Long barcode, String originalPassword, String newPassword)
+    {
+        super(barcode);
+        this.originalPassword = originalPassword;
+        this.newPassword = newPassword;
+    }
 }

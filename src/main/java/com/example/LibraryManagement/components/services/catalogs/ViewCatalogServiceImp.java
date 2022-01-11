@@ -1,9 +1,10 @@
-package com.example.LibraryManagement.components.services;
+package com.example.LibraryManagement.components.services.catalogs;
 
 import com.example.LibraryManagement.components.repositories.books.AuthorRepository;
 import com.example.LibraryManagement.components.repositories.books.BookItemRepository;
 import com.example.LibraryManagement.components.repositories.books.LibraryRepository;
 import com.example.LibraryManagement.components.repositories.books.SubjectRepository;
+import com.example.LibraryManagement.components.services.ValidationService;
 import com.example.LibraryManagement.models.books.libraries.Library;
 import com.example.LibraryManagement.models.books.properties.Author;
 import com.example.LibraryManagement.models.books.properties.BookItem;
@@ -37,29 +38,28 @@ public class ViewCatalogServiceImp implements ViewCatalogService
 
     public ResponseEntity<List<Library>> listAllLibraries() { return ResponseEntity.ok(libraryRepository.findAll()); }
 
-    public ResponseEntity<List<BookItem>> listLibraryBooks(String name)
-    {
-        Library library = validationService.libraryValidation(name);
-
-        Set<BookItem> libraryBooks = library.getBooks();
-        List<BookItem> currBooks = new ArrayList<>(libraryBooks);
-
-        if(currBooks.isEmpty())
-            throw new ApiRequestException("There are no books currently available in this library.",
-                    HttpStatus.NO_CONTENT);
-
-        return ResponseEntity.ok(currBooks);
-    }
-
-    public ResponseEntity<List<BookItem>> listAllBooks() { return ResponseEntity.ok(bookItemRepository.findAll()); }
-
     public ResponseEntity<List<Subject>> listAllSubjects() { return ResponseEntity.ok(subjectRepository.findAll()); }
 
     public ResponseEntity<List<Author>> listAllAuthors() { return ResponseEntity.ok(authorRepository.findAll()); }
 
-    public ResponseEntity<List<BookItem>> searchBooks(String title, String author, List<String> subjects, Date publicationDate)
+    public ResponseEntity<List<BookItem>> listAllBooks() { return ResponseEntity.ok(bookItemRepository.findAll()); }
+
+    public ResponseEntity<List<BookItem>> searchBooks(String libraryName,
+                                                      String title,
+                                                      String authorName,
+                                                      List<String> subjects,
+                                                      Date publicationDate)
     {
         List<BookItem> books = new ArrayList<>();
+
+        if(!libraryName.equals("none"))
+        {
+            Library library = validationService.libraryValidation(libraryName);
+            Set<BookItem> libraryBooks = library.getBooks();
+
+            for(BookItem b: libraryBooks)
+                if(!books.contains(b)) books.add(b);
+        }
 
         if(!title.equals("none"))
         {
@@ -69,10 +69,10 @@ public class ViewCatalogServiceImp implements ViewCatalogService
                 if(!books.contains(b)) books.add(b);
         }
 
-        if(!author.equals("none"))
+        if(!authorName.equals("none"))
         {
-            Author a = validationService.authorValidation(author);
-            Set<BookItem> booksByAuthor = a.getBooks();
+            Author author = validationService.authorValidation(authorName);
+            Set<BookItem> booksByAuthor = author.getBooks();
 
             for(BookItem b: booksByAuthor)
                 if(!books.contains(b)) books.add(b);
@@ -103,6 +103,20 @@ public class ViewCatalogServiceImp implements ViewCatalogService
                     HttpStatus.NO_CONTENT);
 
         return ResponseEntity.ok(books);
+    }
+
+    public ResponseEntity<List<BookItem>> listLibraryBooks(String name)
+    {
+        Library library = validationService.libraryValidation(name);
+
+        Set<BookItem> libraryBooks = library.getBooks();
+        List<BookItem> currBooks = new ArrayList<>(libraryBooks);
+
+        if(currBooks.isEmpty())
+            throw new ApiRequestException("There are no books currently available in this library.",
+                    HttpStatus.NO_CONTENT);
+
+        return ResponseEntity.ok(currBooks);
     }
 
     public ResponseEntity<List<BookItem>> searchBooksByTitle(String title)

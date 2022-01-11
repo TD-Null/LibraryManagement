@@ -1,8 +1,9 @@
-package com.example.LibraryManagement.components.services;
+package com.example.LibraryManagement.components.services.accounts;
 
 import com.example.LibraryManagement.components.repositories.books.BookLendingRepository;
 import com.example.LibraryManagement.components.repositories.books.BookReservationRepository;
 import com.example.LibraryManagement.components.repositories.fines.*;
+import com.example.LibraryManagement.components.services.ValidationService;
 import com.example.LibraryManagement.models.accounts.types.Member;
 import com.example.LibraryManagement.models.books.actions.BookLending;
 import com.example.LibraryManagement.models.books.actions.BookReservation;
@@ -39,8 +40,6 @@ public class MemberServiceImp implements MemberService
     private final BookLendingRepository bookLendingRepository;
     @Autowired
     private final BookReservationRepository bookReservationRepository;
-    @Autowired
-    private final FineRepository fineRepository;
     @Autowired
     private final FineTransactionRepository fineTransactionRepository;
     @Autowired

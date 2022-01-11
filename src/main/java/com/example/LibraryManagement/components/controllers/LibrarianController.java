@@ -1,8 +1,8 @@
 package com.example.LibraryManagement.components.controllers;
 
-import com.example.LibraryManagement.components.services.AccountServiceImp;
-import com.example.LibraryManagement.components.services.UpdateCatalogServiceImp;
-import com.example.LibraryManagement.components.services.LibrarianServiceImp;
+import com.example.LibraryManagement.components.services.accounts.AccountServiceImp;
+import com.example.LibraryManagement.components.services.catalogs.UpdateCatalogServiceImp;
+import com.example.LibraryManagement.components.services.accounts.LibrarianServiceImp;
 import com.example.LibraryManagement.models.accounts.LibraryCard;
 import com.example.LibraryManagement.models.accounts.types.Librarian;
 import com.example.LibraryManagement.models.accounts.types.Member;
@@ -53,12 +53,41 @@ public class LibrarianController
         return librarianService.listAllLibrarians();
     }
 
-    @PutMapping("/account/member")
-    public ResponseEntity<MessageResponse> updateMemberStatus(@RequestParam(name = "id") Long ID,
-                                                              @Valid @RequestBody UpdateMemberStatusRequest request)
+    @PostMapping("/account/librarian/register")
+    public ResponseEntity<LibraryCard> registerLibrarian(@Valid @RequestBody AddLibrarianRequest request)
+    {
+        return accountService.registerLibrarian(
+                request.getName(), request.getPassword(),
+                request.getEmail(), request.getStreetAddress(),
+                request.getCity(), request.getZipcode(),
+                request.getCountry(), request.getPhoneNumber());
+    }
+
+    @PostMapping("/account/librarian/add")
+    public ResponseEntity<LibraryCard> addLibrarian(@Valid @RequestBody AddLibrarianRequest request)
     {
         accountService.barcodeReader(request.getBarcode(), AccountType.LIBRARIAN, AccountStatus.ACTIVE);
-        return accountService.updateMemberStatus(ID, request.getStatus());
+        return accountService.registerLibrarian(
+                request.getName(), request.getPassword(),
+                request.getEmail(), request.getStreetAddress(),
+                request.getCity(), request.getZipcode(),
+                request.getCountry(), request.getPhoneNumber());
+    }
+
+    @PutMapping("/account/member/block")
+    public ResponseEntity<MessageResponse> blockMember(@Valid @RequestBody BarcodeValidationRequest request,
+                                                       @RequestParam(name = "member") Long memberId)
+    {
+        accountService.barcodeReader(request.getBarcode(), AccountType.LIBRARIAN, AccountStatus.ACTIVE);
+        return accountService.updateMemberStatus(memberId, AccountStatus.BLACKLISTED);
+    }
+
+    @PutMapping("/account/member/block")
+    public ResponseEntity<MessageResponse> unblockMember(@Valid @RequestBody BarcodeValidationRequest request,
+                                                         @RequestParam(name = "member") Long memberId)
+    {
+        accountService.barcodeReader(request.getBarcode(), AccountType.LIBRARIAN, AccountStatus.ACTIVE);
+        return accountService.updateMemberStatus(memberId, AccountStatus.ACTIVE);
     }
 
     @GetMapping("/records/book_loans")
@@ -80,27 +109,6 @@ public class LibrarianController
     {
         accountService.barcodeReader(request.getBarcode(), AccountType.LIBRARIAN, AccountStatus.ACTIVE);
         return librarianService.listAllFines();
-    }
-
-    @PostMapping("/account/librarian/register")
-    public ResponseEntity<LibraryCard> registerLibrarian(@Valid @RequestBody AddLibrarianRequest request)
-    {
-        return accountService.registerLibrarian(
-                request.getName(), request.getPassword(),
-                request.getEmail(), request.getStreetAddress(),
-                request.getCity(), request.getZipcode(),
-                request.getCountry(), request.getPhoneNumber());
-    }
-
-    @PostMapping("/account/librarian/add")
-    public ResponseEntity<LibraryCard> addLibrarian(@Valid @RequestBody AddLibrarianRequest request)
-    {
-        accountService.barcodeReader(request.getBarcode(), AccountType.LIBRARIAN, AccountStatus.ACTIVE);
-        return accountService.registerLibrarian(
-                request.getName(), request.getPassword(),
-                request.getEmail(), request.getStreetAddress(),
-                request.getCity(), request.getZipcode(),
-                request.getCountry(), request.getPhoneNumber());
     }
 
     @PostMapping("/catalog/library")

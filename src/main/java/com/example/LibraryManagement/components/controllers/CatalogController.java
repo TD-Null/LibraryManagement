@@ -1,6 +1,6 @@
 package com.example.LibraryManagement.components.controllers;
 
-import com.example.LibraryManagement.components.services.ViewCatalogServiceImp;
+import com.example.LibraryManagement.components.services.catalogs.ViewCatalogServiceImp;
 import com.example.LibraryManagement.models.books.libraries.Library;
 import com.example.LibraryManagement.models.books.properties.Author;
 import com.example.LibraryManagement.models.books.properties.BookItem;
@@ -11,12 +11,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.sql.Date;
-import java.util.ArrayList;
 import java.util.List;
 
 /*
  *
- * TODO: Rework the catalog to use a single function to filter the selection of book items given multiple inputs (title, author, subjects, pub date)
+ *
  */
 @CrossOrigin(origins = "*", maxAge = 3600)
 @AllArgsConstructor
@@ -30,14 +29,8 @@ public class CatalogController
     @GetMapping("/library")
     public ResponseEntity<List<Library>> viewAllLibraries() { return viewCatalogService.listAllLibraries(); }
 
-    @GetMapping("/library/{name}/books")
-    public ResponseEntity<List<BookItem>> viewLibraryBooks(@PathVariable("name") String libraryName) { return viewCatalogService.listLibraryBooks(libraryName); }
-
     @GetMapping
-    public ResponseEntity<List<BookItem>> viewAllBooks()
-    {
-        return viewCatalogService.listAllBooks();
-    }
+    public ResponseEntity<List<BookItem>> viewAllBooks() { return viewCatalogService.listAllBooks(); }
 
     @GetMapping("/subjects")
     public ResponseEntity<List<Subject>> viewAllSubjects() { return viewCatalogService.listAllSubjects(); }
@@ -46,13 +39,17 @@ public class CatalogController
     public ResponseEntity<List<Author>> viewAllAuthors() { return viewCatalogService.listAllAuthors(); }
 
     @GetMapping("/search")
-    public ResponseEntity<List<BookItem>> searchBooks(@RequestParam(value = "title", required = false, defaultValue = "none") String title,
+    public ResponseEntity<List<BookItem>> searchBooks(@RequestParam(value = "library", required = false, defaultValue = "none") String library,
+                                                      @RequestParam(value = "title", required = false, defaultValue = "none") String title,
                                                       @RequestParam(value = "author", required = false, defaultValue = "none") String author,
                                                       @RequestParam(value = "subjects", required = false, defaultValue = "none") List<String> subjects,
                                                       @RequestParam(value = "date", required = false) Date publicationDate)
     {
-        return viewCatalogService.searchBooks(title, author, subjects, publicationDate);
+        return viewCatalogService.searchBooks(library, title, author, subjects, publicationDate);
     }
+
+    @GetMapping("/library/{name}/books")
+    public ResponseEntity<List<BookItem>> viewLibraryBooks(@PathVariable("name") String libraryName) { return viewCatalogService.listLibraryBooks(libraryName); }
 
     @GetMapping("/filter/title")
     public ResponseEntity<List<BookItem>> viewBooksByTitle(@RequestParam String title) { return viewCatalogService.searchBooksByTitle(title); }
