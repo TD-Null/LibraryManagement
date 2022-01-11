@@ -1,7 +1,7 @@
 package com.example.LibraryManagement.models.io.requests.librarian_requests;
 
 import com.example.LibraryManagement.models.enums.books.BookFormat;
-import com.example.LibraryManagement.models.io.requests.BarcodeValidationRequest;
+import com.example.LibraryManagement.models.io.requests.CardValidationRequest;
 import lombok.Getter;
 
 import javax.persistence.*;
@@ -11,7 +11,7 @@ import java.util.Date;
 import java.util.Set;
 
 @Getter
-public class AddBookItemRequest extends BarcodeValidationRequest
+public class AddBookItemRequest extends CardValidationRequest
 {
     @NotBlank
     private final String libraryName;
@@ -52,12 +52,12 @@ public class AddBookItemRequest extends BarcodeValidationRequest
 
     private final double price;
 
-    public AddBookItemRequest(Long barcode, String libraryName, int rack, String location,
+    public AddBookItemRequest(Long barcode, String number, String libraryName, int rack, String location,
                               String ISBN, String title, String publisher, String language, int numberOfPages,
                               String authorName, Set<String> subjectNames, BookFormat format, Date publicationDate,
                               boolean isReferenceOnly, double price)
     {
-        super(barcode);
+        super(barcode, number);
         this.libraryName = libraryName;
         this.rack = rack;
         this.location = location;

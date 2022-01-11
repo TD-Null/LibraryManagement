@@ -9,11 +9,11 @@ import org.springframework.http.ResponseEntity;
 // Methods used in a service component relating to accounts.
 public interface AccountService
 {
-    ResponseEntity<Object> getAccountDetails(Long barcode);
+    ResponseEntity<Object> getAccountDetails(Long barcode, String number);
 
-    ResponseEntity<MessageResponse> updateAccountDetails(Long barcode, String name, String streetAddress,
-                                                         String city, String zipcode, String country,
-                                                         String email, String phoneNumber);
+    ResponseEntity<MessageResponse> updateAccountDetails(Long barcode, String number, String name,
+                                                         String streetAddress, String city, String zipcode,
+                                                         String country, String email, String phoneNumber);
 
     ResponseEntity<MessageResponse> changePassword(Long barcode, String originalPassword, String newPassword);
 
@@ -31,5 +31,5 @@ public interface AccountService
 
     ResponseEntity<MessageResponse> cancelMemberAccount(Long barcode, String cardNumber, String password);
 
-    Object barcodeReader(Long barcode, AccountType type, AccountStatus status);
+    Object barcodeReader(Long barcode, String number, AccountType type, AccountStatus status);
 }

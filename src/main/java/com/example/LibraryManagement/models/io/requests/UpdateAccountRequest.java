@@ -1,13 +1,11 @@
 package com.example.LibraryManagement.models.io.requests;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 
 @Getter
-public class UpdateAccountRequest extends BarcodeValidationRequest
+public class UpdateAccountRequest extends CardValidationRequest
 {
     @NotBlank
     private final String name;
@@ -30,10 +28,10 @@ public class UpdateAccountRequest extends BarcodeValidationRequest
     @NotBlank
     private final String phoneNumber;
 
-    public UpdateAccountRequest(Long barcode, String name, String streetAddress, String city,
+    public UpdateAccountRequest(Long barcode, String number, String name, String streetAddress, String city,
                                 String zipcode, String country, String email, String phoneNumber)
     {
-        super(barcode);
+        super(barcode, number);
         this.name = name;
         this.streetAddress = streetAddress;
         this.city = city;

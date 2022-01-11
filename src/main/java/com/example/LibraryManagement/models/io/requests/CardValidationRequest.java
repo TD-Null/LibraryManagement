@@ -3,6 +3,7 @@ package com.example.LibraryManagement.models.io.requests;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 /*
@@ -12,8 +13,11 @@ import javax.validation.constraints.NotNull;
  */
 @Getter
 @AllArgsConstructor
-public class BarcodeValidationRequest
+public class CardValidationRequest
 {
     @NotNull
     private final Long barcode;
+
+    @NotBlank
+    private final String number;
 }

@@ -44,7 +44,7 @@ public class AccountServiceImp implements AccountService
     private final ValidationService validationService;
 
     // Returns the user's account details using their library card's barcode.
-    public ResponseEntity<Object> getAccountDetails(Long barcode)
+    public ResponseEntity<Object> getAccountDetails(Long barcode, String number)
     {
         /*
          * Ensure that the card exists within the database of the system using its barcode.
@@ -54,7 +54,10 @@ public class AccountServiceImp implements AccountService
         LibraryCard card = validationService.cardValidation(barcode);
         AccountType type = card.getType();
 
-        if(type == AccountType.MEMBER && card.getMember() != null)
+        if(!card.getCardNumber().equals(number))
+            throw new ApiRequestException("Invalid credentials.", HttpStatus.UNAUTHORIZED);
+
+        else if(type == AccountType.MEMBER && card.getMember() != null)
         {
             return ResponseEntity.ok(card.getMember());
         }
@@ -72,10 +75,114 @@ public class AccountServiceImp implements AccountService
                 HttpStatus.UNAUTHORIZED);
     }
 
+    // Authenticates the users credentials with their given library card number and password to login into their account.
+    public ResponseEntity<LibraryCard> authenticateUser(String libraryCardNumber, String password)
+    {
+        Optional<LibraryCard> cardValidation = libraryCardRepository
+                .findLibraryCardByCardNumber(libraryCardNumber);
+
+        // Ensure that the card exists within the database of the system using its card number.
+        if(cardValidation.isPresent())
+        {
+            LibraryCard card = cardValidation.get();
+            AccountType type = card.getType();
+
+            /*
+             * Check if the card is active. If so, check that the user's account is
+             * still active, either of a MEMBER or LIBRARIAN, and if the user's password
+             * matches to their account corresponding to the library card's details given.
+             * If the password matches to their account, then the login is successful and
+             * the details of the library card are given.
+             */
+            if(card.isActive() && (
+                    (type == AccountType.MEMBER && card.getMember() != null
+                            && card.getMember().getStatus() == AccountStatus.ACTIVE
+                            && card.getMember().getPassword().equals(password)) ||
+                    (type == AccountType.LIBRARIAN && card.getLibrarian() != null
+                            && card.getLibrarian().getStatus() == AccountStatus.ACTIVE
+                            && card.getLibrarian().getPassword().equals(password))))
+            {
+                return ResponseEntity.ok(card);
+            }
+        }
+
+        // Else, throw an API request exception stating that the given credentials were invalid.
+        throw new ApiRequestException("Invalid credentials. (Wrong library card number or password)",
+                HttpStatus.UNAUTHORIZED);
+    }
+
+    // Registers a new member using the user's inputted details to create an account.
     @Transactional
-    public ResponseEntity<MessageResponse> updateAccountDetails(Long barcode, String name, String streetAddress,
-                                                                String city, String zipcode, String country,
-                                                                String email, String phoneNumber)
+    public ResponseEntity<LibraryCard> registerMember(String name, String password, String email,
+                                                      String streetAddress, String city, String zipcode,
+                                                      String country, String phoneNumber)
+    {
+        // First, validate that the user's email isn't already being used in the website's other user accounts.
+        if(memberRepository.findMemberByEmail(email).isPresent())
+        {
+            throw new ApiRequestException("Failed to create the account with the given credentials.",
+                    HttpStatus.BAD_REQUEST);
+        }
+
+        // Get the current date when creating this account.
+        Date currDate = new Date();
+
+        // Use the given details of the user to create an account and save to the repository.
+        Address address = new Address(streetAddress, city, zipcode, country);
+        Member member = new Member(name, password, AccountStatus.ACTIVE,
+                address, email, phoneNumber, currDate);
+        memberRepository.save(member);
+
+        // Create a new library card for the user.
+        String cardNumber = generateCardNumber();
+        LibraryCard libraryCard = new LibraryCard(AccountType.MEMBER, cardNumber, currDate, true);
+        libraryCardRepository.save(libraryCard);
+
+        // Link the library card to the user's account.
+        member.setLibraryCard(libraryCard);
+
+        // Return the details of the user's library card after the account has been successfully created.
+        return ResponseEntity.ok(libraryCard);
+    }
+
+    // Registers a new librarian using the user's inputted details to create an account.
+    @Transactional
+    public ResponseEntity<LibraryCard> registerLibrarian(String name, String password, String email,
+                                                         String streetAddress, String city, String zipcode,
+                                                         String country, String phoneNumber)
+    {
+        // First, validate that the user's email isn't already being used in the website's other user accounts.
+        if(librarianRepository.findLibrarianByEmail(email).isPresent())
+        {
+            throw new ApiRequestException("Failed to create the account with the given credentials.",
+                    HttpStatus.BAD_REQUEST);
+        }
+
+        // Get the current date when creating this account.
+        Date currDate = new Date();
+
+        // Use the given details of the user to create an account and save to the repository.
+        Address address = new Address(streetAddress, city, zipcode, country);
+        Librarian librarian = new Librarian(name, password, AccountStatus.ACTIVE,
+                address, email, phoneNumber);
+        librarianRepository.save(librarian);
+
+        // Create a new library card for the user.
+        String cardNumber = generateCardNumber();
+        LibraryCard libraryCard = new LibraryCard(AccountType.LIBRARIAN, cardNumber, currDate, true);
+        libraryCardRepository.save(libraryCard);
+
+        // Link the library card to the user's account.
+        librarian.setLibraryCard(libraryCard);
+
+        // Return the details of the user's library card after the account has been successfully created.
+        return ResponseEntity.ok(libraryCard);
+    }
+
+    @Transactional
+    public ResponseEntity<MessageResponse> updateAccountDetails(Long barcode, String number, String name,
+                                                                String streetAddress, String city, String zipcode,
+                                                                String country, String email, String phoneNumber)
     {
         /*
          * Ensure that the card exists within the database of the system using its barcode.
@@ -85,7 +192,10 @@ public class AccountServiceImp implements AccountService
         LibraryCard card = validationService.cardValidation(barcode);
         AccountType type = card.getType();
 
-        if(type == AccountType.MEMBER && card.getMember() != null)
+        if(!card.getCardNumber().equals(number))
+            throw new ApiRequestException("Invalid credentials.", HttpStatus.UNAUTHORIZED);
+
+        else if(type == AccountType.MEMBER && card.getMember() != null)
         {
             Member member = card.getMember();
             member.setName(name);
@@ -159,110 +269,6 @@ public class AccountServiceImp implements AccountService
          */
         throw new ApiRequestException("Unable to find user's details within the system.",
                 HttpStatus.BAD_REQUEST);
-    }
-
-    // Authenticates the users credentials with their given library card number and password to login into their account.
-    public ResponseEntity<LibraryCard> authenticateUser(String libraryCardNumber, String password)
-    {
-        Optional<LibraryCard> cardValidation = libraryCardRepository
-                .findLibraryCardByCardNumber(libraryCardNumber);
-
-        // Ensure that the card exists within the database of the system using its card number.
-        if(cardValidation.isPresent())
-        {
-            LibraryCard card = cardValidation.get();
-            AccountType type = card.getType();
-
-            /*
-             * Check if the card is active. If so, check that the user's account is
-             * still active, either of a MEMBER or LIBRARIAN, and if the user's password
-             * matches to their account corresponding to the library card's details given.
-             * If the password matches to their account, then the login is successful and
-             * the details of the library card are given.
-             */
-            if(card.isActive() && (
-                    (type == AccountType.MEMBER && card.getMember() != null
-                            && card.getMember().getStatus() == AccountStatus.ACTIVE
-                            && card.getMember().getPassword().equals(password)) ||
-                    (type == AccountType.LIBRARIAN && card.getLibrarian() != null
-                            && card.getLibrarian().getStatus() == AccountStatus.ACTIVE
-                            && card.getLibrarian().getPassword().equals(password))))
-            {
-                return ResponseEntity.ok(card);
-            }
-        }
-
-        // Else, throw an API request exception stating that the given credentials were invalid.
-        throw new ApiRequestException("Invalid credentials. (Wrong library card number or password)",
-                HttpStatus.UNAUTHORIZED);
-    }
-
-    // Registers a new member using the user's inputted details to create an account.
-    @Transactional
-    public ResponseEntity<LibraryCard> registerMember(String name, String password, String email,
-                                                    String streetAddress, String city, String zipcode,
-                                                    String country, String phoneNumber)
-    {
-        // First, validate that the user's email isn't already being used in the website's other user accounts.
-        if(memberRepository.findMemberByEmail(email).isPresent())
-        {
-            throw new ApiRequestException("Failed to create the account with the given credentials.",
-                    HttpStatus.BAD_REQUEST);
-        }
-
-        // Get the current date when creating this account.
-        Date currDate = new Date();
-
-        // Use the given details of the user to create an account and save to the repository.
-        Address address = new Address(streetAddress, city, zipcode, country);
-        Member member = new Member(name, password, AccountStatus.ACTIVE,
-                address, email, phoneNumber, currDate);
-        memberRepository.save(member);
-
-        // Create a new library card for the user.
-        String cardNumber = generateCardNumber();
-        LibraryCard libraryCard = new LibraryCard(AccountType.MEMBER, cardNumber, currDate, true);
-        libraryCardRepository.save(libraryCard);
-
-        // Link the library card to the user's account.
-        member.setLibraryCard(libraryCard);
-
-        // Return the details of the user's library card after the account has been successfully created.
-        return ResponseEntity.ok(libraryCard);
-    }
-
-    // Registers a new librarian using the user's inputted details to create an account.
-    @Transactional
-    public ResponseEntity<LibraryCard> registerLibrarian(String name, String password, String email,
-                                                             String streetAddress, String city, String zipcode,
-                                                             String country, String phoneNumber)
-    {
-        // First, validate that the user's email isn't already being used in the website's other user accounts.
-        if(librarianRepository.findLibrarianByEmail(email).isPresent())
-        {
-            throw new ApiRequestException("Failed to create the account with the given credentials.",
-                    HttpStatus.BAD_REQUEST);
-        }
-
-        // Get the current date when creating this account.
-        Date currDate = new Date();
-
-        // Use the given details of the user to create an account and save to the repository.
-        Address address = new Address(streetAddress, city, zipcode, country);
-        Librarian librarian = new Librarian(name, password, AccountStatus.ACTIVE,
-                address, email, phoneNumber);
-        librarianRepository.save(librarian);
-
-        // Create a new library card for the user.
-        String cardNumber = generateCardNumber();
-        LibraryCard libraryCard = new LibraryCard(AccountType.LIBRARIAN, cardNumber, currDate, true);
-        libraryCardRepository.save(libraryCard);
-
-        // Link the library card to the user's account.
-        librarian.setLibraryCard(libraryCard);
-
-        // Return the details of the user's library card after the account has been successfully created.
-        return ResponseEntity.ok(libraryCard);
     }
 
     // Updates a member's account status using the member's ID and the given status update.
@@ -352,7 +358,7 @@ public class AccountServiceImp implements AccountService
      *
      * For example, only librarians can be able to add and modify books.
      */
-    public Object barcodeReader(Long barcode, AccountType type, AccountStatus status)
+    public Object barcodeReader(Long barcode, String number, AccountType type, AccountStatus status)
     {
         Optional<LibraryCard> cardValidation = libraryCardRepository.findById(barcode);
 
@@ -361,13 +367,16 @@ public class AccountServiceImp implements AccountService
         {
             LibraryCard card = cardValidation.get();
 
+            if(!card.getCardNumber().equals(number))
+                throw new ApiRequestException("Invalid credentials.", HttpStatus.UNAUTHORIZED);
+
             /*
              * Check if the card is active and the account type matches to what is
              * expected. If so, check that the user's account is still active, either
              * of a MEMBER or LIBRARIAN. If both the library card and user's account is
              * still active, then the user may proceed.
              */
-            if (card.isActive() && card.getType() == type)
+            else if (card.isActive() && card.getType() == type)
             {
                 if(type == AccountType.MEMBER && card.getMember() != null
                         && card.getMember().getStatus() == status)

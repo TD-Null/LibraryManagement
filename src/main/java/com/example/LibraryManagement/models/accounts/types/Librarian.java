@@ -29,7 +29,7 @@ import javax.persistence.*;
 public class Librarian extends Account
 {
     @OneToOne(cascade = {CascadeType.MERGE, CascadeType.DETACH})
-    @JoinColumn(name = "barcode", nullable = false)
+    @JoinColumn(name = "card")
     private LibraryCard libraryCard;
 
     public Librarian(String name, String password, AccountStatus status,

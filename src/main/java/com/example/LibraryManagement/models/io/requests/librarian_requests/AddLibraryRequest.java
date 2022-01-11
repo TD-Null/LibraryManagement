@@ -1,12 +1,12 @@
 package com.example.LibraryManagement.models.io.requests.librarian_requests;
 
-import com.example.LibraryManagement.models.io.requests.BarcodeValidationRequest;
+import com.example.LibraryManagement.models.io.requests.CardValidationRequest;
 import lombok.Getter;
 
 import javax.validation.constraints.NotBlank;
 
 @Getter
-public class AddLibraryRequest extends BarcodeValidationRequest
+public class AddLibraryRequest extends CardValidationRequest
 {
     @NotBlank
     private final String libraryName;
@@ -23,10 +23,10 @@ public class AddLibraryRequest extends BarcodeValidationRequest
     @NotBlank
     private final String country;
 
-    public AddLibraryRequest(Long barcode, String libraryName, String streetAddress,
+    public AddLibraryRequest(Long barcode, String number, String libraryName, String streetAddress,
                              String city, String zipcode, String country)
     {
-        super(barcode);
+        super(barcode, number);
         this.libraryName = libraryName;
         this.streetAddress = streetAddress;
         this.city = city;

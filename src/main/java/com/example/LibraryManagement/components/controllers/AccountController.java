@@ -18,6 +18,7 @@ import javax.validation.Valid;
  * - Signing up for a new account
  * - Viewing user's account details
  * - Edit user's account details
+ * - Change user's password
  */
 @CrossOrigin(origins = "*", maxAge = 3600)
 @AllArgsConstructor
@@ -28,17 +29,30 @@ public class AccountController
     @Autowired
     private final AccountServiceImp accountService;
 
-    @GetMapping("/details")
-    public ResponseEntity<Object> viewAccountDetails(@Valid @RequestBody BarcodeValidationRequest request)
-    {
-        return accountService.getAccountDetails(request.getBarcode());
-    }
-
+    /*
+     * Account details GET request.
+     * Expects a valid barcode from the user's library card.
+     * Returns a 200 response code with the details of the user's accounts,
+     * from either a MEMBER or LIBRARIAN account.
+     */
 //    @GetMapping("/details")
-//    public ResponseEntity<Object> viewAccountDetails(@RequestParam(value = "card") Long barcode)
+//    public ResponseEntity<Object> viewAccountDetails(@Valid @RequestBody CardValidationRequest request)
 //    {
-//        return accountService.getAccountDetails(barcode);
+//        return accountService.getAccountDetails(request.getBarcode(), request.getNumber());
 //    }
+
+    /*
+     * Account details GET request.
+     * Expects a valid barcode from the user's library card.
+     * Returns a 200 response code with the details of the user's accounts,
+     * from either a MEMBER or LIBRARIAN account.
+     */
+    @GetMapping("/details")
+    public ResponseEntity<Object> viewAccountDetails(@RequestParam(value = "id") Long barcode,
+                                                     @RequestParam(value = "card") String number)
+    {
+        return accountService.getAccountDetails(barcode, number);
+    }
 
     /*
      * Authentication POST request.
@@ -66,14 +80,29 @@ public class AccountController
                 signUpRequest.getCountry(), signUpRequest.getPhoneNumber());
     }
 
+    /*
+     * Account details update PUT request.
+     * Expects a valid barcode and old/new details regarding the user's account,
+     * for either a MEMBER or LIBRARIAN account.
+     * Returns a 200 response code with a message indicating that the account's
+     * details has been updated.
+     */
     @PutMapping("/update")
     public ResponseEntity<MessageResponse> editAccountDetails(@Valid @RequestBody UpdateAccountRequest request)
     {
-        return accountService.updateAccountDetails(request.getBarcode(), request.getName(), request.getStreetAddress(),
-                request.getCity(), request.getZipcode(), request.getCountry(), request.getEmail(), request.getPhoneNumber());
+        return accountService.updateAccountDetails(request.getBarcode(), request.getNumber(),
+                request.getName(), request.getStreetAddress(), request.getCity(),
+                request.getZipcode(), request.getCountry(), request.getEmail(),
+                request.getPhoneNumber());
     }
 
-
+    /*
+     * Account password update PUT request.
+     * Expects a valid barcode and the original and new password regarding the
+     * user's account, for either a MEMBER or LIBRARIAN account.
+     * Returns a 200 response code with a message indicating that the account's
+     * password has been updated.
+     */
     @PutMapping("/update/password")
     public ResponseEntity<MessageResponse> changePassword(@Valid @RequestBody ChangePasswordRequest request)
     {
