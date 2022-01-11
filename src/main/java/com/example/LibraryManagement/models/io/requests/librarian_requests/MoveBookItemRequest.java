@@ -11,12 +11,12 @@ import javax.validation.constraints.NotNull;
 public class MoveBookItemRequest extends BarcodeValidationRequest
 {
     @NotBlank
-    private String libraryName;
+    private final String libraryName;
 
-    private int rack;
+    private final int rack;
 
     @NotBlank
-    private String location;
+    private final String location;
 
     public MoveBookItemRequest(Long barcode, String libraryName, int rack, String location)
     {

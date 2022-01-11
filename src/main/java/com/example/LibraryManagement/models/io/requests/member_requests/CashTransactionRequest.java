@@ -9,7 +9,7 @@ import javax.validation.constraints.NotNull;
 public class CashTransactionRequest extends BarcodeValidationRequest
 {
     @NotNull
-    private double cashTendered;
+    private final double cashTendered;
 
     public CashTransactionRequest(Long barcode, double cashTendered)
     {

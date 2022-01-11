@@ -10,9 +10,9 @@ import javax.validation.constraints.NotNull;
 public class CardTransactionRequest extends BarcodeValidationRequest
 {
     @NotBlank
-    private String name;
+    private final String name;
     @NotNull
-    private double amount;
+    private final double amount;
 
     public CardTransactionRequest(Long barcode, String name, double amount)
     {

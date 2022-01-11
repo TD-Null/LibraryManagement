@@ -15,35 +15,35 @@ import java.util.Set;
 public class UpdateBookItemRequest extends BarcodeValidationRequest
 {
     @NotBlank
-    private String ISBN;
+    private final String ISBN;
 
     @NotBlank
-    private String title;
+    private final String title;
 
     @NotBlank
-    private String publisher;
+    private final String publisher;
 
     @NotBlank
-    private String language;
+    private final String language;
 
-    private int numberOfPages;
+    private final int numberOfPages;
 
     @NotBlank
-    private String authorName;
+    private final String authorName;
 
     @NotNull
-    private Set<String> subjectNames;
+    private final Set<String> subjectNames;
 
     @NotNull
-    private BookFormat format;
+    private final BookFormat format;
 
     @NotNull
     @Temporal(TemporalType.DATE)
-    private Date publicationDate;
+    private final Date publicationDate;
 
-    private boolean isReferenceOnly;
+    private final boolean isReferenceOnly;
 
-    private double price;
+    private final double price;
 
     public UpdateBookItemRequest(Long barcode, String ISBN, String title,
                                  String publisher, String language, int numberOfPages,

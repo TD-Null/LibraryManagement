@@ -14,43 +14,43 @@ import java.util.Set;
 public class AddBookItemRequest extends BarcodeValidationRequest
 {
     @NotBlank
-    private String libraryName;
+    private final String libraryName;
 
-    private int rack;
-
-    @NotBlank
-    private String location;
+    private final int rack;
 
     @NotBlank
-    private String ISBN;
+    private final String location;
 
     @NotBlank
-    private String title;
+    private final String ISBN;
 
     @NotBlank
-    private String publisher;
+    private final String title;
 
     @NotBlank
-    private String language;
-
-    private int numberOfPages;
+    private final String publisher;
 
     @NotBlank
-    private String authorName;
+    private final String language;
+
+    private final int numberOfPages;
+
+    @NotBlank
+    private final String authorName;
 
     @NotNull
-    private Set<String> subjectNames;
+    private final Set<String> subjectNames;
 
     @NotNull
-    private BookFormat format;
+    private final BookFormat format;
 
     @NotNull
     @Temporal(TemporalType.DATE)
-    private Date publicationDate;
+    private final Date publicationDate;
 
-    private boolean isReferenceOnly;
+    private final boolean isReferenceOnly;
 
-    private double price;
+    private final double price;
 
     public AddBookItemRequest(Long barcode, String libraryName, int rack, String location,
                               String ISBN, String title, String publisher, String language, int numberOfPages,

@@ -10,25 +10,25 @@ import javax.validation.constraints.NotNull;
 public class UpdateAccountRequest extends BarcodeValidationRequest
 {
     @NotBlank
-    private String name;
+    private final String name;
 
     @NotBlank
-    private String streetAddress;
+    private final String streetAddress;
 
     @NotBlank
-    private String city;
+    private final String city;
 
     @NotBlank
-    private String zipcode;
+    private final String zipcode;
 
     @NotBlank
-    private String country;
+    private final String country;
 
     @NotBlank
-    private String email;
+    private final String email;
 
     @NotBlank
-    private String phoneNumber;
+    private final String phoneNumber;
 
     public UpdateAccountRequest(Long barcode, String name, String streetAddress, String city,
                                 String zipcode, String country, String email, String phoneNumber)

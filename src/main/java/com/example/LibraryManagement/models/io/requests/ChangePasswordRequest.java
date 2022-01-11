@@ -9,10 +9,10 @@ import javax.validation.constraints.NotBlank;
 public class ChangePasswordRequest extends BarcodeValidationRequest
 {
     @NotBlank
-    private String originalPassword;
+    private final String originalPassword;
 
     @NotBlank
-    private String newPassword;
+    private final String newPassword;
 
     public ChangePasswordRequest(Long barcode, String originalPassword, String newPassword)
     {

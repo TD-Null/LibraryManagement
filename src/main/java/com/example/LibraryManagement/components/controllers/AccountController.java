@@ -73,24 +73,10 @@ public class AccountController
                 request.getCity(), request.getZipcode(), request.getCountry(), request.getEmail(), request.getPhoneNumber());
     }
 
-//    @PutMapping("/update")
-//    public ResponseEntity<MessageResponse> editAccountDetails(@Valid @RequestBody UpdateAccountRequest request,
-//                                                              @RequestParam(value = "card") Long barcode)
-//    {
-//        return accountService.updateAccountDetails(barcode, request.getName(), request.getStreetAddress(),
-//                request.getCity(), request.getZipcode(), request.getCountry(), request.getEmail(), request.getPhoneNumber());
-//    }
 
     @PutMapping("/update/password")
     public ResponseEntity<MessageResponse> changePassword(@Valid @RequestBody ChangePasswordRequest request)
     {
         return accountService.changePassword(request.getBarcode(), request.getOriginalPassword(), request.getNewPassword());
     }
-
-//    @PutMapping("/update/password")
-//    public ResponseEntity<MessageResponse> changePassword(@Valid @RequestBody ChangePasswordRequest request,
-//                                                          @RequestParam(value = "card") Long barcode)
-//    {
-//        return accountService.changePassword(barcode, request.getOriginalPassword(), request.getNewPassword());
-//    }
 }
