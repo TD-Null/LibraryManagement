@@ -80,7 +80,7 @@ public class AccountController
 //        return accountService.changePassword(request.getBarcode(), request.getOriginalPassword(), request.getNewPassword());
 //    }
 
-        @PutMapping("/update/password")
+    @PutMapping("/update/password")
     public ResponseEntity<MessageResponse> changePassword(@Valid @RequestBody ChangePasswordRequest request,
                                                           @RequestParam Long barcode)
     {
