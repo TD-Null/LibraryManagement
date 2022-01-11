@@ -1,8 +1,9 @@
-package com.example.LibraryManagement.components.services;
+package com.example.LibraryManagement.components.services.accounts;
 
 import com.example.LibraryManagement.components.repositories.books.BookLendingRepository;
 import com.example.LibraryManagement.components.repositories.books.BookReservationRepository;
-import com.example.LibraryManagement.components.repositories.books.fines.*;
+import com.example.LibraryManagement.components.repositories.fines.*;
+import com.example.LibraryManagement.components.services.ValidationService;
 import com.example.LibraryManagement.models.accounts.types.Member;
 import com.example.LibraryManagement.models.books.actions.BookLending;
 import com.example.LibraryManagement.models.books.actions.BookReservation;
@@ -40,8 +41,6 @@ public class MemberServiceImp implements MemberService
     @Autowired
     private final BookReservationRepository bookReservationRepository;
     @Autowired
-    private final FineRepository fineRepository;
-    @Autowired
     private final FineTransactionRepository fineTransactionRepository;
     @Autowired
     private final CreditCardTransactionRepository creditCardTransactionRepository;
@@ -49,6 +48,8 @@ public class MemberServiceImp implements MemberService
     private final CheckTransactionRepository checkTransactionRepository;
     @Autowired
     private final CashTransactionRepository cashTransactionRepository;
+    @Autowired
+    private final ValidationService validationService;
 
     private static final double finePerDay = 1.0;
 
@@ -332,7 +333,7 @@ public class MemberServiceImp implements MemberService
     public ResponseEntity<MessageResponse> payFine(Member member, Long fineID,
                                                    TransactionType type, Object transaction, double amount)
     {
-        Fine fine = fineValidation(fineID);
+        Fine fine = validationService.fineValidation(fineID);
 
         if(!fine.getMember().equals(member))
             throw new ApiRequestException("Fine is not issued to this user.", HttpStatus.BAD_REQUEST);
@@ -384,15 +385,5 @@ public class MemberServiceImp implements MemberService
         member.payFine();
 
         return ResponseEntity.ok(new MessageResponse("User has successfully paid their fine."));
-    }
-
-    private Fine fineValidation(Long ID)
-    {
-        Optional<Fine> fine = fineRepository.findById(ID);
-
-        if(fine.isEmpty())
-            throw new ApiRequestException("Unable to find fine within the system.", HttpStatus.BAD_REQUEST);
-
-        return fine.get();
     }
 }

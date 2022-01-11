@@ -1,9 +1,8 @@
 package com.example.LibraryManagement.components.controllers;
 
-import com.example.LibraryManagement.components.services.AccountServiceImp;
+import com.example.LibraryManagement.components.services.accounts.AccountServiceImp;
 import com.example.LibraryManagement.models.accounts.LibraryCard;
-import com.example.LibraryManagement.models.enums.accounts.AccountStatus;
-import com.example.LibraryManagement.models.io.requests.account_requests.*;
+import com.example.LibraryManagement.models.io.requests.*;
 import com.example.LibraryManagement.models.io.responses.MessageResponse;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,17 +28,17 @@ public class AccountController
     @Autowired
     private final AccountServiceImp accountService;
 
-//    @GetMapping("/details")
-//    public ResponseEntity<Object> viewAccountDetails(@Valid @RequestBody BarcodeValidationRequest request)
-//    {
-//        return accountService.getAccountDetails(request.getBarcode());
-//    }
-
     @GetMapping("/details")
-    public ResponseEntity<Object> viewAccountDetails(@RequestParam Long barcode)
+    public ResponseEntity<Object> viewAccountDetails(@Valid @RequestBody BarcodeValidationRequest request)
     {
-        return accountService.getAccountDetails(barcode);
+        return accountService.getAccountDetails(request.getBarcode());
     }
+
+//    @GetMapping("/details")
+//    public ResponseEntity<Object> viewAccountDetails(@RequestParam(value = "card") Long barcode)
+//    {
+//        return accountService.getAccountDetails(barcode);
+//    }
 
     /*
      * Authentication POST request.
@@ -74,16 +73,10 @@ public class AccountController
                 request.getCity(), request.getZipcode(), request.getCountry(), request.getEmail(), request.getPhoneNumber());
     }
 
-//    @PutMapping("/update/password")
-//    public ResponseEntity<MessageResponse> changePassword(@Valid @RequestBody ChangePasswordRequest request)
-//    {
-//        return accountService.changePassword(request.getBarcode(), request.getOriginalPassword(), request.getNewPassword());
-//    }
 
     @PutMapping("/update/password")
-    public ResponseEntity<MessageResponse> changePassword(@Valid @RequestBody ChangePasswordRequest request,
-                                                          @RequestParam Long barcode)
+    public ResponseEntity<MessageResponse> changePassword(@Valid @RequestBody ChangePasswordRequest request)
     {
-        return accountService.changePassword(barcode, request.getOriginalPassword(), request.getNewPassword());
+        return accountService.changePassword(request.getBarcode(), request.getOriginalPassword(), request.getNewPassword());
     }
 }

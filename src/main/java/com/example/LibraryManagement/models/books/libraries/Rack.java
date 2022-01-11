@@ -21,41 +21,13 @@ import java.util.Set;
  * Each rack can contain multiple BookItems of its library.
  */
 @Getter
-@Setter
-@EqualsAndHashCode
-@NoArgsConstructor
-@Entity
-@Table
+@AllArgsConstructor
 public class Rack
 {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "ID")
-    private Long id;
-
     @Column(name = "Number")
     private int number;
 
     @NotBlank
     @Column(name = "Location")
-    private String locationIdentifier;
-
-    @JsonIgnore
-    @ManyToOne
-    @JoinColumn(name = "library_name", nullable = false)
-    private Library library;
-
-    @JsonIgnore
-    @OneToMany(mappedBy = "rack", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private Set<BookItem> books = new HashSet<>();
-
-    public Rack(int number, String locationIdentifier)
-    {
-        this.number = number;
-        this.locationIdentifier = locationIdentifier;
-    }
-
-    public void addBookItem(BookItem b) { books.add(b); }
-
-    public void removeBookItem(BookItem b) { books.remove(b); }
+    private String location;
 }

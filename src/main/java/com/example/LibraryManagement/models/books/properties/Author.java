@@ -35,7 +35,7 @@ public class Author
     private String description;
 
     @JsonIgnore
-    @OneToMany(mappedBy = "author", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "author", fetch = FetchType.LAZY, cascade = {CascadeType.MERGE, CascadeType.DETACH})
     private Set<BookItem> books = new HashSet<>();
 
     public Author(String name) { this.name = name; }

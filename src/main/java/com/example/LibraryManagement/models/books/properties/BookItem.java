@@ -39,18 +39,21 @@ public class BookItem extends Book
     private Long barcode;
 
     @ManyToOne
-    @JoinColumn(name = "library_name", nullable = false)
+    @JoinColumn(name = "library_name")
     private Library library;
 
-    @ManyToOne
-    @JoinColumn(name = "rack_id")
-    private Rack rack;
+    @Column(name = "Rack")
+    private int rackNumber;
+
+    @NotBlank
+    @Column(name = "Location")
+    private String locationIdentifier;
 
     @ManyToOne
-    @JoinColumn(name = "author_name", nullable = false)
+    @JoinColumn(name = "author_name")
     private Author author;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "subjects",
             joinColumns = @JoinColumn(name = "name"),
@@ -95,23 +98,32 @@ public class BookItem extends Book
     private Member currReservedMember;
 
     @JsonIgnore
-    @OneToMany(mappedBy = "bookItem", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "bookItem", fetch = FetchType.LAZY, cascade = {CascadeType.MERGE, CascadeType.DETACH})
     private Set<BookLending> lendingRecords = new HashSet<>();
 
     @JsonIgnore
-    @OneToMany(mappedBy = "bookItem", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "bookItem", fetch = FetchType.LAZY, cascade = {CascadeType.MERGE, CascadeType.DETACH})
     private Set<BookReservation> reservationRecords = new HashSet<>();
 
-    public BookItem(String ISBN, String title, String publisher, String language,
-                    int numberOfPages, BookFormat format, BookStatus status,
+    public BookItem(String ISBN, String title, String publisher,
+                    String language, int numberOfPages, int rackNumber,
+                    String locationIdentifier, BookFormat format, BookStatus status,
                     Date publicationDate, boolean isReferenceOnly, double price)
     {
         super(ISBN, title, publisher, language, numberOfPages);
+        this.rackNumber = rackNumber;
+        this.locationIdentifier = locationIdentifier;
         this.format = format;
         this.status = status;
         this.publicationDate = publicationDate;
         this.isReferenceOnly = isReferenceOnly;
         this.price = price;
+    }
+
+    public void setRack(Rack r)
+    {
+        rackNumber = r.getNumber();
+        locationIdentifier = r.getLocation();
     }
 
     public void addLoanRecord(BookLending bl)
@@ -120,4 +132,10 @@ public class BookItem extends Book
     }
 
     public void addReservationRecord(BookReservation br) { reservationRecords.add(br); }
+
+    public void clearRecords()
+    {
+        lendingRecords.clear();
+        reservationRecords.clear();
+    }
 }

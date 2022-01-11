@@ -28,7 +28,7 @@ import javax.persistence.*;
 })
 public class Librarian extends Account
 {
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(cascade = {CascadeType.MERGE, CascadeType.DETACH})
     @JoinColumn(name = "barcode", nullable = false)
     private LibraryCard libraryCard;
 

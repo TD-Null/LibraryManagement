@@ -1,6 +1,6 @@
-package com.example.LibraryManagement.models.io.requests.account_requests.member_requests;
+package com.example.LibraryManagement.models.io.requests.member_requests;
 
-import com.example.LibraryManagement.models.io.requests.account_requests.BarcodeValidationRequest;
+import com.example.LibraryManagement.models.io.requests.BarcodeValidationRequest;
 import lombok.Getter;
 
 import javax.validation.constraints.NotBlank;
@@ -10,9 +10,9 @@ import javax.validation.constraints.NotNull;
 public class CardTransactionRequest extends BarcodeValidationRequest
 {
     @NotBlank
-    private String name;
+    private final String name;
     @NotNull
-    private double amount;
+    private final double amount;
 
     public CardTransactionRequest(Long barcode, String name, double amount)
     {

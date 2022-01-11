@@ -1,9 +1,10 @@
-package com.example.LibraryManagement.components.services;
+package com.example.LibraryManagement.components.services.catalogs;
 
 import com.example.LibraryManagement.components.repositories.books.AuthorRepository;
 import com.example.LibraryManagement.components.repositories.books.BookItemRepository;
-import com.example.LibraryManagement.components.repositories.books.libraries.LibraryRepository;
+import com.example.LibraryManagement.components.repositories.books.LibraryRepository;
 import com.example.LibraryManagement.components.repositories.books.SubjectRepository;
+import com.example.LibraryManagement.components.services.ValidationService;
 import com.example.LibraryManagement.models.books.libraries.Library;
 import com.example.LibraryManagement.models.books.properties.Author;
 import com.example.LibraryManagement.models.books.properties.BookItem;
@@ -16,6 +17,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.*;
 
@@ -31,12 +33,81 @@ public class ViewCatalogServiceImp implements ViewCatalogService
     private final AuthorRepository authorRepository;
     @Autowired
     private final SubjectRepository subjectRepository;
+    @Autowired
+    private final ValidationService validationService;
 
     public ResponseEntity<List<Library>> listAllLibraries() { return ResponseEntity.ok(libraryRepository.findAll()); }
 
+    public ResponseEntity<List<Subject>> listAllSubjects() { return ResponseEntity.ok(subjectRepository.findAll()); }
+
+    public ResponseEntity<List<Author>> listAllAuthors() { return ResponseEntity.ok(authorRepository.findAll()); }
+
+    public ResponseEntity<List<BookItem>> listAllBooks() { return ResponseEntity.ok(bookItemRepository.findAll()); }
+
+    public ResponseEntity<List<BookItem>> searchBooks(String libraryName,
+                                                      String title,
+                                                      String authorName,
+                                                      List<String> subjects,
+                                                      Date publicationDate)
+    {
+        List<BookItem> books = new ArrayList<>();
+
+        if(!libraryName.equals("none"))
+        {
+            Library library = validationService.libraryValidation(libraryName);
+            Set<BookItem> libraryBooks = library.getBooks();
+
+            for(BookItem b: libraryBooks)
+                if(!books.contains(b)) books.add(b);
+        }
+
+        if(!title.equals("none"))
+        {
+            List<BookItem> booksByTitle = bookItemRepository.findAllByTitleContaining(title);
+
+            for(BookItem b: booksByTitle)
+                if(!books.contains(b)) books.add(b);
+        }
+
+        if(!authorName.equals("none"))
+        {
+            Author author = validationService.authorValidation(authorName);
+            Set<BookItem> booksByAuthor = author.getBooks();
+
+            for(BookItem b: booksByAuthor)
+                if(!books.contains(b)) books.add(b);
+        }
+
+        if(subjects.contains("none"))
+        {
+            for(String name: subjects)
+            {
+                Subject subject = validationService.subjectValidation(name);
+                Set<BookItem> booksBySubject = subject.getBooks();
+
+                for(BookItem b: booksBySubject)
+                    if(!books.contains(b)) books.add(b);
+            }
+        }
+
+        if(publicationDate != null)
+        {
+            List<BookItem> booksByPubDate = bookItemRepository.findAllByPublicationDate(publicationDate);
+
+            for(BookItem b: booksByPubDate)
+                if(!books.contains(b)) books.add(b);
+        }
+
+        if(books.isEmpty())
+            throw new ApiRequestException("There are no books found under this search.",
+                    HttpStatus.NO_CONTENT);
+
+        return ResponseEntity.ok(books);
+    }
+
     public ResponseEntity<List<BookItem>> listLibraryBooks(String name)
     {
-        Library library = libraryValidation(name);
+        Library library = validationService.libraryValidation(name);
 
         Set<BookItem> libraryBooks = library.getBooks();
         List<BookItem> currBooks = new ArrayList<>(libraryBooks);
@@ -47,12 +118,6 @@ public class ViewCatalogServiceImp implements ViewCatalogService
 
         return ResponseEntity.ok(currBooks);
     }
-
-    public ResponseEntity<List<BookItem>> listAllBooks() { return ResponseEntity.ok(bookItemRepository.findAll()); }
-
-    public ResponseEntity<List<Subject>> listAllSubjects() { return ResponseEntity.ok(subjectRepository.findAll()); }
-
-    public ResponseEntity<List<Author>> listAllAuthors() { return ResponseEntity.ok(authorRepository.findAll()); }
 
     public ResponseEntity<List<BookItem>> searchBooksByTitle(String title)
     {
@@ -67,7 +132,7 @@ public class ViewCatalogServiceImp implements ViewCatalogService
 
     public ResponseEntity<List<BookItem>> searchBooksByAuthor(String name)
     {
-        Author author = authorValidation(name);
+        Author author = validationService.authorValidation(name);
 
         Set<BookItem> authorBooks = author.getBooks();
         List<BookItem> currBooks = new ArrayList<>(authorBooks);
@@ -81,7 +146,7 @@ public class ViewCatalogServiceImp implements ViewCatalogService
 
     public ResponseEntity<List<BookItem>> searchBooksBySubject(String name)
     {
-        Subject subject = subjectValidation(name);
+        Subject subject = validationService.subjectValidation(name);
 
         Set<BookItem> subjectBooks = subject.getBooks();
         List<BookItem> currBooks = new ArrayList<>(subjectBooks);
@@ -102,36 +167,5 @@ public class ViewCatalogServiceImp implements ViewCatalogService
                     HttpStatus.NO_CONTENT);
 
         return ResponseEntity.ok(currBooks);
-    }
-
-    private Library libraryValidation(String name)
-    {
-        Optional<Library> library = libraryRepository.findById(name);
-
-        if(library.isEmpty())
-            throw new ApiRequestException("Unable to find this library.",
-                    HttpStatus.NO_CONTENT);
-
-        return library.get();
-    }
-
-    private Author authorValidation(String name)
-    {
-        if(!authorRepository.existsById(name))
-        {
-            authorRepository.save(new Author(name));
-        }
-
-        return authorRepository.getById(name);
-    }
-
-    private Subject subjectValidation(String name)
-    {
-        if(!subjectRepository.existsById(name))
-        {
-            subjectRepository.save(new Subject(name));
-        }
-
-        return subjectRepository.getById(name);
     }
 }

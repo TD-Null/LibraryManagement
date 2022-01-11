@@ -48,9 +48,9 @@ import java.util.Set;
 @Table(uniqueConstraints = {
         @UniqueConstraint(columnNames = "Email")
 })
-public class Member extends Account
+public class Member extends Account implements MemberMethods
 {
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(cascade = {CascadeType.MERGE, CascadeType.DETACH})
     @JoinColumn(name = "card")
     private LibraryCard libraryCard;
 
@@ -66,27 +66,27 @@ public class Member extends Account
     private int totalFines = 0;
 
     @JsonIgnore
-    @OneToMany(mappedBy = "currLoanMember", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "currLoanMember", fetch = FetchType.LAZY, cascade = {CascadeType.MERGE, CascadeType.DETACH})
     private Set<BookItem> checkedOutBooks = new HashSet<>();
 
     @JsonIgnore
-    @OneToMany(mappedBy = "currReservedMember", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "currReservedMember", fetch = FetchType.LAZY, cascade = {CascadeType.MERGE, CascadeType.DETACH})
     private Set<BookItem> reservedBooks = new HashSet<>();
 
     @JsonIgnore
-    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = {CascadeType.MERGE, CascadeType.DETACH})
     private Set<BookLending> bookLoans = new HashSet<>();
 
     @JsonIgnore
-    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = {CascadeType.MERGE, CascadeType.DETACH})
     private Set<BookReservation> bookReservations = new HashSet<>();
 
     @JsonIgnore
-    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = {CascadeType.MERGE, CascadeType.DETACH})
     private Set<AccountNotification> notifications = new HashSet<>();
 
     @JsonIgnore
-    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = {CascadeType.MERGE, CascadeType.DETACH})
     private Set<Fine> fines = new HashSet<>();
 
     public Member(String name, String password, AccountStatus status,

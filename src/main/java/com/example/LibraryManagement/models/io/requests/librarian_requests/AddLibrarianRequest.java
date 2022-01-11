@@ -1,7 +1,6 @@
-package com.example.LibraryManagement.models.io.requests.account_requests.librarian_requests;
+package com.example.LibraryManagement.models.io.requests.librarian_requests;
 
-import com.example.LibraryManagement.models.io.requests.account_requests.BarcodeValidationRequest;
-import lombok.AllArgsConstructor;
+import com.example.LibraryManagement.models.io.requests.BarcodeValidationRequest;
 import lombok.Getter;
 
 import javax.validation.constraints.Email;

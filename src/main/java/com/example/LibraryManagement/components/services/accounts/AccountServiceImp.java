@@ -1,12 +1,12 @@
-package com.example.LibraryManagement.components.services;
+package com.example.LibraryManagement.components.services.accounts;
 
 import com.example.LibraryManagement.components.repositories.accounts.LibrarianRepository;
 import com.example.LibraryManagement.components.repositories.accounts.LibraryCardRepository;
 import com.example.LibraryManagement.components.repositories.accounts.MemberRepository;
+import com.example.LibraryManagement.components.services.ValidationService;
 import com.example.LibraryManagement.models.accounts.types.Librarian;
 import com.example.LibraryManagement.models.accounts.types.Member;
 import com.example.LibraryManagement.models.accounts.LibraryCard;
-import com.example.LibraryManagement.models.books.libraries.Library;
 import com.example.LibraryManagement.models.datatypes.Address;
 import com.example.LibraryManagement.models.enums.accounts.AccountStatus;
 import com.example.LibraryManagement.models.enums.accounts.AccountType;
@@ -40,6 +40,8 @@ public class AccountServiceImp implements AccountService
     private final LibrarianRepository librarianRepository;
     @Autowired
     private final MemberRepository memberRepository;
+    @Autowired
+    private final ValidationService validationService;
 
     // Returns the user's account details using their library card's barcode.
     public ResponseEntity<Object> getAccountDetails(Long barcode)
@@ -49,7 +51,7 @@ public class AccountServiceImp implements AccountService
          * Afterwards, get the account user associated with the given library card and if
          * available, return the user's details.
          */
-        LibraryCard card = cardValidation(barcode);
+        LibraryCard card = validationService.cardValidation(barcode);
         AccountType type = card.getType();
 
         if(type == AccountType.MEMBER && card.getMember() != null)
@@ -80,7 +82,7 @@ public class AccountServiceImp implements AccountService
          * Afterwards, get the account user associated with the given library card and if
          * available, edit the user's details.
          */
-        LibraryCard card = cardValidation(barcode);
+        LibraryCard card = validationService.cardValidation(barcode);
         AccountType type = card.getType();
 
         if(type == AccountType.MEMBER && card.getMember() != null)
@@ -120,7 +122,7 @@ public class AccountServiceImp implements AccountService
          * Afterwards, get the account user associated with the given library card and if
          * available, change the user's password.
          */
-        LibraryCard card = cardValidation(barcode);
+        LibraryCard card = validationService.cardValidation(barcode);
         AccountType type = card.getType();
 
         if(type == AccountType.MEMBER && card.getMember() != null)
@@ -134,7 +136,7 @@ public class AccountServiceImp implements AccountService
 
             member.setPassword(newPassword);
 
-            return ResponseEntity.ok(new MessageResponse("Successfully changed user;s password within the system."));
+            return ResponseEntity.ok(new MessageResponse("Successfully changed user's password within the system."));
         }
 
         else if(type == AccountType.LIBRARIAN && card.getLibrarian() != null)
@@ -231,7 +233,7 @@ public class AccountServiceImp implements AccountService
 
     // Registers a new librarian using the user's inputted details to create an account.
     @Transactional
-    public ResponseEntity<MessageResponse> registerLibrarian(String name, String password, String email,
+    public ResponseEntity<LibraryCard> registerLibrarian(String name, String password, String email,
                                                              String streetAddress, String city, String zipcode,
                                                              String country, String phoneNumber)
     {
@@ -260,7 +262,7 @@ public class AccountServiceImp implements AccountService
         librarian.setLibraryCard(libraryCard);
 
         // Return the details of the user's library card after the account has been successfully created.
-        return ResponseEntity.ok(new MessageResponse("Librarian account has been successfully created."));
+        return ResponseEntity.ok(libraryCard);
     }
 
     // Updates a member's account status using the member's ID and the given status update.
@@ -275,12 +277,10 @@ public class AccountServiceImp implements AccountService
             Member member = memberValidation.get();
             AccountStatus currStatus = member.getStatus();
 
-            // If the member's account is already CLOSED or CANCELLED, its status cannot be updated.
-            if(currStatus == AccountStatus.CLOSED || currStatus == AccountStatus.CANCELLED)
-            {
+            // If the member's account is already CANCELLED, its status cannot be updated.
+            if(currStatus == AccountStatus.CANCELLED)
                 throw new ApiRequestException("The member's account is inactive. The account's status cannot be updated.",
                         HttpStatus.BAD_REQUEST);
-            }
 
             // Else, update the member's account status and return a response.
             else
@@ -293,6 +293,56 @@ public class AccountServiceImp implements AccountService
         // Else, the account's status cannot be updated as it cannot be found.
         throw new ApiRequestException("Unable to find member's account within the system.",
                 HttpStatus.UNAUTHORIZED);
+    }
+
+    @Transactional
+    public ResponseEntity<MessageResponse> cancelMemberAccount(Long barcode, String cardNumber, String password)
+    {
+        LibraryCard card = validationService.cardValidation(barcode);
+
+        if(card.getType() == AccountType.MEMBER)
+        {
+            Member member = card.getMember();
+
+            if(member == null)
+                throw new ApiRequestException("No member is associated with this card.",
+                        HttpStatus.BAD_REQUEST);
+
+            else if(member.getStatus() == AccountStatus.CANCELLED)
+                throw new ApiRequestException("Member has already cancelled this account",
+                        HttpStatus.BAD_REQUEST);
+
+            else if(member.getStatus() == AccountStatus.BLACKLISTED)
+                throw new ApiRequestException("Member's account is currently blocked. " +
+                        "User cannot cancel their membership currently.",
+                        HttpStatus.BAD_REQUEST);
+
+            else if(!card.isActive())
+                throw new ApiRequestException("Card is currently inactive, " +
+                        "so membership cannot be cancelled.",
+                        HttpStatus.BAD_REQUEST);
+
+            else if(!card.getCardNumber().equals(cardNumber) || !member.getPassword().equals(password))
+                throw new ApiRequestException("Given credentials are invalid." +
+                        "Cannot proceed with cancelling member's account",
+                        HttpStatus.UNAUTHORIZED);
+
+            else if(member.getIssuedBooksTotal() > 0)
+                throw new ApiRequestException("User currently has books still issued to their account." +
+                        "Please return any loaned books and cancel any book reservations made.",
+                        HttpStatus.ACCEPTED);
+
+            else if(member.getTotalFines() > 0)
+                throw new ApiRequestException("User currently has fines still associated with their account." +
+                        "Please pay for any fines still present in your account.",
+                        HttpStatus.ACCEPTED);
+
+            card.setActive(false);
+            member.setStatus(AccountStatus.CANCELLED);
+            return ResponseEntity.ok(new MessageResponse("MUser has successfully cancelled their membership."));
+        }
+
+        throw new ApiRequestException("User is not a member within the system.", HttpStatus.UNAUTHORIZED);
     }
 
     /*
@@ -336,17 +386,6 @@ public class AccountServiceImp implements AccountService
         // Else, the user will be unable to proceed with any action.
         throw new ApiRequestException("User is not allowed to perform this action.",
                 HttpStatus.UNAUTHORIZED);
-    }
-
-    public LibraryCard cardValidation(Long barcode)
-    {
-        Optional<LibraryCard> card = libraryCardRepository.findById(barcode);
-
-        if(card.isEmpty())
-            throw new ApiRequestException("Unable to find library card within the system.",
-                    HttpStatus.UNAUTHORIZED);
-
-        return card.get();
     }
 
     /*

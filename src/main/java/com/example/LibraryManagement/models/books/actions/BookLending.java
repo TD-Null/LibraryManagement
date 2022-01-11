@@ -25,7 +25,6 @@ public class BookLending
     @JoinColumn(name = "barcode", nullable = false)
     private BookItem bookItem;
 
-    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "member", nullable = false)
     private Member member;

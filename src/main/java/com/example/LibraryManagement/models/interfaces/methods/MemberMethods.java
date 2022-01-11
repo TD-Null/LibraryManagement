@@ -1,6 +1,12 @@
 package com.example.LibraryManagement.models.interfaces.methods;
 
+import com.example.LibraryManagement.models.books.actions.BookLending;
+import com.example.LibraryManagement.models.books.actions.BookReservation;
+import com.example.LibraryManagement.models.books.fines.Fine;
+import com.example.LibraryManagement.models.books.notifications.AccountNotification;
 import com.example.LibraryManagement.models.books.properties.BookItem;
+
+import java.util.Date;
 
 /*
  * Methods for the Member.class:
@@ -13,13 +19,23 @@ import com.example.LibraryManagement.models.books.properties.BookItem;
  */
 public interface MemberMethods
 {
-    public void addBookItem(BookItem b);
+    void checkoutBookItem(BookItem b, BookLending bl);
 
-    public void removeBookItem(BookItem b);
+    void returnBookItem(BookItem b, Date returnDate);
 
-    public void reserveBookItem(BookItem b);
+    void reserveBookItem(BookItem b, BookReservation br);
 
-    public void removeReservedBookItem(BookItem b);
+    void checkoutReservedBookItem(BookItem b, BookLending bl);
 
-    public void addReservedBookItem(BookItem b);
+    void updatedPendingReservation(BookItem b);
+
+    void cancelReservedBookItem(BookItem b);
+
+    void renewBookItem(BookItem b, Date dueDate, Date newDueDate);
+
+    void sendNotification(AccountNotification notification);
+
+    void addFine(Fine f);
+
+    void payFine();
 }

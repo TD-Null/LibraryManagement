@@ -1,10 +1,12 @@
-package com.example.LibraryManagement.components.services;
+package com.example.LibraryManagement.components.services.catalogs;
 
 import com.example.LibraryManagement.components.repositories.books.*;
-import com.example.LibraryManagement.components.repositories.books.libraries.LibraryRepository;
-import com.example.LibraryManagement.components.repositories.books.libraries.RackRepository;
+import com.example.LibraryManagement.components.repositories.books.LibraryRepository;
+import com.example.LibraryManagement.components.services.ValidationService;
+import com.example.LibraryManagement.models.accounts.types.Member;
 import com.example.LibraryManagement.models.books.libraries.Library;
 import com.example.LibraryManagement.models.books.libraries.Rack;
+import com.example.LibraryManagement.models.books.notifications.AccountNotification;
 import com.example.LibraryManagement.models.books.properties.Author;
 import com.example.LibraryManagement.models.books.properties.BookItem;
 import com.example.LibraryManagement.models.books.properties.Subject;
@@ -23,7 +25,6 @@ import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 import java.util.Date;
 import java.util.HashSet;
-import java.util.Optional;
 import java.util.Set;
 
 @AllArgsConstructor
@@ -35,11 +36,7 @@ public class UpdateCatalogServiceImp implements UpdateCatalogService
     @Autowired
     private final LibraryRepository libraryRepository;
     @Autowired
-    private final RackRepository rackRepository;
-    @Autowired
-    private final AuthorRepository authorRepository;
-    @Autowired
-    private final SubjectRepository subjectRepository;
+    private final ValidationService validationService;
 
     public ResponseEntity<MessageResponse> addLibrary(String name, String streetAddress, String city,
                                                       String zipcode, String country)
@@ -53,38 +50,25 @@ public class UpdateCatalogServiceImp implements UpdateCatalogService
     }
 
     @Transactional
-    public ResponseEntity<MessageResponse> addLibraryRack(String name, int number, String locationIdentifier)
+    public ResponseEntity<MessageResponse> addBookItem(String libraryName, Rack rack, String ISBN, String title,
+                                                       String publisher, String language, int numberOfPages,
+                                                       String authorName, Set<String> subjects, BookFormat format,
+                                                       Date publicationDate, boolean isReferenceOnly, double price)
     {
-        Library library = libraryValidation(name);
-        Rack rack = new Rack(number, locationIdentifier);
-        rackRepository.save(rack);
-        library.addRack(rack);
-
-        return ResponseEntity.ok(new MessageResponse("Rack has been successfully added to the Library within the system."));
-    }
-
-    @Transactional
-    public ResponseEntity<MessageResponse> addBookItem(String libraryName, long rackID, String ISBN,
-                                                       String title, String publisher, String language,
-                                                       int numberOfPages, String authorName, Set<String> subjects,
-                                                       BookFormat format, Date publicationDate, boolean isReferenceOnly,
-                                                       double price)
-    {
-        Library library = libraryValidation(libraryName);
-        Rack rack = rackValidation(library, rackID);
-        Author author = authorValidation(authorName);
+        Library library = validationService.libraryValidation(libraryName);
+        Author author = validationService.authorValidation(authorName);
 
         BookItem bookItem = new BookItem(ISBN, title, publisher, language, numberOfPages,
-                format, BookStatus.AVAILABLE, publicationDate, isReferenceOnly, price);
+                rack.getNumber(), rack.getLocation(), format, BookStatus.AVAILABLE, publicationDate,
+                isReferenceOnly, price);
         bookItemRepository.save(bookItem);
 
         library.addBookItem(bookItem);
-        rack.addBookItem(bookItem);
         author.addBookItem(bookItem);
 
-        for(String sub: subjects)
+        for(String s: subjects)
         {
-            Subject subject = subjectValidation(sub);
+            Subject subject = validationService.subjectValidation(s);
             subject.addBookItem(bookItem);
         }
 
@@ -97,7 +81,7 @@ public class UpdateCatalogServiceImp implements UpdateCatalogService
                                                           String authorName, Set<String> subjects, BookFormat format,
                                                           Date publicationDate, boolean isReferenceOnly, double price)
     {
-        BookItem bookItem = bookValidation(barcode);
+        BookItem bookItem = validationService.bookValidation(barcode);
 
         bookItem.setISBN(ISBN);
         bookItem.setTitle(title);
@@ -109,7 +93,7 @@ public class UpdateCatalogServiceImp implements UpdateCatalogService
         bookItem.setReferenceOnly(isReferenceOnly);
         bookItem.setPrice(price);
 
-        Author author = authorValidation(authorName);
+        Author author = validationService.authorValidation(authorName);
         Author prevAuthor = bookItem.getAuthor();
 
         if(!prevAuthor.equals(author))
@@ -118,14 +102,13 @@ public class UpdateCatalogServiceImp implements UpdateCatalogService
             author.addBookItem(bookItem);
         }
 
+        Set<Subject> prevSubjects = bookItem.getSubjects();
         Set<Subject> newSubjects = new HashSet<>();
 
         for(String s: subjects)
         {
-            newSubjects.add(subjectValidation(s));
+            newSubjects.add(validationService.subjectValidation(s));
         }
-
-        Set<Subject> prevSubjects = bookItem.getSubjects();
 
         for(Subject s: prevSubjects)
         {
@@ -143,69 +126,66 @@ public class UpdateCatalogServiceImp implements UpdateCatalogService
             }
         }
 
-        return ResponseEntity.ok(new MessageResponse("Book has been successful updated within the system."));
+        return ResponseEntity.ok(new MessageResponse("Book has been successfully updated within the system."));
     }
 
-    private Library libraryValidation(String name)
+    @Transactional
+    public ResponseEntity<MessageResponse> moveBookItem(Long barcode, String libraryName, Rack r)
     {
-        Optional<Library> library = libraryRepository.findById(name);
+        BookItem book = validationService.bookValidation(barcode);
+        Library prevLibrary = book.getLibrary();
+        Library newLibrary = validationService.libraryValidation(libraryName);
 
-        if(library.isEmpty())
-            throw new ApiRequestException("Unable to find this library.",
-                    HttpStatus.BAD_REQUEST);
-
-        return library.get();
-    }
-
-    private Rack rackValidation(Library library, long rackID)
-    {
-        if(!rackRepository.existsById(rackID))
-            throw new ApiRequestException("This rack does not exist within the system",
-                    HttpStatus.BAD_REQUEST);
-
-        Rack rack = rackRepository.getById(rackID);
-
-        Set<Rack> libraryRacks = library.getRacks();
-
-        if(libraryRacks.isEmpty())
-            throw new ApiRequestException("There are no racks available in this library",
-                    HttpStatus.BAD_REQUEST);
-
-        else if(!libraryRacks.contains(rack))
-            throw new ApiRequestException("This rack is not present within this library.",
-                    HttpStatus.BAD_REQUEST);
-
-        return rack;
-    }
-
-    public BookItem bookValidation(Long barcode)
-    {
-        Optional<BookItem> bookItem = bookItemRepository.findById(barcode);
-
-        if(bookItem.isEmpty())
-            throw new ApiRequestException("Unable to find book within the system.",
-                    HttpStatus.BAD_REQUEST);
-
-        return bookItem.get();
-    }
-
-    private Author authorValidation(String name)
-    {
-        if(!authorRepository.existsById(name))
+        if(!newLibrary.equals(prevLibrary))
         {
-            authorRepository.save(new Author(name));
+            prevLibrary.removeBookItem(book);
+            newLibrary.addBookItem(book);
         }
 
-        return authorRepository.getById(name);
+        book.setRack(r);
+        return ResponseEntity.ok(new MessageResponse("Book has been successfully moved within the system"));
     }
 
-    private Subject subjectValidation(String name)
+    @Transactional
+    public ResponseEntity<MessageResponse> removeLibrary(String libraryName)
     {
-        if(!subjectRepository.existsById(name))
+        Library library = validationService.libraryValidation(libraryName);
+        library.clearLibrary();
+
+        libraryRepository.delete(library);
+        return ResponseEntity.ok(new MessageResponse("Library has been successfully removed from the system."));
+    }
+
+    @Transactional
+    public ResponseEntity<MessageResponse> removeBookItem(Long barcode)
+    {
+        BookItem book = validationService.bookValidation(barcode);
+
+        if(book.getCurrLoanMember() != null && book.getStatus() == BookStatus.LOANED)
+            throw new ApiRequestException("This book is currently not available and is loaned to a member.", HttpStatus.ACCEPTED);
+
+        else if(book.getCurrReservedMember() != null && book.getStatus() == BookStatus.RESERVED)
         {
-            subjectRepository.save(new Subject(name));
+            Member member = book.getCurrReservedMember();
+            member.cancelReservedBookItem(book);
+            member.sendNotification(new AccountNotification(new Date(), member.getEmail(), member.getAddress(),
+                    "Sorry, but this book is being removed and cannot be reserved for this user. " +
+                            "We apologize for this inconvenience."));
         }
 
-        return subjectRepository.getById(name);
+        Library library = book.getLibrary();
+        Author author = book.getAuthor();
+        Set<Subject> subjects = book.getSubjects();
+
+        library.removeBookItem(book);
+        author.removeBookItem(book);
+
+        for(Subject s: subjects)
+            s.removeBookItem(book);
+
+        book.clearRecords();
+
+        bookItemRepository.delete(book);
+        return ResponseEntity.ok(new MessageResponse("Book has been successfully removed from the system."));
     }
 }
