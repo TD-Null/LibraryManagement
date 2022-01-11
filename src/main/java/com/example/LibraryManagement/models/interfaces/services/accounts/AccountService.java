@@ -11,13 +11,25 @@ public interface AccountService
 {
     ResponseEntity<Object> getAccountDetails(Long barcode);
 
+    ResponseEntity<MessageResponse> updateAccountDetails(Long barcode, String name, String streetAddress,
+                                                         String city, String zipcode, String country,
+                                                         String email, String phoneNumber);
+
+    ResponseEntity<MessageResponse> changePassword(Long barcode, String originalPassword, String newPassword);
+
     ResponseEntity<LibraryCard> authenticateUser(String libraryCardNumber, String password);
 
     ResponseEntity<LibraryCard> registerMember(String name, String password, String email,
                                                String streetAddress, String city, String zipcode,
                                                String country, String phoneNumber);
 
+    ResponseEntity<LibraryCard> registerLibrarian(String name, String password, String email,
+                                                  String streetAddress, String city, String zipcode,
+                                                  String country, String phoneNumber);
+
     ResponseEntity<MessageResponse> updateMemberStatus(Long memberID, AccountStatus status);
+
+    ResponseEntity<MessageResponse> cancelMemberAccount(Long barcode, String cardNumber, String password);
 
     Object barcodeReader(Long barcode, AccountType type, AccountStatus status);
 }

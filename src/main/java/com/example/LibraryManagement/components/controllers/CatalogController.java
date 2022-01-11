@@ -49,7 +49,7 @@ public class CatalogController
     public ResponseEntity<List<BookItem>> searchBooks(@RequestParam(value = "title", required = false, defaultValue = "none") String title,
                                                       @RequestParam(value = "author", required = false, defaultValue = "none") String author,
                                                       @RequestParam(value = "subjects", required = false, defaultValue = "none") List<String> subjects,
-                                                      @RequestParam(value = "date", required = false, defaultValue = "none") String publicationDate)
+                                                      @RequestParam(value = "date", required = false) Date publicationDate)
     {
         return viewCatalogService.searchBooks(title, author, subjects, publicationDate);
     }

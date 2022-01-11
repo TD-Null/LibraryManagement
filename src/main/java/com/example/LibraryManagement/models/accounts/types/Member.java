@@ -48,7 +48,7 @@ import java.util.Set;
 @Table(uniqueConstraints = {
         @UniqueConstraint(columnNames = "Email")
 })
-public class Member extends Account
+public class Member extends Account implements MemberMethods
 {
     @OneToOne(cascade = {CascadeType.MERGE, CascadeType.DETACH})
     @JoinColumn(name = "card")

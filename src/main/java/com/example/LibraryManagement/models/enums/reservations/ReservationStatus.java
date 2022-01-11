@@ -28,5 +28,4 @@ public enum ReservationStatus
     PENDING,
     COMPLETED,
     CANCELLED,
-    NONE
 }

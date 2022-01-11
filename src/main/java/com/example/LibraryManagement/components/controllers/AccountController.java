@@ -6,6 +6,7 @@ import com.example.LibraryManagement.models.io.requests.ChangePasswordRequest;
 import com.example.LibraryManagement.models.io.requests.LoginRequest;
 import com.example.LibraryManagement.models.io.requests.SignupRequest;
 import com.example.LibraryManagement.models.io.requests.UpdateAccountRequest;
+import com.example.LibraryManagement.models.io.requests.member_requests.CancelMembershipRequest;
 import com.example.LibraryManagement.models.io.responses.MessageResponse;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;

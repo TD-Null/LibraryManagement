@@ -57,7 +57,7 @@ public class ViewCatalogServiceImp implements ViewCatalogService
 
     public ResponseEntity<List<Author>> listAllAuthors() { return ResponseEntity.ok(authorRepository.findAll()); }
 
-    public ResponseEntity<List<BookItem>> searchBooks(String title, String author, List<String> subjects, String publicationDate)
+    public ResponseEntity<List<BookItem>> searchBooks(String title, String author, List<String> subjects, Date publicationDate)
     {
         List<BookItem> books = new ArrayList<>();
 
@@ -90,9 +90,12 @@ public class ViewCatalogServiceImp implements ViewCatalogService
             }
         }
 
-        if(!publicationDate.equals("none"))
+        if(publicationDate != null)
         {
+            List<BookItem> booksByPubDate = bookItemRepository.findAllByPublicationDate(publicationDate);
 
+            for(BookItem b: booksByPubDate)
+                if(!books.contains(b)) books.add(b);
         }
 
         if(books.isEmpty())

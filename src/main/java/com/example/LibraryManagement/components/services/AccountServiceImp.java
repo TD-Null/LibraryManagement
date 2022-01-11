@@ -6,7 +6,6 @@ import com.example.LibraryManagement.components.repositories.accounts.MemberRepo
 import com.example.LibraryManagement.models.accounts.types.Librarian;
 import com.example.LibraryManagement.models.accounts.types.Member;
 import com.example.LibraryManagement.models.accounts.LibraryCard;
-import com.example.LibraryManagement.models.books.libraries.Library;
 import com.example.LibraryManagement.models.datatypes.Address;
 import com.example.LibraryManagement.models.enums.accounts.AccountStatus;
 import com.example.LibraryManagement.models.enums.accounts.AccountType;
@@ -277,12 +276,10 @@ public class AccountServiceImp implements AccountService
             Member member = memberValidation.get();
             AccountStatus currStatus = member.getStatus();
 
-            // If the member's account is already CLOSED or CANCELLED, its status cannot be updated.
-            if(currStatus == AccountStatus.CLOSED || currStatus == AccountStatus.CANCELLED)
-            {
+            // If the member's account is already CANCELLED, its status cannot be updated.
+            if(currStatus == AccountStatus.CANCELLED)
                 throw new ApiRequestException("The member's account is inactive. The account's status cannot be updated.",
                         HttpStatus.BAD_REQUEST);
-            }
 
             // Else, update the member's account status and return a response.
             else
@@ -295,6 +292,56 @@ public class AccountServiceImp implements AccountService
         // Else, the account's status cannot be updated as it cannot be found.
         throw new ApiRequestException("Unable to find member's account within the system.",
                 HttpStatus.UNAUTHORIZED);
+    }
+
+    @Transactional
+    public ResponseEntity<MessageResponse> cancelMemberAccount(Long barcode, String cardNumber, String password)
+    {
+        LibraryCard card = validationService.cardValidation(barcode);
+
+        if(card.getType() == AccountType.MEMBER)
+        {
+            Member member = card.getMember();
+
+            if(member == null)
+                throw new ApiRequestException("No member is associated with this card.",
+                        HttpStatus.BAD_REQUEST);
+
+            else if(member.getStatus() == AccountStatus.CANCELLED)
+                throw new ApiRequestException("Member has already cancelled this account",
+                        HttpStatus.BAD_REQUEST);
+
+            else if(member.getStatus() == AccountStatus.BLACKLISTED)
+                throw new ApiRequestException("Member's account is currently blocked. " +
+                        "User cannot cancel their membership currently.",
+                        HttpStatus.BAD_REQUEST);
+
+            else if(!card.isActive())
+                throw new ApiRequestException("Card is currently inactive, " +
+                        "so membership cannot be cancelled.",
+                        HttpStatus.BAD_REQUEST);
+
+            else if(!card.getCardNumber().equals(cardNumber) || !member.getPassword().equals(password))
+                throw new ApiRequestException("Given credentials are invalid." +
+                        "Cannot proceed with cancelling member's account",
+                        HttpStatus.UNAUTHORIZED);
+
+            else if(member.getIssuedBooksTotal() > 0)
+                throw new ApiRequestException("User currently has books still issued to their account." +
+                        "Please return any loaned books and cancel any book reservations made.",
+                        HttpStatus.ACCEPTED);
+
+            else if(member.getTotalFines() > 0)
+                throw new ApiRequestException("User currently has fines still associated with their account." +
+                        "Please pay for any fines still present in your account.",
+                        HttpStatus.ACCEPTED);
+
+            card.setActive(false);
+            member.setStatus(AccountStatus.CANCELLED);
+            return ResponseEntity.ok(new MessageResponse("MUser has successfully cancelled their membership."));
+        }
+
+        throw new ApiRequestException("User is not a member within the system.", HttpStatus.UNAUTHORIZED);
     }
 
     /*
