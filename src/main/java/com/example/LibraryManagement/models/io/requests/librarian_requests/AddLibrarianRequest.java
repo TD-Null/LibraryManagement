@@ -1,6 +1,6 @@
 package com.example.LibraryManagement.models.io.requests.librarian_requests;
 
-import com.example.LibraryManagement.models.io.requests.BarcodeValidationRequest;
+import com.example.LibraryManagement.models.io.requests.CardValidationRequest;
 import lombok.Getter;
 
 import javax.validation.constraints.Email;
@@ -8,7 +8,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
 @Getter
-public class AddLibrarianRequest extends BarcodeValidationRequest
+public class AddLibrarianRequest extends CardValidationRequest
 {
     @NotBlank
     private final String name;
@@ -37,11 +37,11 @@ public class AddLibrarianRequest extends BarcodeValidationRequest
     @NotBlank
     private final String phoneNumber;
 
-    public AddLibrarianRequest(Long barcode, String name, String password,
+    public AddLibrarianRequest(Long barcode, String number, String name, String password,
                                String email, String streetAddress, String city,
                                String zipcode, String country, String phoneNumber)
     {
-        super(barcode);
+        super(barcode, number);
         this.name = name;
         this.password = password;
         this.email = email;

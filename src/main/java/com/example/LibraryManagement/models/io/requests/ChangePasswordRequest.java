@@ -1,12 +1,11 @@
 package com.example.LibraryManagement.models.io.requests;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import javax.validation.constraints.NotBlank;
 
 @Getter
-public class ChangePasswordRequest extends BarcodeValidationRequest
+public class ChangePasswordRequest extends CardValidationRequest
 {
     @NotBlank
     private final String originalPassword;
@@ -14,9 +13,9 @@ public class ChangePasswordRequest extends BarcodeValidationRequest
     @NotBlank
     private final String newPassword;
 
-    public ChangePasswordRequest(Long barcode, String originalPassword, String newPassword)
+    public ChangePasswordRequest(Long barcode, String number, String originalPassword, String newPassword)
     {
-        super(barcode);
+        super(barcode, number);
         this.originalPassword = originalPassword;
         this.newPassword = newPassword;
     }
