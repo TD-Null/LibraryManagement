@@ -35,18 +35,6 @@ public class AccountController
      * Returns a 200 response code with the details of the user's accounts,
      * from either a MEMBER or LIBRARIAN account.
      */
-//    @GetMapping("/details")
-//    public ResponseEntity<Object> viewAccountDetails(@Valid @RequestBody CardValidationRequest request)
-//    {
-//        return accountService.getAccountDetails(request.getBarcode(), request.getNumber());
-//    }
-
-    /*
-     * Account details GET request.
-     * Expects a valid barcode from the user's library card.
-     * Returns a 200 response code with the details of the user's accounts,
-     * from either a MEMBER or LIBRARIAN account.
-     */
     @GetMapping("/details")
     public ResponseEntity<Object> viewAccountDetails(@RequestParam(value = "id") Long barcode,
                                                      @RequestParam(value = "card") String number)
