@@ -31,4 +31,6 @@ public class Subject
     public void addBookItem(BookItem b) { books.add(b); }
 
     public void removeBookItem(BookItem b) { books.remove(b); }
+
+    public void clearBooks() { books.clear(); }
 }

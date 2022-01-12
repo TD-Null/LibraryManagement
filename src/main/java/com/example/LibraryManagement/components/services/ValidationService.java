@@ -14,6 +14,7 @@ import com.example.LibraryManagement.models.books.properties.BookItem;
 import com.example.LibraryManagement.models.books.properties.Subject;
 import com.example.LibraryManagement.models.io.responses.exceptions.ApiRequestException;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -33,9 +34,9 @@ public class ValidationService
     @Autowired
     private final LibraryRepository libraryRepository;
     @Autowired
-    private final AuthorRepository authorRepository;
-    @Autowired
     private final SubjectRepository subjectRepository;
+    @Autowired
+    private final AuthorRepository authorRepository;
 
     public LibraryCard cardValidation(Long barcode)
     {
@@ -81,16 +82,6 @@ public class ValidationService
         return bookItem.get();
     }
 
-    public Author authorValidation(String name)
-    {
-        if(!authorRepository.existsById(name))
-        {
-            authorRepository.save(new Author(name));
-        }
-
-        return authorRepository.getById(name);
-    }
-
     public Subject subjectValidation(String name)
     {
         if(!subjectRepository.existsById(name))
@@ -99,5 +90,15 @@ public class ValidationService
         }
 
         return subjectRepository.getById(name);
+    }
+
+    public Author authorValidation(String name)
+    {
+        if(!authorRepository.existsById(name))
+        {
+            authorRepository.save(new Author(name));
+        }
+
+        return authorRepository.getById(name);
     }
 }

@@ -26,11 +26,11 @@ public class CatalogController
     @Autowired
     private final ViewCatalogServiceImp viewCatalogService;
 
-    @GetMapping("/library")
-    public ResponseEntity<List<Library>> viewAllLibraries() { return viewCatalogService.listAllLibraries(); }
-
     @GetMapping
     public ResponseEntity<List<BookItem>> viewAllBooks() { return viewCatalogService.listAllBooks(); }
+
+    @GetMapping("/library")
+    public ResponseEntity<List<Library>> viewAllLibraries() { return viewCatalogService.listAllLibraries(); }
 
     @GetMapping("/subjects")
     public ResponseEntity<List<Subject>> viewAllSubjects() { return viewCatalogService.listAllSubjects(); }

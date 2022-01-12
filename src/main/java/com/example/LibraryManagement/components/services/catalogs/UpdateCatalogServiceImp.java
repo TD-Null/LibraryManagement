@@ -36,6 +36,10 @@ public class UpdateCatalogServiceImp implements UpdateCatalogService
     @Autowired
     private final LibraryRepository libraryRepository;
     @Autowired
+    private final SubjectRepository subjectRepository;
+    @Autowired
+    private final AuthorRepository authorRepository;
+    @Autowired
     private final ValidationService validationService;
 
     public ResponseEntity<MessageResponse> addLibrary(String name, String streetAddress, String city,
@@ -73,6 +77,24 @@ public class UpdateCatalogServiceImp implements UpdateCatalogService
         }
 
         return ResponseEntity.ok(new MessageResponse("Book has been successfully added to the system."));
+    }
+
+    public ResponseEntity<MessageResponse> addSubject(String subject)
+    {
+        if(subjectRepository.existsById(subject))
+            throw new ApiRequestException("Subject already exists within the system.", HttpStatus.BAD_REQUEST);
+
+        subjectRepository.save(new Subject(subject));
+        return ResponseEntity.ok(new MessageResponse("Subject has been successfully added to the system."));
+    }
+
+    public ResponseEntity<MessageResponse> addAuthor(String author, String description)
+    {
+        if(authorRepository.existsById(author))
+            throw new ApiRequestException("Author already exists within the system.", HttpStatus.BAD_REQUEST);
+
+        authorRepository.save(new Author(author, description));
+        return ResponseEntity.ok(new MessageResponse("Author has been successfully added to the system."));
     }
 
     @Transactional
@@ -147,6 +169,17 @@ public class UpdateCatalogServiceImp implements UpdateCatalogService
     }
 
     @Transactional
+    public ResponseEntity<MessageResponse> modifyAuthor(String name, String description)
+    {
+        if(!authorRepository.existsById(name))
+            throw new ApiRequestException("Author does not exist within the system.", HttpStatus.BAD_REQUEST);
+
+        Author author = authorRepository.getById(name);
+        author.setDescription(description);
+        return ResponseEntity.ok(new MessageResponse("Author has been updated successfully within the system."));
+    }
+
+    @Transactional
     public ResponseEntity<MessageResponse> removeLibrary(String libraryName)
     {
         Library library = validationService.libraryValidation(libraryName);
@@ -187,5 +220,32 @@ public class UpdateCatalogServiceImp implements UpdateCatalogService
 
         bookItemRepository.delete(book);
         return ResponseEntity.ok(new MessageResponse("Book has been successfully removed from the system."));
+    }
+
+    @Transactional
+    public ResponseEntity<MessageResponse> removeSubject(String name)
+    {
+        if(!subjectRepository.existsById(name))
+            throw new ApiRequestException("Subject does not exist within the system.", HttpStatus.BAD_REQUEST);
+
+        Subject subject = subjectRepository.getById(name);
+        subject.clearBooks();
+        subjectRepository.delete(subject);
+        return ResponseEntity.ok(new MessageResponse("Subject has been successfully removed from the system."));
+    }
+
+    @Transactional
+    public ResponseEntity<MessageResponse> removeAuthor(String name)
+    {
+        if(!authorRepository.existsById(name))
+            throw new ApiRequestException("Author does not exist within the system.", HttpStatus.BAD_REQUEST);
+
+        Author author = authorRepository.getById(name);
+
+        if(!author.getBooks().isEmpty())
+            throw new ApiRequestException("Author is still associated with books within the system.", HttpStatus.BAD_REQUEST);
+
+        authorRepository.delete(author);
+        return ResponseEntity.ok(new MessageResponse("Author has been successfully removed from the system."));
     }
 }

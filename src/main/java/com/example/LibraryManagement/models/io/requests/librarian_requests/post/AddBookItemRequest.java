@@ -1,4 +1,4 @@
-package com.example.LibraryManagement.models.io.requests.librarian_requests;
+package com.example.LibraryManagement.models.io.requests.librarian_requests.post;
 
 import com.example.LibraryManagement.models.enums.books.BookFormat;
 import com.example.LibraryManagement.models.io.requests.CardValidationRequest;

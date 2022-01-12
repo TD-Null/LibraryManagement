@@ -36,6 +36,16 @@ public class ViewCatalogServiceImp implements ViewCatalogService
     @Autowired
     private final ValidationService validationService;
 
+    public ResponseEntity<List<BookItem>> listAllBooks()
+    {
+        List<BookItem> books = bookItemRepository.findAll();
+
+        if(books.isEmpty())
+            throw new ApiRequestException("No books available.", HttpStatus.NO_CONTENT);
+
+        return ResponseEntity.ok(books);
+    }
+
     public ResponseEntity<List<Library>> listAllLibraries()
     {
         List<Library> libraries = libraryRepository.findAll();
@@ -64,16 +74,6 @@ public class ViewCatalogServiceImp implements ViewCatalogService
             throw new ApiRequestException("No authors available.", HttpStatus.NO_CONTENT);
 
         return ResponseEntity.ok(authors);
-    }
-
-    public ResponseEntity<List<BookItem>> listAllBooks()
-    {
-        List<BookItem> books = bookItemRepository.findAll();
-
-        if(books.isEmpty())
-            throw new ApiRequestException("No books available.", HttpStatus.NO_CONTENT);
-
-        return ResponseEntity.ok(books);
     }
 
     public ResponseEntity<List<BookItem>> searchBooks(String libraryName,

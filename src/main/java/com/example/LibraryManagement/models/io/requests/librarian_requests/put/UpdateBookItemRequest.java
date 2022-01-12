@@ -1,4 +1,4 @@
-package com.example.LibraryManagement.models.io.requests.librarian_requests;
+package com.example.LibraryManagement.models.io.requests.librarian_requests.put;
 
 import com.example.LibraryManagement.models.enums.books.BookFormat;
 import com.example.LibraryManagement.models.io.requests.CardValidationRequest;
@@ -14,6 +14,9 @@ import java.util.Set;
 @Getter
 public class UpdateBookItemRequest extends CardValidationRequest
 {
+    @NotNull
+    private final Long bookBarcode;
+
     @NotBlank
     private final String ISBN;
 
@@ -45,12 +48,14 @@ public class UpdateBookItemRequest extends CardValidationRequest
 
     private final double price;
 
-    public UpdateBookItemRequest(Long barcode, String number, String ISBN, String title,
-                                 String publisher, String language, int numberOfPages,
-                                 String authorName, Set<String> subjectNames, BookFormat format,
-                                 Date publicationDate, boolean isReferenceOnly, double price)
+    public UpdateBookItemRequest(Long barcode, String number, Long bookBarcode,
+                                 String ISBN, String title, String publisher,
+                                 String language, int numberOfPages, String authorName,
+                                 Set<String> subjectNames, BookFormat format, Date publicationDate,
+                                 boolean isReferenceOnly, double price)
     {
         super(barcode, number);
+        this.bookBarcode = bookBarcode;
         this.ISBN = ISBN;
         this.title = title;
         this.publisher = publisher;
