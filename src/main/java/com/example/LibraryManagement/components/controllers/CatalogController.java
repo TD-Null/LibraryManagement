@@ -48,7 +48,7 @@ public class CatalogController
         return viewCatalogService.searchBooks(library, title, author, subjects, publicationDate);
     }
 
-    @GetMapping("/library")
+    @GetMapping("/library/books")
     public ResponseEntity<List<BookItem>> viewLibraryBooks(@RequestParam(value = "name") String libraryName) { return viewCatalogService.listLibraryBooks(libraryName); }
 
     @GetMapping("/filter/title")
