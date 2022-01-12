@@ -11,8 +11,10 @@ import com.example.LibraryManagement.models.books.actions.BookLending;
 import com.example.LibraryManagement.models.books.actions.BookReservation;
 import com.example.LibraryManagement.models.books.fines.Fine;
 import com.example.LibraryManagement.models.interfaces.services.accounts.LibrarianService;
+import com.example.LibraryManagement.models.io.responses.exceptions.ApiRequestException;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -33,13 +35,53 @@ public class LibrarianServiceImp implements LibrarianService
     @Autowired
     private final FineRepository fineRepository;
 
-    public ResponseEntity<List<Librarian>> listAllLibrarians() { return ResponseEntity.ok(librarianRepository.findAll()); }
+    public ResponseEntity<List<Librarian>> listAllLibrarians()
+    {
+        List<Librarian> librarians = librarianRepository.findAll();
 
-    public ResponseEntity<List<Member>> listAllMembers() { return ResponseEntity.ok(memberRepository.findAll()); }
+        if(librarians.isEmpty())
+            throw new ApiRequestException("There are no librarians within the system.", HttpStatus.NO_CONTENT);
 
-    public ResponseEntity<List<BookLending>> listAllBookLoans() { return ResponseEntity.ok(bookLendingRepository.findAll()); }
+        return ResponseEntity.ok(librarians);
+    }
 
-    public ResponseEntity<List<BookReservation>> listAllBookReservations() { return ResponseEntity.ok(bookReservationRepository.findAll()); }
+    public ResponseEntity<List<Member>> listAllMembers()
+    {
+        List<Member> members = memberRepository.findAll();
 
-    public ResponseEntity<List<Fine>> listAllFines() { return ResponseEntity.ok(fineRepository.findAll()); }
+        if(members.isEmpty())
+            throw new ApiRequestException("There are no members within the system.", HttpStatus.NO_CONTENT);
+
+        return ResponseEntity.ok(members);
+    }
+
+    public ResponseEntity<List<BookLending>> listAllBookLoans()
+    {
+        List<BookLending> bookLoans = bookLendingRepository.findAll();
+
+        if(bookLoans.isEmpty())
+            throw new ApiRequestException("There are no book loans made within the system.", HttpStatus.NO_CONTENT);
+
+        return ResponseEntity.ok(bookLoans);
+    }
+
+    public ResponseEntity<List<BookReservation>> listAllBookReservations()
+    {
+        List<BookReservation> reservations = bookReservationRepository.findAll();
+
+        if(reservations.isEmpty())
+            throw new ApiRequestException("There are no reservations made within the system.", HttpStatus.NO_CONTENT);
+
+        return ResponseEntity.ok(bookReservationRepository.findAll());
+    }
+
+    public ResponseEntity<List<Fine>> listAllFines()
+    {
+        List<Fine> fines = fineRepository.findAll();
+
+        if(fines.isEmpty())
+            throw new ApiRequestException("There are no fines made within the system.", HttpStatus.NO_CONTENT);
+
+        return ResponseEntity.ok(fineRepository.findAll());
+    }
 }

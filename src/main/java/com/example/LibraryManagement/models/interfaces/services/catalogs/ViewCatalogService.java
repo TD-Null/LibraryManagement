@@ -17,8 +17,6 @@ public interface ViewCatalogService
 {
     ResponseEntity<List<Library>> listAllLibraries();
 
-    ResponseEntity<List<BookItem>> listLibraryBooks(String name);
-
     ResponseEntity<List<BookItem>> listAllBooks();
 
     ResponseEntity<List<Subject>> listAllSubjects();
@@ -31,11 +29,13 @@ public interface ViewCatalogService
                                                List<String> subjects,
                                                Date publicationDate);
 
-    ResponseEntity<List<BookItem>> searchBooksByTitle(String title);
-
-    ResponseEntity<List<BookItem>> searchBooksByAuthor(String name);
-
-    ResponseEntity<List<BookItem>> searchBooksBySubject(String subject);
-
-    ResponseEntity<List<BookItem>> searchBooksByPubDate(Date publicationDate);
+//    ResponseEntity<List<BookItem>> listLibraryBooks(String name);
+//
+//    ResponseEntity<List<BookItem>> searchBooksByTitle(String title);
+//
+//    ResponseEntity<List<BookItem>> searchBooksByAuthor(String name);
+//
+//    ResponseEntity<List<BookItem>> searchBooksBySubject(String subject);
+//
+//    ResponseEntity<List<BookItem>> searchBooksByPubDate(Date publicationDate);
 }
