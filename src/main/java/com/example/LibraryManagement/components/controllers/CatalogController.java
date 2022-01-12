@@ -48,18 +48,4 @@ public class CatalogController
         return viewCatalogService.searchBooks(library, title, author, subjects, publicationDate);
     }
 
-    @GetMapping("/library/{name}/books")
-    public ResponseEntity<List<BookItem>> viewLibraryBooks(@PathVariable("name") String libraryName) { return viewCatalogService.listLibraryBooks(libraryName); }
-
-    @GetMapping("/filter/title")
-    public ResponseEntity<List<BookItem>> viewBooksByTitle(@RequestParam String title) { return viewCatalogService.searchBooksByTitle(title); }
-
-    @GetMapping("filter/author")
-    public ResponseEntity<List<BookItem>> viewBooksByAuthor(@RequestParam String name) { return viewCatalogService.searchBooksByAuthor(name); }
-
-    @GetMapping("filter/subjects")
-    public ResponseEntity<List<BookItem>> viewBooksBySubject(@RequestParam String subject) { return viewCatalogService.searchBooksBySubject(subject); }
-
-    @GetMapping("filter/publication_date")
-    public ResponseEntity<List<BookItem>> viewBooksByPubDate(@RequestParam Date publicationDate) { return viewCatalogService.searchBooksByPubDate(publicationDate); }
 }

@@ -35,7 +35,7 @@ public class Fine
 
     @JsonIgnore
     @ManyToOne
-    @JoinColumn(name = "member", nullable = false)
+    @JoinColumn(name = "member")
     private Member member;
 
     @OneToOne(cascade = CascadeType.ALL)

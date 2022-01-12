@@ -26,7 +26,7 @@ public class AccountNotification
 
     @JsonIgnore
     @ManyToOne
-    @JoinColumn(name = "member", nullable = false)
+    @JoinColumn(name = "member")
     private Member member;
 
     @Column(name = "Date", nullable = false)

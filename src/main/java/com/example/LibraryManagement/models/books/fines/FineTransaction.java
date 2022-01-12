@@ -37,9 +37,6 @@ public class FineTransaction
     @Column(name = "Type", nullable = false)
     private TransactionType type;
 
-//    @Column(name = "Transaction", nullable = false)
-//    private Object transaction;
-
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "creditCardTransaction")
     private CreditCardTransaction creditCardTransaction;

@@ -31,5 +31,7 @@ public interface AccountService
 
     ResponseEntity<MessageResponse> cancelMemberAccount(Long barcode, String cardNumber, String password);
 
+    ResponseEntity<MessageResponse> cancelLibrarianAccount(Long barcode, String cardNumber);
+
     Object barcodeReader(Long barcode, String number, AccountType type, AccountStatus status);
 }
