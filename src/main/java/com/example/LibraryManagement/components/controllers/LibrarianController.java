@@ -77,6 +77,15 @@ public class LibrarianController
                 request.getCountry(), request.getPhoneNumber());
     }
 
+    @DeleteMapping("account/librarian/remove")
+    public ResponseEntity<MessageResponse> removeLibrarian(@Valid @RequestBody RemoveLibrarianRequest request)
+    {
+        accountService.barcodeReader(request.getBarcode(), request.getNumber(),
+                AccountType.LIBRARIAN, AccountStatus.ACTIVE);
+        return accountService.cancelLibrarianAccount(
+                request.getLibrarianCardBarcode(), request.getLibrarianCardNumber());
+    }
+
     @PutMapping("/account/member/block")
     public ResponseEntity<MessageResponse> blockMember(@Valid @RequestBody CardValidationRequest request,
                                                        @RequestParam(name = "member") Long memberId)

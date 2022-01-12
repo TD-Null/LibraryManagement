@@ -20,6 +20,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.sql.ResultSet;
 import java.util.Date;
 import java.util.Optional;
 import java.util.Random;
@@ -345,10 +346,50 @@ public class AccountServiceImp implements AccountService
 
             card.setActive(false);
             member.setStatus(AccountStatus.CANCELLED);
-            return ResponseEntity.ok(new MessageResponse("MUser has successfully cancelled their membership."));
+            return ResponseEntity.ok(new MessageResponse("User has successfully cancelled their membership."));
         }
 
         throw new ApiRequestException("User is not a member within the system.", HttpStatus.UNAUTHORIZED);
+    }
+
+    @Transactional
+    public ResponseEntity<MessageResponse> cancelLibrarianAccount(Long barcode, String cardNumber)
+    {
+        LibraryCard card = validationService.cardValidation(barcode);
+
+        if(card.getType() == AccountType.LIBRARIAN)
+        {
+            Librarian librarian = card.getLibrarian();
+
+            if(librarian == null)
+                throw new ApiRequestException("No librarian is associated with this card.",
+                        HttpStatus.BAD_REQUEST);
+
+            else if(librarian.getStatus() == AccountStatus.CANCELLED)
+                throw new ApiRequestException("Librarian's account has already been cancelled.",
+                        HttpStatus.BAD_REQUEST);
+
+            else if(librarian.getStatus() == AccountStatus.BLACKLISTED)
+                throw new ApiRequestException("Librarian's account is currently blocked. " +
+                        "User cannot cancel their account currently.",
+                        HttpStatus.BAD_REQUEST);
+
+            else if(!card.isActive())
+                throw new ApiRequestException("Card is currently inactive, " +
+                        "so membership cannot be cancelled.",
+                        HttpStatus.BAD_REQUEST);
+
+            else if(!card.getCardNumber().equals(cardNumber))
+                throw new ApiRequestException("Given credentials are invalid." +
+                        "Cannot proceed with cancelling librarian's account",
+                        HttpStatus.UNAUTHORIZED);
+
+            card.setActive(false);
+            librarian.setStatus(AccountStatus.CANCELLED);
+            return ResponseEntity.ok(new MessageResponse("Librarian's account has been removed from the system."));
+        }
+
+        throw new ApiRequestException("User is not a librarian within the system.", HttpStatus.UNAUTHORIZED);
     }
 
     /*
