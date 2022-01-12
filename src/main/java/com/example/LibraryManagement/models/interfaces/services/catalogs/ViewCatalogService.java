@@ -15,9 +15,9 @@ import java.util.Set;
 // Methods used in a service component relating to the catalog.
 public interface ViewCatalogService
 {
-    ResponseEntity<List<Library>> listAllLibraries();
-
     ResponseEntity<List<BookItem>> listAllBooks();
+
+    ResponseEntity<List<Library>> listAllLibraries();
 
     ResponseEntity<List<Subject>> listAllSubjects();
 

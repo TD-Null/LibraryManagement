@@ -14,6 +14,14 @@ import com.example.LibraryManagement.models.enums.accounts.AccountStatus;
 import com.example.LibraryManagement.models.enums.accounts.AccountType;
 import com.example.LibraryManagement.models.io.requests.CardValidationRequest;
 import com.example.LibraryManagement.models.io.requests.librarian_requests.*;
+import com.example.LibraryManagement.models.io.requests.librarian_requests.delete.RemoveAuthorRequest;
+import com.example.LibraryManagement.models.io.requests.librarian_requests.delete.RemoveBookItemRequest;
+import com.example.LibraryManagement.models.io.requests.librarian_requests.delete.RemoveLibrarianRequest;
+import com.example.LibraryManagement.models.io.requests.librarian_requests.delete.RemoveLibraryRequest;
+import com.example.LibraryManagement.models.io.requests.librarian_requests.post.*;
+import com.example.LibraryManagement.models.io.requests.librarian_requests.put.MoveBookItemRequest;
+import com.example.LibraryManagement.models.io.requests.librarian_requests.put.UpdateAuthorRequest;
+import com.example.LibraryManagement.models.io.requests.librarian_requests.put.UpdateBookItemRequest;
 import com.example.LibraryManagement.models.io.responses.MessageResponse;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -153,42 +161,79 @@ public class LibrarianController
                 request.isReferenceOnly(), request.getPrice());
     }
 
-    @PutMapping("/catalog/book/update")
-    public ResponseEntity<MessageResponse> updateBookItem(@Valid @RequestBody AddBookItemRequest request,
-                                                          @RequestParam(value = "book") Long barcode)
+    @PostMapping("catalog/subject/add")
+    public ResponseEntity<MessageResponse> addSubject(@Valid @RequestBody SubjectRequest request)
     {
         accountService.barcodeReader(request.getBarcode(), request.getNumber(),
                 AccountType.LIBRARIAN, AccountStatus.ACTIVE);
-        return updateCatalogService.modifyBookItem(barcode, request.getISBN(), request.getTitle(), request.getPublisher(),
-                request.getLanguage(), request.getNumberOfPages(), request.getAuthorName(), request.getSubjectNames(),
-                request.getFormat(), request.getPublicationDate(), request.isReferenceOnly(), request.getPrice());
+        return updateCatalogService.addSubject(request.getSubject());
     }
 
-    @PutMapping("/catalog/move")
-    public ResponseEntity<MessageResponse> moveBookItem(@Valid @RequestBody MoveBookItemRequest request,
-                                                        @RequestParam Long barcode)
+    @PostMapping("catalog/author/add")
+    public ResponseEntity<MessageResponse> addAuthor(@Valid @RequestBody AddAuthorRequest request)
     {
         accountService.barcodeReader(request.getBarcode(), request.getNumber(),
                 AccountType.LIBRARIAN, AccountStatus.ACTIVE);
-        return updateCatalogService.moveBookItem(barcode, request.getLibraryName(),
+        return updateCatalogService.addAuthor(request.getAuthor(), request.getDescription());
+    }
+
+    @PutMapping("/catalog/book/update")
+    public ResponseEntity<MessageResponse> updateBookItem(@Valid @RequestBody UpdateBookItemRequest request)
+    {
+        accountService.barcodeReader(request.getBarcode(), request.getNumber(),
+                AccountType.LIBRARIAN, AccountStatus.ACTIVE);
+        return updateCatalogService.modifyBookItem(request.getBookBarcode(), request.getISBN(), request.getTitle(),
+                request.getPublisher(), request.getLanguage(), request.getNumberOfPages(), request.getAuthorName(),
+                request.getSubjectNames(), request.getFormat(), request.getPublicationDate(), request.isReferenceOnly(),
+                request.getPrice());
+    }
+
+    @PutMapping("/catalog/book/move")
+    public ResponseEntity<MessageResponse> moveBookItem(@Valid @RequestBody MoveBookItemRequest request)
+    {
+        accountService.barcodeReader(request.getBarcode(), request.getNumber(),
+                AccountType.LIBRARIAN, AccountStatus.ACTIVE);
+        return updateCatalogService.moveBookItem(request.getBookBarcode(), request.getLibraryName(),
                 new Rack(request.getRack(), request.getLocation()));
     }
 
-    @DeleteMapping("catalog/library/remove")
-    public ResponseEntity<MessageResponse> removeLibrary(@Valid @RequestBody CardValidationRequest request,
-                                                         @RequestParam(name = "library") String name)
+    @PutMapping("/catalog/author/update")
+    public ResponseEntity<MessageResponse> updateAuthor(@Valid @RequestBody UpdateAuthorRequest request)
     {
         accountService.barcodeReader(request.getBarcode(), request.getNumber(),
                 AccountType.LIBRARIAN, AccountStatus.ACTIVE);
-        return updateCatalogService.removeLibrary(name);
+        return updateCatalogService.modifyAuthor(request.getAuthor(), request.getDescription());
+    }
+
+    @DeleteMapping("catalog/library/remove")
+    public ResponseEntity<MessageResponse> removeLibrary(@Valid @RequestBody RemoveLibraryRequest request)
+    {
+        accountService.barcodeReader(request.getBarcode(), request.getNumber(),
+                AccountType.LIBRARIAN, AccountStatus.ACTIVE);
+        return updateCatalogService.removeLibrary(request.getLibrary());
     }
 
     @DeleteMapping("/catalog/book/remove")
-    public ResponseEntity<MessageResponse> removeBookItem(@Valid @RequestBody CardValidationRequest request,
-                                                          @RequestParam Long barcode)
+    public ResponseEntity<MessageResponse> removeBookItem(@Valid @RequestBody RemoveBookItemRequest request)
     {
         accountService.barcodeReader(request.getBarcode(), request.getNumber(),
                 AccountType.LIBRARIAN, AccountStatus.ACTIVE);
-        return updateCatalogService.removeBookItem(barcode);
+        return updateCatalogService.removeBookItem(request.getBookBarcode());
+    }
+
+    @DeleteMapping("/catalog/subject/remove")
+    public ResponseEntity<MessageResponse> removeSubject(@Valid @RequestBody SubjectRequest request)
+    {
+        accountService.barcodeReader(request.getBarcode(), request.getNumber(),
+                AccountType.LIBRARIAN, AccountStatus.ACTIVE);
+        return updateCatalogService.removeSubject(request.getSubject());
+    }
+
+    @DeleteMapping("/catalog/author/remove")
+    public ResponseEntity<MessageResponse> removeAuthor(@Valid @RequestBody RemoveAuthorRequest request)
+    {
+        accountService.barcodeReader(request.getBarcode(), request.getNumber(),
+                AccountType.LIBRARIAN, AccountStatus.ACTIVE);
+        return updateCatalogService.removeAuthor(request.getAuthor());
     }
 }
