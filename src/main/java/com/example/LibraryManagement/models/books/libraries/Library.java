@@ -35,7 +35,7 @@ public class Library
 {
     @Id
     @NotBlank
-    @Column(name = "Name")
+    @Column(name = "Name", nullable = false)
     private String name;
 
     @NotBlank

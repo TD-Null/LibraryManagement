@@ -23,11 +23,11 @@ public class BookReservation
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "barcode", nullable = false)
+    @JoinColumn(name = "barcode")
     private BookItem bookItem;
 
     @ManyToOne
-    @JoinColumn(name = "member", nullable = false)
+    @JoinColumn(name = "member")
     private Member member;
 
     @Column(name = "CreationDate", nullable = false)

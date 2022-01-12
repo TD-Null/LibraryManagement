@@ -19,7 +19,7 @@ public class Subject
 {
     @Id
     @NotBlank
-    @Column(name = "Name")
+    @Column(name = "Name", nullable = false)
     private String name;
 
     @JsonIgnore
