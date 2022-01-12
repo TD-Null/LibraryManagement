@@ -50,9 +50,10 @@ public class MemberController
     private final ValidationService validationService;
 
     @GetMapping("/checkout/books")
-    public ResponseEntity<List<BookItem>> viewBooksLoans(@Valid @RequestBody CardValidationRequest request)
+    public ResponseEntity<List<BookItem>> viewBooksLoans(@RequestParam(value = "id") Long barcode,
+                                                         @RequestParam(value = "card") String number)
     {
-        Member member = (Member) accountService.barcodeReader(request.getBarcode(), request.getNumber(),
+        Member member = (Member) accountService.barcodeReader(barcode, number,
                 AccountType.MEMBER, AccountStatus.ACTIVE);
         List<BookItem> bookLoans = new ArrayList<>(member.getCheckedOutBooks());
 
@@ -63,9 +64,10 @@ public class MemberController
     }
 
     @GetMapping("/reserve/books")
-    public ResponseEntity<List<BookItem>> viewReservedBooks(@Valid @RequestBody CardValidationRequest request)
+    public ResponseEntity<List<BookItem>> viewReservedBooks(@RequestParam(value = "id") Long barcode,
+                                                            @RequestParam(value = "card") String number)
     {
-        Member member = (Member) accountService.barcodeReader(request.getBarcode(), request.getNumber(),
+        Member member = (Member) accountService.barcodeReader(barcode, number,
                 AccountType.MEMBER, AccountStatus.ACTIVE);
         List<BookItem> bookReservations = new ArrayList<>(member.getReservedBooks());
 
@@ -76,9 +78,10 @@ public class MemberController
     }
 
     @GetMapping("/notifications")
-    public ResponseEntity<List<AccountNotification>> viewNotifications(@Valid @RequestBody CardValidationRequest request)
+    public ResponseEntity<List<AccountNotification>> viewNotifications(@RequestParam(value = "id") Long barcode,
+                                                                       @RequestParam(value = "card") String number)
     {
-        Member member = (Member) accountService.barcodeReader(request.getBarcode(), request.getNumber(),
+        Member member = (Member) accountService.barcodeReader(barcode, number,
                 AccountType.MEMBER, AccountStatus.ACTIVE);
         List<AccountNotification> notifications = new ArrayList<>(member.getNotifications());
 
@@ -89,9 +92,10 @@ public class MemberController
     }
 
     @GetMapping("/fines")
-    public ResponseEntity<List<Fine>> viewFines(@Valid @RequestBody CardValidationRequest request)
+    public ResponseEntity<List<Fine>> viewFines(@RequestParam(value = "id") Long barcode,
+                                                @RequestParam(value = "card") String number)
     {
-        Member member = (Member) accountService.barcodeReader(request.getBarcode(), request.getNumber(),
+        Member member = (Member) accountService.barcodeReader(barcode, number,
                 AccountType.MEMBER, AccountStatus.ACTIVE);
         List<Fine> fines = new ArrayList<>(member.getFines());
 
@@ -102,9 +106,10 @@ public class MemberController
     }
 
     @GetMapping("/transactions")
-    public ResponseEntity<List<FineTransaction>> viewTransactions(@Valid @RequestBody CardValidationRequest request)
+    public ResponseEntity<List<FineTransaction>> viewTransactions(@RequestParam(value = "id") Long barcode,
+                                                                  @RequestParam(value = "card") String number)
     {
-        Member member = (Member) accountService.barcodeReader(request.getBarcode(), request.getNumber(),
+        Member member = (Member) accountService.barcodeReader(barcode, number,
                 AccountType.MEMBER, AccountStatus.ACTIVE);
         List<FineTransaction> transactions = new ArrayList<>();
         List<Fine> fines = new ArrayList<>(member.getFines());
@@ -126,9 +131,10 @@ public class MemberController
     }
 
     @GetMapping("/checkout/history")
-    public ResponseEntity<List<BookLending>> viewCheckoutHistory(@Valid @RequestBody CardValidationRequest request)
+    public ResponseEntity<List<BookLending>> viewCheckoutHistory(@RequestParam(value = "id") Long barcode,
+                                                                 @RequestParam(value = "card") String number)
     {
-        Member member = (Member) accountService.barcodeReader(request.getBarcode(), request.getNumber(),
+        Member member = (Member) accountService.barcodeReader(barcode, number,
                 AccountType.MEMBER, AccountStatus.ACTIVE);
         List<BookLending> checkoutRecords = new ArrayList<>(member.getBookLoans());
 
@@ -139,9 +145,10 @@ public class MemberController
     }
 
     @GetMapping("/reserve/history")
-    public ResponseEntity<List<BookReservation>> viewReservationHistory(@Valid @RequestBody CardValidationRequest request)
+    public ResponseEntity<List<BookReservation>> viewReservationHistory(@RequestParam(value = "id") Long barcode,
+                                                                        @RequestParam(value = "card") String number)
     {
-        Member member = (Member) accountService.barcodeReader(request.getBarcode(), request.getNumber(),
+        Member member = (Member) accountService.barcodeReader(barcode, number,
                 AccountType.MEMBER, AccountStatus.ACTIVE);
         List<BookReservation> reservationRecords = new ArrayList<>(member.getBookReservations());
 

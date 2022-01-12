@@ -40,23 +40,25 @@ public class LibrarianController
     private final UpdateCatalogServiceImp updateCatalogService;
 
     @GetMapping("/account/member")
-    public ResponseEntity<List<Member>> viewAllMembers(@Valid @RequestBody CardValidationRequest request)
+    public ResponseEntity<List<Member>> viewAllMembers(@RequestParam(value = "id") Long barcode,
+                                                       @RequestParam(value = "card") String number)
     {
-        accountService.barcodeReader(request.getBarcode(), request.getNumber(),
+        accountService.barcodeReader(barcode, number,
                 AccountType.LIBRARIAN, AccountStatus.ACTIVE);
         return librarianService.listAllMembers();
     }
 
     @GetMapping("/account/librarian")
-    public ResponseEntity<List<Librarian>> viewAllLibrarians(@Valid @RequestBody CardValidationRequest request)
+    public ResponseEntity<List<Librarian>> viewAllLibrarians(@RequestParam(value = "id") Long barcode,
+                                                             @RequestParam(value = "card") String number)
     {
-        accountService.barcodeReader(request.getBarcode(), request.getNumber(),
+        accountService.barcodeReader(barcode, number,
                 AccountType.LIBRARIAN, AccountStatus.ACTIVE);
         return librarianService.listAllLibrarians();
     }
 
     @PostMapping("/account/librarian/register")
-    public ResponseEntity<LibraryCard> registerLibrarian(@Valid @RequestBody AddLibrarianRequest request)
+    public ResponseEntity<LibraryCard> registerLibrarian(@Valid @RequestBody RegisterLibrarianRequest request)
     {
         return accountService.registerLibrarian(
                 request.getName(), request.getPassword(),
@@ -97,7 +99,7 @@ public class LibrarianController
 
     @PutMapping("/account/member/unblock")
     public ResponseEntity<MessageResponse> unblockMember(@Valid @RequestBody CardValidationRequest request,
-                                                         @RequestParam(name = "member") Long memberId)
+                                                         @RequestParam(value = "member") Long memberId)
     {
         accountService.barcodeReader(request.getBarcode(), request.getNumber(),
                 AccountType.LIBRARIAN, AccountStatus.ACTIVE);
@@ -105,30 +107,33 @@ public class LibrarianController
     }
 
     @GetMapping("/records/book_loans")
-    public ResponseEntity<List<BookLending>> viewAllBookLoans(@Valid @RequestBody CardValidationRequest request)
+    public ResponseEntity<List<BookLending>> viewAllBookLoans(@RequestParam(value = "id") Long barcode,
+                                                              @RequestParam(value = "card") String number)
     {
-        accountService.barcodeReader(request.getBarcode(), request.getNumber(),
+        accountService.barcodeReader(barcode, number,
                 AccountType.LIBRARIAN, AccountStatus.ACTIVE);
         return librarianService.listAllBookLoans();
     }
 
     @GetMapping("/records/book_reservations")
-    public ResponseEntity<List<BookReservation>> viewAllBookReservations(@Valid @RequestBody CardValidationRequest request)
+    public ResponseEntity<List<BookReservation>> viewAllBookReservations(@RequestParam(value = "id") Long barcode,
+                                                                         @RequestParam(value = "card") String number)
     {
-        accountService.barcodeReader(request.getBarcode(), request.getNumber(),
+        accountService.barcodeReader(barcode, number,
                 AccountType.LIBRARIAN, AccountStatus.ACTIVE);
         return librarianService.listAllBookReservations();
     }
 
     @GetMapping("/record/fines")
-    public ResponseEntity<List<Fine>> viewAllFines(@Valid @RequestBody CardValidationRequest request)
+    public ResponseEntity<List<Fine>> viewAllFines(@RequestParam(value = "id") Long barcode,
+                                                   @RequestParam(value = "card") String number)
     {
-        accountService.barcodeReader(request.getBarcode(), request.getNumber(),
+        accountService.barcodeReader(barcode, number,
                 AccountType.LIBRARIAN, AccountStatus.ACTIVE);
         return librarianService.listAllFines();
     }
 
-    @PostMapping("/catalog/library")
+    @PostMapping("/catalog/library/add")
     public ResponseEntity<MessageResponse> addLibrary(@Valid @RequestBody AddLibraryRequest request)
     {
         accountService.barcodeReader(request.getBarcode(), request.getNumber(),
@@ -137,7 +142,7 @@ public class LibrarianController
                 request.getZipcode(), request.getCountry());
     }
 
-    @PostMapping("/catalog/add")
+    @PostMapping("/catalog/book/add")
     public ResponseEntity<MessageResponse> addBookItem(@Valid @RequestBody AddBookItemRequest request)
     {
         accountService.barcodeReader(request.getBarcode(), request.getNumber(),
@@ -148,9 +153,9 @@ public class LibrarianController
                 request.isReferenceOnly(), request.getPrice());
     }
 
-    @PutMapping("/catalog/update")
+    @PutMapping("/catalog/book/update")
     public ResponseEntity<MessageResponse> updateBookItem(@Valid @RequestBody AddBookItemRequest request,
-                                                          @RequestParam Long barcode)
+                                                          @RequestParam(value = "book") Long barcode)
     {
         accountService.barcodeReader(request.getBarcode(), request.getNumber(),
                 AccountType.LIBRARIAN, AccountStatus.ACTIVE);
