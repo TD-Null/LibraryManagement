@@ -16,6 +16,7 @@ public class LoginRequest
 {
     @NotBlank(message = ValidationMessages.cardNumberMsg)
     private final String libraryCardNumber;
+
     @NotBlank(message = ValidationMessages.passwordMsg)
     private final String password;
 }

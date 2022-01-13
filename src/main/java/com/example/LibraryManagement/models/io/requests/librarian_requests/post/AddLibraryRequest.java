@@ -12,16 +12,16 @@ public class AddLibraryRequest extends CardValidationRequest
     @NotBlank(message = ValidationMessages.libraryMsg)
     private final String libraryName;
 
-    @NotBlank
+    @NotBlank(message = ValidationMessages.streetMsg)
     private final String streetAddress;
 
-    @NotBlank
+    @NotBlank(message = ValidationMessages.cityMsg)
     private final String city;
 
-    @NotBlank
+    @NotBlank(message = ValidationMessages.zipcodeMsg)
     private final String zipcode;
 
-    @NotBlank
+    @NotBlank(message = ValidationMessages.countryMsg)
     private final String country;
 
     public AddLibraryRequest(Long barcode, String number, String libraryName, String streetAddress,

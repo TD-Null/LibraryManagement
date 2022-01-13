@@ -1,6 +1,7 @@
 package com.example.LibraryManagement.models.io.requests.librarian_requests.post;
 
 import com.example.LibraryManagement.models.io.requests.CardValidationRequest;
+import com.example.LibraryManagement.models.io.responses.ValidationMessages;
 import lombok.Getter;
 
 import javax.validation.constraints.Email;
@@ -10,31 +11,31 @@ import javax.validation.constraints.Size;
 @Getter
 public class AddLibrarianRequest extends CardValidationRequest
 {
-    @NotBlank
+    @NotBlank(message = ValidationMessages.nameMsg)
     private final String name;
 
-    @NotBlank
-    @Size(min = 6, max = 40)
+    @NotBlank(message = ValidationMessages.passwordMsg)
+    @Size(min = 6, max = 40, message = ValidationMessages.passwordSizeMsg)
     private final String password;
 
-    @NotBlank
-    @Size(max = 50)
-    @Email
+    @NotBlank(message = ValidationMessages.emailMsg)
+    @Size(max = 50, message = ValidationMessages.emailSizeMsg)
+    @Email(message = ValidationMessages.emailValidMsg)
     private final String email;
 
-    @NotBlank
+    @NotBlank(message = ValidationMessages.streetMsg)
     private final String streetAddress;
 
-    @NotBlank
+    @NotBlank(message = ValidationMessages.cityMsg)
     private final String city;
 
-    @NotBlank
+    @NotBlank(message = ValidationMessages.zipcodeMsg)
     private final String zipcode;
 
-    @NotBlank
+    @NotBlank(message = ValidationMessages.countryMsg)
     private final String country;
 
-    @NotBlank
+    @NotBlank(message = ValidationMessages.phoneMsg)
     private final String phoneNumber;
 
     public AddLibrarianRequest(Long barcode, String number, String name, String password,
