@@ -13,7 +13,7 @@ import java.util.Set;
 @Getter
 public class AddBookItemRequest extends CardValidationRequest
 {
-    @NotBlank
+    @NotBlank(message = "Please give the name of the library.")
     private final String libraryName;
 
     private final int rack;

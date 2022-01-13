@@ -13,7 +13,6 @@ public class CheckTransactionRequest extends CardValidationRequest
     private final String bankName;
     @NotBlank
     private final String checkNumber;
-    @NotNull
     private final double amount;
 
     public CheckTransactionRequest(Long barcode, String number, String bankName, String checkNumber, double amount)

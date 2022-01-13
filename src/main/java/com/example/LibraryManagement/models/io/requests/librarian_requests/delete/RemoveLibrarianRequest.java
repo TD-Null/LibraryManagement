@@ -9,10 +9,10 @@ import javax.validation.constraints.NotNull;
 @Getter
 public class RemoveLibrarianRequest extends CardValidationRequest
 {
-    @NotNull
+    @NotNull(message = "Please give the barcode of the library card.")
     private final Long librarianCardBarcode;
 
-    @NotBlank
+    @NotBlank(message = "Please give the card number of the library card.")
     private final String librarianCardNumber;
 
     public RemoveLibrarianRequest(Long barcode, String number,

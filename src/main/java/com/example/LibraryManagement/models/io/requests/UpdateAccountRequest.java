@@ -1,31 +1,36 @@
 package com.example.LibraryManagement.models.io.requests;
 
+import com.example.LibraryManagement.models.io.responses.ValidationMessages;
 import lombok.Getter;
 
+import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 
 @Getter
 public class UpdateAccountRequest extends CardValidationRequest
 {
-    @NotBlank
+    @NotBlank(message = ValidationMessages.nameMsg)
     private final String name;
 
-    @NotBlank
-    private final String streetAddress;
-
-    @NotBlank
-    private final String city;
-
-    @NotBlank
-    private final String zipcode;
-
-    @NotBlank
-    private final String country;
-
-    @NotBlank
+    @NotBlank(message = ValidationMessages.emailMsg)
+    @Size(max = 50, message = ValidationMessages.emailSizeMsg)
+    @Email(message = ValidationMessages.emailValidMsg)
     private final String email;
 
-    @NotBlank
+    @NotBlank(message = ValidationMessages.streetMsg)
+    private final String streetAddress;
+
+    @NotBlank(message = ValidationMessages.cityMsg)
+    private final String city;
+
+    @NotBlank(message = ValidationMessages.zipcodeMsg)
+    private final String zipcode;
+
+    @NotBlank(message = ValidationMessages.countryMsg)
+    private final String country;
+
+    @NotBlank(message = ValidationMessages.phoneMsg)
     private final String phoneNumber;
 
     public UpdateAccountRequest(Long barcode, String number, String name, String streetAddress, String city,
