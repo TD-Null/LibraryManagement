@@ -40,7 +40,7 @@ public class LibrarianServiceImp implements LibrarianService
         List<Librarian> librarians = librarianRepository.findAll();
 
         if(librarians.isEmpty())
-            throw new ApiRequestException("There are no librarians within the system.", HttpStatus.NO_CONTENT);
+            throw new ApiRequestException("There are no librarians within the system.", HttpStatus.NOT_FOUND);
 
         return ResponseEntity.ok(librarians);
     }
@@ -50,7 +50,7 @@ public class LibrarianServiceImp implements LibrarianService
         List<Member> members = memberRepository.findAll();
 
         if(members.isEmpty())
-            throw new ApiRequestException("There are no members within the system.", HttpStatus.NO_CONTENT);
+            throw new ApiRequestException("There are no members within the system.", HttpStatus.NOT_FOUND);
 
         return ResponseEntity.ok(members);
     }
@@ -60,7 +60,7 @@ public class LibrarianServiceImp implements LibrarianService
         List<BookLending> bookLoans = bookLendingRepository.findAll();
 
         if(bookLoans.isEmpty())
-            throw new ApiRequestException("There are no book loans made within the system.", HttpStatus.NO_CONTENT);
+            throw new ApiRequestException("There are no book loans made within the system.", HttpStatus.NOT_FOUND);
 
         return ResponseEntity.ok(bookLoans);
     }
@@ -70,7 +70,7 @@ public class LibrarianServiceImp implements LibrarianService
         List<BookReservation> reservations = bookReservationRepository.findAll();
 
         if(reservations.isEmpty())
-            throw new ApiRequestException("There are no reservations made within the system.", HttpStatus.NO_CONTENT);
+            throw new ApiRequestException("There are no reservations made within the system.", HttpStatus.NOT_FOUND);
 
         return ResponseEntity.ok(bookReservationRepository.findAll());
     }
@@ -80,7 +80,7 @@ public class LibrarianServiceImp implements LibrarianService
         List<Fine> fines = fineRepository.findAll();
 
         if(fines.isEmpty())
-            throw new ApiRequestException("There are no fines made within the system.", HttpStatus.NO_CONTENT);
+            throw new ApiRequestException("There are no fines made within the system.", HttpStatus.NOT_FOUND);
 
         return ResponseEntity.ok(fineRepository.findAll());
     }

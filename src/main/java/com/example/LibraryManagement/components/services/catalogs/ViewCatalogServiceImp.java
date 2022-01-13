@@ -17,7 +17,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.*;
 
@@ -41,7 +40,7 @@ public class ViewCatalogServiceImp implements ViewCatalogService
         List<BookItem> books = bookItemRepository.findAll();
 
         if(books.isEmpty())
-            throw new ApiRequestException("No books available.", HttpStatus.NO_CONTENT);
+            throw new ApiRequestException("No books available.", HttpStatus.NOT_FOUND);
 
         return ResponseEntity.ok(books);
     }
@@ -51,7 +50,7 @@ public class ViewCatalogServiceImp implements ViewCatalogService
         List<Library> libraries = libraryRepository.findAll();
 
         if(libraries.isEmpty())
-            throw new ApiRequestException("No libraries available.", HttpStatus.NO_CONTENT);
+            throw new ApiRequestException("No libraries available.", HttpStatus.NOT_FOUND);
 
         return ResponseEntity.ok(libraries);
     }
@@ -61,7 +60,7 @@ public class ViewCatalogServiceImp implements ViewCatalogService
         List<Subject> subjects = subjectRepository.findAll();
 
         if(subjects.isEmpty())
-            throw new ApiRequestException("No subjects available.", HttpStatus.NO_CONTENT);
+            throw new ApiRequestException("No subjects available.", HttpStatus.NOT_FOUND);
 
         return ResponseEntity.ok(subjects);
     }
@@ -71,7 +70,7 @@ public class ViewCatalogServiceImp implements ViewCatalogService
         List<Author> authors = authorRepository.findAll();
 
         if(authors.isEmpty())
-            throw new ApiRequestException("No authors available.", HttpStatus.NO_CONTENT);
+            throw new ApiRequestException("No authors available.", HttpStatus.NOT_FOUND);
 
         return ResponseEntity.ok(authors);
     }
@@ -132,7 +131,7 @@ public class ViewCatalogServiceImp implements ViewCatalogService
 
         if(books.isEmpty())
             throw new ApiRequestException("There are no books found under this search.",
-                    HttpStatus.NO_CONTENT);
+                    HttpStatus.NOT_FOUND);
 
         return ResponseEntity.ok(books);
     }
