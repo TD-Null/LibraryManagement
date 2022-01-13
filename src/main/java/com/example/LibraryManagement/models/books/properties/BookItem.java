@@ -45,7 +45,6 @@ public class BookItem extends Book
     @Column(name = "Rack")
     private int rackNumber;
 
-    @NotBlank
     @Column(name = "Location")
     private String locationIdentifier;
 

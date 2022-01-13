@@ -18,7 +18,6 @@ public class AddBookItemRequest extends CardValidationRequest
 
     private final int rack;
 
-    @NotBlank
     private final String location;
 
     @NotBlank

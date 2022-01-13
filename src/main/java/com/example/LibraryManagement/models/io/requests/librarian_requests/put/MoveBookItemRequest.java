@@ -15,10 +15,8 @@ public class MoveBookItemRequest extends CardValidationRequest
     @NotBlank
     private final String libraryName;
 
-    @NotNull
     private final int rack;
 
-    @NotBlank
     private final String location;
 
     public MoveBookItemRequest(Long barcode, String number, Long bookBarcode, String libraryName, int rack, String location)
