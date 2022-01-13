@@ -109,7 +109,7 @@ public class ViewCatalogServiceImp implements ViewCatalogService
                 if(!books.contains(b)) books.add(b);
         }
 
-        if(subjects.contains("none"))
+        if(!subjects.contains("none"))
         {
             for(String name: subjects)
             {
