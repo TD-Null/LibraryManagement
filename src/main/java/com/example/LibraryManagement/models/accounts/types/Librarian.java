@@ -29,7 +29,6 @@ import javax.persistence.*;
 })
 public class Librarian extends Account
 {
-    @JsonIgnore
     @OneToOne(cascade = {CascadeType.MERGE, CascadeType.DETACH})
     @JoinColumn(name = "card")
     private LibraryCard libraryCard;

@@ -35,11 +35,11 @@ public class LibraryCard
     @Column(name = "barcode")
     private Long barcode;
 
-    @JsonInclude(JsonInclude.Include.NON_NULL)
+    @JsonIgnore
     @OneToOne(mappedBy = "libraryCard")
     private Member member;
 
-    @JsonInclude(JsonInclude.Include.NON_NULL)
+    @JsonIgnore
     @OneToOne(mappedBy = "libraryCard")
     private Librarian librarian;
 
