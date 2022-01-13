@@ -101,7 +101,7 @@ public class MemberServiceImp implements MemberService
                         HttpStatus.ACCEPTED);
 
             throw new ApiRequestException("This user is already borrowing this book.",
-                    HttpStatus.ACCEPTED);
+                    HttpStatus.BAD_REQUEST);
         }
 
         else if(book.getStatus() == BookStatus.LOST)
@@ -137,7 +137,6 @@ public class MemberServiceImp implements MemberService
         else if(!book.getCurrLoanMember().equals(member))
             throw new ApiRequestException("This book is not issued to this user.",
                     HttpStatus.BAD_REQUEST);
-
 
         member.returnBookItem(book, returnDate);
 
@@ -196,7 +195,8 @@ public class MemberServiceImp implements MemberService
                     HttpStatus.ACCEPTED);
 
         else if(member.getIssuedBooksTotal() >= Limitations.MAX_ISSUED_BOOKS)
-            throw new ApiRequestException("Sorry, but the user is currently at the maximum limit on how many books can be issued to them.",
+            throw new ApiRequestException("Sorry, but the user is currently at the " +
+                    "maximum limit on how many books can be issued to them.",
                     HttpStatus.ACCEPTED);
 
         else if(book.getCurrReservedMember() != null)
@@ -207,7 +207,8 @@ public class MemberServiceImp implements MemberService
                 throw new ApiRequestException("Sorry, but this book is currently reserved for another member",
                         HttpStatus.ACCEPTED);
 
-            throw new ApiRequestException("This user has already reserved this book.", HttpStatus.ACCEPTED);
+            throw new ApiRequestException("This user has already reserved this book.",
+                    HttpStatus.BAD_REQUEST);
         }
 
         else if(book.getStatus() == BookStatus.LOST)
@@ -239,10 +240,12 @@ public class MemberServiceImp implements MemberService
         Member reservedMember = book.getCurrReservedMember();
 
         if(reservedMember == null)
-            throw new ApiRequestException("This book is not being reserved by anyone.", HttpStatus.BAD_REQUEST);
+            throw new ApiRequestException("This book is not being reserved by anyone.",
+                    HttpStatus.BAD_REQUEST);
 
         else if(!reservedMember.equals(member))
-            throw new ApiRequestException("This book is being reserved by another user.", HttpStatus.BAD_REQUEST);
+            throw new ApiRequestException("This book is being reserved by another user.",
+                    HttpStatus.BAD_REQUEST);
 
         member.sendNotification(notification);
         member.cancelReservedBookItem(book);
@@ -294,7 +297,8 @@ public class MemberServiceImp implements MemberService
             {
                 Member reservedMember = book.getCurrReservedMember();
                 reservedMember.updatedPendingReservation(book);
-                reservedMember.sendNotification(new AccountNotification(returnDate, reservedMember.getEmail(), reservedMember.getAddress(),
+                reservedMember.sendNotification(new AccountNotification(returnDate,
+                        reservedMember.getEmail(), reservedMember.getAddress(),
                         "Reservation for book " + book.getTitle() + " is now available."));
                 book.setStatus(BookStatus.RESERVED);
             }
@@ -312,7 +316,8 @@ public class MemberServiceImp implements MemberService
         {
             Member reservedMember = book.getCurrReservedMember();
             reservedMember.updatedPendingReservation(book);
-            reservedMember.sendNotification(new AccountNotification(returnDate, reservedMember.getEmail(), reservedMember.getAddress(),
+            reservedMember.sendNotification(new AccountNotification(returnDate,
+                    reservedMember.getEmail(), reservedMember.getAddress(),
                     "Reservation for book " + book.getTitle() + " is now available."));
             book.setStatus(BookStatus.RESERVED);
 
