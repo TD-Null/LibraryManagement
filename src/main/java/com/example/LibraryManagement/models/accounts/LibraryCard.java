@@ -4,6 +4,7 @@ import com.example.LibraryManagement.models.accounts.types.Member;
 import com.example.LibraryManagement.models.accounts.types.Librarian;
 import com.example.LibraryManagement.models.enums.accounts.AccountType;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
 
 import javax.persistence.*;
@@ -34,11 +35,11 @@ public class LibraryCard
     @Column(name = "barcode")
     private Long barcode;
 
-    @JsonIgnore
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     @OneToOne(mappedBy = "libraryCard")
     private Member member;
 
-    @JsonIgnore
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     @OneToOne(mappedBy = "libraryCard")
     private Librarian librarian;
 

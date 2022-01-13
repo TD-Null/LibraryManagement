@@ -50,6 +50,7 @@ import java.util.Set;
 })
 public class Member extends Account implements MemberMethods
 {
+    @JsonIgnore
     @OneToOne(cascade = {CascadeType.MERGE, CascadeType.DETACH})
     @JoinColumn(name = "card")
     private LibraryCard libraryCard;

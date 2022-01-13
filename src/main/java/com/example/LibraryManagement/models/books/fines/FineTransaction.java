@@ -6,6 +6,7 @@ import com.example.LibraryManagement.models.books.fines.transactions.CheckTransa
 import com.example.LibraryManagement.models.books.fines.transactions.CreditCardTransaction;
 import com.example.LibraryManagement.models.enums.fines.TransactionType;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
 
 import javax.persistence.*;
@@ -37,14 +38,17 @@ public class FineTransaction
     @Column(name = "Type", nullable = false)
     private TransactionType type;
 
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "creditCardTransaction")
     private CreditCardTransaction creditCardTransaction;
 
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "checkTransaction")
     private CheckTransaction checkTransaction;
 
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "cashTransaction")
     private CashTransaction cashTransaction;
