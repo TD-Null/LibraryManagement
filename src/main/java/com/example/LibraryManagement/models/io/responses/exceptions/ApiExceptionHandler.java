@@ -15,8 +15,8 @@ import java.time.ZonedDateTime;
  * catch exclusively the ApiRequestException object exceptions.
  * Once an exception has caught, a Response Entity will be returned
  * containing data of the REST API, including its message and time
- * that the exception was thrown, as well as return an HTTP 400 Bad
- * Request code.
+ * that the exception was thrown, as well as return a given HTTP
+ * Status Request code.
  */
 @ControllerAdvice
 public class ApiExceptionHandler
