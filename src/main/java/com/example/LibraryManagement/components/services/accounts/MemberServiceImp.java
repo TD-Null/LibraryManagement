@@ -1,5 +1,6 @@
 package com.example.LibraryManagement.components.services.accounts;
 
+import com.example.LibraryManagement.components.repositories.accounts.AccountNotificationRepository;
 import com.example.LibraryManagement.components.repositories.books.BookLendingRepository;
 import com.example.LibraryManagement.components.repositories.books.BookReservationRepository;
 import com.example.LibraryManagement.components.repositories.fines.*;
@@ -41,6 +42,8 @@ public class MemberServiceImp implements MemberService
     @Autowired
     private final BookReservationRepository bookReservationRepository;
     @Autowired
+    private final AccountNotificationRepository notificationRepository;
+    @Autowired
     private final FineTransactionRepository fineTransactionRepository;
     @Autowired
     private final CreditCardTransactionRepository creditCardTransactionRepository;
@@ -58,17 +61,19 @@ public class MemberServiceImp implements MemberService
     {
         Date currDate = new Date();
         Date dueDate = new Date(currDate.getTime() + Limitations.MAX_LENDING_DAYS * (1000 * 60 * 60 * 24));
-        AccountNotification notification = new AccountNotification(currDate, member.getEmail(), member.getAddress(),
+        AccountNotification notification = new AccountNotification(member,
+                currDate, member.getEmail(), member.getAddress(),
                 "User has been loaned the book " + book.getTitle() + ".");
         BookLending bookLoan = new BookLending(book, member, currDate, dueDate);
 
         if(book.isReferenceOnly())
             throw new ApiRequestException("Sorry, but this book is only for reference and cannot be borrowed.",
-                    HttpStatus.ACCEPTED);
+                    HttpStatus.CONFLICT);
 
         else if(member.getIssuedBooksTotal() >= Limitations.MAX_ISSUED_BOOKS)
-            throw new ApiRequestException("Sorry, but the user is currently at the maximum limit on how many books can be issued to them.",
-                    HttpStatus.ACCEPTED);
+            throw new ApiRequestException("Sorry, but the user is currently at the maximum limit " +
+                    "on how many books can be issued to them.",
+                    HttpStatus.CONFLICT);
 
         else if(book.getCurrReservedMember() != null)
         {
@@ -76,10 +81,11 @@ public class MemberServiceImp implements MemberService
 
             if(!reservedMember.equals(member))
                 throw new ApiRequestException("Sorry, but this book is currently reserved for another member",
-                        HttpStatus.ACCEPTED);
+                        HttpStatus.CONFLICT);
 
             bookLendingRepository.save(bookLoan);
             member.checkoutReservedBookItem(book, bookLoan);
+            notificationRepository.save(notification);
             member.sendNotification(notification);
 
             book.setStatus(BookStatus.LOANED);
@@ -98,7 +104,7 @@ public class MemberServiceImp implements MemberService
 
             if(!loanedMember.equals(member))
                 throw new ApiRequestException("Sorry, but this book is currently reserved for another member",
-                        HttpStatus.ACCEPTED);
+                        HttpStatus.CONFLICT);
 
             throw new ApiRequestException("This user is already borrowing this book.",
                     HttpStatus.BAD_REQUEST);
@@ -106,10 +112,11 @@ public class MemberServiceImp implements MemberService
 
         else if(book.getStatus() == BookStatus.LOST)
             throw new ApiRequestException("Sorry, but the book is lost and cannot be found at the time.",
-                    HttpStatus.ACCEPTED);
+                    HttpStatus.CONFLICT);
 
         bookLendingRepository.save(bookLoan);
         member.checkoutBookItem(book, bookLoan);
+        notificationRepository.save(notification);
         member.sendNotification(notification);
 
         book.setStatus(BookStatus.LOANED);
@@ -126,7 +133,7 @@ public class MemberServiceImp implements MemberService
     {
         Date returnDate = new Date();
         Date dueDate = book.getDueDate();
-        AccountNotification notification = new AccountNotification(returnDate, member.getEmail(), member.getAddress(),
+        AccountNotification notification = new AccountNotification(member, returnDate, member.getEmail(), member.getAddress(),
             "User has returned the book " + book.getTitle() + " on time.");
         MessageResponse response = new MessageResponse("Book has been returned to the library.");
 
@@ -147,17 +154,20 @@ public class MemberServiceImp implements MemberService
             double fine = finePerDay * diff;
 
             response = new MessageResponse("Book has been returned late to the library. User must pay a fine.");
-            AccountNotification fineNotification = new AccountNotification(returnDate, member.getEmail(), member.getAddress(),
-                    "User has been issued a fine of " + fine
+            AccountNotification fineNotification = new AccountNotification(member,
+                    returnDate, member.getEmail(), member.getAddress(),
+                    "User has been issued a fine of $" + fine
                             + " for returning the book " + book.getTitle()
                             + " late.");
 
             member.addFine(new Fine(fine));
+            notificationRepository.save(fineNotification);
             member.sendNotification(fineNotification);
         }
 
         else
         {
+            notificationRepository.save(notification);
             member.sendNotification(notification);
         }
 
@@ -169,8 +179,13 @@ public class MemberServiceImp implements MemberService
         {
             Member reservedMember = book.getCurrReservedMember();
             reservedMember.updatedPendingReservation(book);
-            reservedMember.sendNotification(new AccountNotification(returnDate, reservedMember.getEmail(), reservedMember.getAddress(),
-                    "Reservation for book " + book.getTitle() + " is now available."));
+
+            AccountNotification reservationNotification = new AccountNotification(reservedMember,
+                    returnDate, reservedMember.getEmail(), reservedMember.getAddress(),
+                    "Reservation for book " + book.getTitle() + " is now available.");
+
+            notificationRepository.save(reservationNotification);
+            reservedMember.sendNotification(reservationNotification);
             book.setStatus(BookStatus.RESERVED);
         }
 
@@ -186,18 +201,18 @@ public class MemberServiceImp implements MemberService
     public ResponseEntity<MessageResponse> reserveBook(Member member, BookItem book)
     {
         Date currDate = new Date();
-        AccountNotification notification = new AccountNotification(currDate, member.getEmail(), member.getAddress(),
+        AccountNotification notification = new AccountNotification(member, currDate, member.getEmail(), member.getAddress(),
                 "User has made a reservation for the book " + book.getTitle() + ".");
         BookReservation bookReservation = new BookReservation(book, member, currDate, ReservationStatus.WAITING);
 
         if(book.isReferenceOnly())
             throw new ApiRequestException("Sorry, but this book is only for reference and cannot be borrowed.",
-                    HttpStatus.ACCEPTED);
+                    HttpStatus.CONFLICT);
 
         else if(member.getIssuedBooksTotal() >= Limitations.MAX_ISSUED_BOOKS)
             throw new ApiRequestException("Sorry, but the user is currently at the " +
                     "maximum limit on how many books can be issued to them.",
-                    HttpStatus.ACCEPTED);
+                    HttpStatus.CONFLICT);
 
         else if(book.getCurrReservedMember() != null)
         {
@@ -205,7 +220,7 @@ public class MemberServiceImp implements MemberService
 
             if(!reservedMember.equals(member))
                 throw new ApiRequestException("Sorry, but this book is currently reserved for another member",
-                        HttpStatus.ACCEPTED);
+                        HttpStatus.CONFLICT);
 
             throw new ApiRequestException("This user has already reserved this book.",
                     HttpStatus.BAD_REQUEST);
@@ -213,7 +228,7 @@ public class MemberServiceImp implements MemberService
 
         else if(book.getStatus() == BookStatus.LOST)
             throw new ApiRequestException("Sorry, but the book is lost and cannot be found at the time.",
-                    HttpStatus.ACCEPTED);
+                    HttpStatus.CONFLICT);
 
         else if(book.getStatus() == BookStatus.AVAILABLE)
         {
@@ -223,6 +238,7 @@ public class MemberServiceImp implements MemberService
 
         bookReservationRepository.save(bookReservation);
         member.reserveBookItem(book, bookReservation);
+        notificationRepository.save(notification);
         member.sendNotification(notification);
 
         book.setCurrReservedMember(member);
@@ -235,7 +251,8 @@ public class MemberServiceImp implements MemberService
     public ResponseEntity<MessageResponse> cancelReservation(Member member, BookItem book)
     {
         Date currDate = new Date();
-        AccountNotification notification = new AccountNotification(currDate, member.getEmail(), member.getAddress(),
+        AccountNotification notification = new AccountNotification(member,
+                currDate, member.getEmail(), member.getAddress(),
                 "User has cancelled their reservation for the book " + book.getTitle() + ".");
         Member reservedMember = book.getCurrReservedMember();
 
@@ -245,8 +262,9 @@ public class MemberServiceImp implements MemberService
 
         else if(!reservedMember.equals(member))
             throw new ApiRequestException("This book is being reserved by another user.",
-                    HttpStatus.BAD_REQUEST);
+                    HttpStatus.CONFLICT);
 
+        notificationRepository.save(notification);
         member.sendNotification(notification);
         member.cancelReservedBookItem(book);
 
@@ -264,7 +282,8 @@ public class MemberServiceImp implements MemberService
         Date returnDate = new Date();
         Date dueDate = book.getDueDate();
         Date newDueDate = new Date(dueDate.getTime() + Limitations.MAX_LENDING_DAYS * (1000 * 60 * 60 * 24));
-        AccountNotification notification = new AccountNotification(returnDate, member.getEmail(), member.getAddress(),
+        AccountNotification notification = new AccountNotification(member,
+                returnDate, member.getEmail(), member.getAddress(),
                 "User has renewed the book " + book.getTitle() + ".");
 
         if(book.getStatus() != BookStatus.LOANED || book.getCurrLoanMember() == null)
@@ -281,12 +300,14 @@ public class MemberServiceImp implements MemberService
             long diff = TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS);
             double fine = finePerDay * diff;
 
-            AccountNotification fineNotification = new AccountNotification(returnDate, member.getEmail(), member.getAddress(),
+            AccountNotification fineNotification = new AccountNotification(member,
+                    returnDate, member.getEmail(), member.getAddress(),
                     "User has been issued a fine of " + fine
                             + " for returning the book " + book.getTitle()
                             + " late.");
 
             member.addFine(new Fine(fine));
+            notificationRepository.save(fineNotification);
             member.sendNotification(fineNotification);
 
             book.setCurrLoanMember(null);
@@ -297,9 +318,13 @@ public class MemberServiceImp implements MemberService
             {
                 Member reservedMember = book.getCurrReservedMember();
                 reservedMember.updatedPendingReservation(book);
-                reservedMember.sendNotification(new AccountNotification(returnDate,
-                        reservedMember.getEmail(), reservedMember.getAddress(),
-                        "Reservation for book " + book.getTitle() + " is now available."));
+
+                AccountNotification reservationNotification = new AccountNotification(reservedMember,
+                        returnDate, reservedMember.getEmail(), reservedMember.getAddress(),
+                        "Reservation for book " + book.getTitle() + " is now available.");
+
+                notificationRepository.save(notification);
+                reservedMember.sendNotification(reservationNotification);
                 book.setStatus(BookStatus.RESERVED);
             }
 
@@ -316,9 +341,13 @@ public class MemberServiceImp implements MemberService
         {
             Member reservedMember = book.getCurrReservedMember();
             reservedMember.updatedPendingReservation(book);
-            reservedMember.sendNotification(new AccountNotification(returnDate,
-                    reservedMember.getEmail(), reservedMember.getAddress(),
-                    "Reservation for book " + book.getTitle() + " is now available."));
+
+            AccountNotification reservationNotification = new AccountNotification(reservedMember,
+                    returnDate, reservedMember.getEmail(), reservedMember.getAddress(),
+                    "Reservation for book " + book.getTitle() + " is now available.");
+
+            notificationRepository.save(notification);
+            reservedMember.sendNotification(reservationNotification);
             book.setStatus(BookStatus.RESERVED);
 
             book.setCurrLoanMember(null);

@@ -24,7 +24,6 @@ public class AccountNotification
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "member")
     private Member member;
@@ -55,8 +54,9 @@ public class AccountNotification
     @Column(name = "Content")
     private String content;
 
-    public AccountNotification(Date createdOn, String email, Address address, String content)
+    public AccountNotification(Member member, Date createdOn, String email, Address address, String content)
     {
+        this.member = member;
         this.createdOn = createdOn;
         this.email = email;
         setAddress(address);

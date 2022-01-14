@@ -1,5 +1,6 @@
 package com.example.LibraryManagement.components.services.catalogs;
 
+import com.example.LibraryManagement.components.repositories.accounts.AccountNotificationRepository;
 import com.example.LibraryManagement.components.repositories.books.*;
 import com.example.LibraryManagement.components.repositories.books.LibraryRepository;
 import com.example.LibraryManagement.components.services.ValidationService;
@@ -42,6 +43,8 @@ public class UpdateCatalogServiceImp implements UpdateCatalogService
     private final AuthorRepository authorRepository;
     @Autowired
     private final ValidationService validationService;
+    @Autowired
+    private final AccountNotificationRepository notificationRepository;
 
     public ResponseEntity<MessageResponse> addLibrary(String name, String streetAddress, String city,
                                                       String zipcode, String country)
@@ -219,9 +222,14 @@ public class UpdateCatalogServiceImp implements UpdateCatalogService
         {
             Member member = book.getCurrReservedMember();
             member.cancelReservedBookItem(book);
-            member.sendNotification(new AccountNotification(new Date(), member.getEmail(), member.getAddress(),
+
+            AccountNotification notification = new AccountNotification(member,
+                    new Date(), member.getEmail(), member.getAddress(),
                     "Sorry, but this book is being removed and cannot be reserved for this user. " +
-                            "We apologize for this inconvenience."));
+                            "We apologize for this inconvenience.");
+
+            notificationRepository.save(notification);
+            member.sendNotification(notification);
         }
 
         Library library = book.getLibrary();
