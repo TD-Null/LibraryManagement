@@ -47,7 +47,7 @@ public class UpdateCatalogServiceImp implements UpdateCatalogService
     {
         if(libraryRepository.existsById(name))
             throw new ApiRequestException("Library already exists within the system.",
-                    HttpStatus.BAD_REQUEST);
+                    HttpStatus.CONFLICT);
 
         libraryRepository.save(new Library(name, new Address(streetAddress, city, zipcode, country)));
         return ResponseEntity.ok(new MessageResponse("Library has been successfully added to the system."));
