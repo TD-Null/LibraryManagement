@@ -183,7 +183,7 @@ public class LibrarianController
         accountService.barcodeReader(request.getBarcode(), request.getNumber(),
                 AccountType.LIBRARIAN, AccountStatus.ACTIVE);
         return updateCatalogService.modifyBookItem(request.getBookBarcode(), request.getIsbn(), request.getTitle(),
-                request.getPublisher(), request.getLanguage(), request.getNumberOfPages(), request.getAuthorName(),
+                request.getPublisher(), request.getLanguage(), request.getNumberOfPages(), request.getAuthor(),
                 request.getSubjectNames(), request.getFormat(), request.getPublicationDate(), request.isReferenceOnly(),
                 request.getPrice());
     }
