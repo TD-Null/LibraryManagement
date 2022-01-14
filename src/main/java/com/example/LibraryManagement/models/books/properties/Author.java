@@ -20,7 +20,7 @@ import java.util.Set;
  */
 @Getter
 @Setter
-@EqualsAndHashCode
+@EqualsAndHashCode(exclude = "books")
 @NoArgsConstructor
 @Entity
 @Table

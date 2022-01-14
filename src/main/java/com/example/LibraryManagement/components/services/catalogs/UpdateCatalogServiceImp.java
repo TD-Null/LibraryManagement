@@ -69,13 +69,14 @@ public class UpdateCatalogServiceImp implements UpdateCatalogService
         BookItem bookItem = new BookItem(ISBN, title, publisher, language, numberOfPages,
                 rack.getNumber(), rack.getLocation(), format, BookStatus.AVAILABLE, publicationDate,
                 isReferenceOnly, price);
+
         bookItemRepository.save(bookItem);
 
-        library.addBookItem(bookItem);
         bookItem.setLibrary(library);
-
-        author.addBookItem(bookItem);
         bookItem.setAuthor(author);
+
+        library.addBookItem(bookItem);
+        author.addBookItem(bookItem);
 
         for(String s: subjects)
         {
