@@ -22,7 +22,7 @@ public class AddBookItemRequest extends CardValidationRequest
 
     private final String location;
 
-    @NotEmpty(message = ValidationMessages.bookISBNMsg)
+    @NotBlank(message = ValidationMessages.bookISBNMsg)
     private final String isbn;
 
     @NotBlank(message = ValidationMessages.bookTitleMsg)

@@ -19,7 +19,7 @@ public class UpdateBookItemRequest extends CardValidationRequest
     @NotNull(message = ValidationMessages.bookBarcodeMsg)
     private final Long bookBarcode;
 
-    @NotEmpty(message = ValidationMessages.bookISBNMsg)
+    @NotBlank(message = ValidationMessages.bookISBNMsg)
     private final String isbn;
 
     @NotBlank(message = ValidationMessages.bookTitleMsg)
