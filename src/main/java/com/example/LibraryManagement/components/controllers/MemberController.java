@@ -131,7 +131,7 @@ public class MemberController
     }
 
     @GetMapping("/checkout/history")
-    public ResponseEntity<List<BookLending>> viewCheckoutHistory(@RequestParam(value = "id") Long barcode,
+    public ResponseEntity<List<BookLending>> viewCheckoutHistory(@RequestParam(value = "barcode") Long barcode,
                                                                  @RequestParam(value = "card") String number)
     {
         Member member = (Member) accountService.barcodeReader(barcode, number,
@@ -145,7 +145,7 @@ public class MemberController
     }
 
     @GetMapping("/reserve/history")
-    public ResponseEntity<List<BookReservation>> viewReservationHistory(@RequestParam(value = "id") Long barcode,
+    public ResponseEntity<List<BookReservation>> viewReservationHistory(@RequestParam(value = "barcode") Long barcode,
                                                                         @RequestParam(value = "card") String number)
     {
         Member member = (Member) accountService.barcodeReader(barcode, number,

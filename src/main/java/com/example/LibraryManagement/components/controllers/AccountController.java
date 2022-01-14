@@ -36,7 +36,7 @@ public class AccountController
      * from either a MEMBER or LIBRARIAN account.
      */
     @GetMapping("/details")
-    public ResponseEntity<Object> viewAccountDetails(@RequestParam(value = "id") Long barcode,
+    public ResponseEntity<Object> viewAccountDetails(@RequestParam(value = "barcode") Long barcode,
                                                      @RequestParam(value = "card") String number)
     {
         return accountService.getAccountDetails(barcode, number);

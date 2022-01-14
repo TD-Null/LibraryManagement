@@ -48,7 +48,7 @@ public class LibrarianController
     private final UpdateCatalogServiceImp updateCatalogService;
 
     @GetMapping("/account/member")
-    public ResponseEntity<List<Member>> viewAllMembers(@RequestParam(value = "id") Long barcode,
+    public ResponseEntity<List<Member>> viewAllMembers(@RequestParam(value = "barcode") Long barcode,
                                                        @RequestParam(value = "card") String number)
     {
         accountService.barcodeReader(barcode, number,
@@ -57,7 +57,7 @@ public class LibrarianController
     }
 
     @GetMapping("/account/librarian")
-    public ResponseEntity<List<Librarian>> viewAllLibrarians(@RequestParam(value = "id") Long barcode,
+    public ResponseEntity<List<Librarian>> viewAllLibrarians(@RequestParam(value = "barcode") Long barcode,
                                                              @RequestParam(value = "card") String number)
     {
         accountService.barcodeReader(barcode, number,
@@ -115,7 +115,7 @@ public class LibrarianController
     }
 
     @GetMapping("/records/book_loans")
-    public ResponseEntity<List<BookLending>> viewAllBookLoans(@RequestParam(value = "id") Long barcode,
+    public ResponseEntity<List<BookLending>> viewAllBookLoans(@RequestParam(value = "barcode") Long barcode,
                                                               @RequestParam(value = "card") String number)
     {
         accountService.barcodeReader(barcode, number,
@@ -124,7 +124,7 @@ public class LibrarianController
     }
 
     @GetMapping("/records/book_reservations")
-    public ResponseEntity<List<BookReservation>> viewAllBookReservations(@RequestParam(value = "id") Long barcode,
+    public ResponseEntity<List<BookReservation>> viewAllBookReservations(@RequestParam(value = "barcode") Long barcode,
                                                                          @RequestParam(value = "card") String number)
     {
         accountService.barcodeReader(barcode, number,
@@ -133,7 +133,7 @@ public class LibrarianController
     }
 
     @GetMapping("/record/fines")
-    public ResponseEntity<List<Fine>> viewAllFines(@RequestParam(value = "id") Long barcode,
+    public ResponseEntity<List<Fine>> viewAllFines(@RequestParam(value = "barcode") Long barcode,
                                                    @RequestParam(value = "card") String number)
     {
         accountService.barcodeReader(barcode, number,
