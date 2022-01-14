@@ -27,7 +27,7 @@ import java.util.Set;
  */
 @Getter
 @Setter
-@EqualsAndHashCode(callSuper = true)
+@EqualsAndHashCode(callSuper = true, exclude = {"lendingRecords", "reservationRecords"})
 @NoArgsConstructor
 @Entity
 @Table

@@ -33,9 +33,11 @@ public class BookLending
     private Date creationDate;
 
     @Column(name = "DueDate", nullable = false)
+    @Temporal(TemporalType.DATE)
     private Date dueDate;
 
     @Column(name = "ReturnDate")
+    @Temporal(TemporalType.DATE)
     private Date returnDate;
 
     public BookLending(BookItem bookItem, Member member, Date creationDate, Date dueDate)

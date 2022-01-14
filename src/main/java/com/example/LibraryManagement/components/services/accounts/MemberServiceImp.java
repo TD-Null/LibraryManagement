@@ -67,7 +67,8 @@ public class MemberServiceImp implements MemberService
         BookLending bookLoan = new BookLending(book, member, currDate, dueDate);
 
         if(book.isReferenceOnly())
-            throw new ApiRequestException("Sorry, but this book is only for reference and cannot be borrowed.",
+            throw new ApiRequestException("Sorry, but this book is only for reference " +
+                    "and cannot be borrowed.",
                     HttpStatus.CONFLICT);
 
         else if(member.getIssuedBooksTotal() >= Limitations.MAX_ISSUED_BOOKS)
@@ -135,7 +136,7 @@ public class MemberServiceImp implements MemberService
         Date dueDate = book.getDueDate();
         AccountNotification notification = new AccountNotification(member, returnDate, member.getEmail(), member.getAddress(),
             "User has returned the book " + book.getTitle() + " on time.");
-        MessageResponse response = new MessageResponse("Book has been returned to the library.");
+        MessageResponse response = new MessageResponse("Book has been returned.");
 
         if(book.getStatus() != BookStatus.LOANED || book.getCurrLoanMember() == null)
             throw new ApiRequestException("Book cannot be returned as it is not currently being loaned to a member.",
@@ -153,7 +154,7 @@ public class MemberServiceImp implements MemberService
             long diff = TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS);
             double fine = finePerDay * diff;
 
-            response = new MessageResponse("Book has been returned late to the library. User must pay a fine.");
+            response = new MessageResponse("Book has been returned late. User must pay a fine.");
             AccountNotification fineNotification = new AccountNotification(member,
                     returnDate, member.getEmail(), member.getAddress(),
                     "User has been issued a fine of $" + fine

@@ -22,7 +22,7 @@ import java.util.Date;
  */
 @Getter
 @Setter
-@EqualsAndHashCode
+@EqualsAndHashCode(exclude = "member")
 @NoArgsConstructor
 @Entity
 @Table(uniqueConstraints = {

@@ -31,6 +31,7 @@ public class BookReservation
     private Member member;
 
     @Column(name = "CreationDate", nullable = false)
+    @Temporal(TemporalType.DATE)
     private Date creationDate;
 
     @Column(name = "Status", nullable = false)
