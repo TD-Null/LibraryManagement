@@ -335,7 +335,7 @@ public class MemberServiceImp implements MemberService
             }
 
             return ResponseEntity.ok(new MessageResponse
-                    ("Book has been returned late to the library. User cannot renew the book and must pay a fine."));
+                    ("Book has been returned late. User cannot renew the book and must pay a fine."));
         }
 
         else if(book.getCurrReservedMember() != null)
