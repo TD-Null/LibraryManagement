@@ -45,7 +45,6 @@ public class BookItem extends Book
     @Column(name = "Rack")
     private int rackNumber;
 
-    @NotBlank
     @Column(name = "Location")
     private String locationIdentifier;
 
@@ -125,6 +124,18 @@ public class BookItem extends Book
         rackNumber = r.getNumber();
         locationIdentifier = r.getLocation();
     }
+
+    public void removeRack()
+    {
+        rackNumber= -1;
+        locationIdentifier = "";
+    }
+
+    public void addSubject(Subject s) { subjects.add(s); }
+
+    public void removeSubject(Subject s) { subjects.remove(s); }
+
+    public void clearSubjects() { subjects.clear(); }
 
     public void addLoanRecord(BookLending bl)
     {

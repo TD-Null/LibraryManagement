@@ -9,10 +9,10 @@ import javax.validation.constraints.NotNull;
 @Getter
 public class RemoveAuthorRequest extends CardValidationRequest
 {
-    @NotBlank
+    @NotBlank(message = "Please give the name of the author.")
     private final String author;
 
-    public RemoveAuthorRequest(@NotNull Long barcode, @NotBlank String number, String author)
+    public RemoveAuthorRequest(Long barcode, String number, String author)
     {
         super(barcode, number);
         this.author = author;

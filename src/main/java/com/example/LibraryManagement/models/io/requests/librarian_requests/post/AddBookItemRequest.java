@@ -2,10 +2,12 @@ package com.example.LibraryManagement.models.io.requests.librarian_requests.post
 
 import com.example.LibraryManagement.models.enums.books.BookFormat;
 import com.example.LibraryManagement.models.io.requests.CardValidationRequest;
+import com.example.LibraryManagement.models.io.responses.ValidationMessages;
 import lombok.Getter;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.util.Date;
 import java.util.Set;
@@ -13,38 +15,36 @@ import java.util.Set;
 @Getter
 public class AddBookItemRequest extends CardValidationRequest
 {
-    @NotBlank
+    @NotBlank(message = ValidationMessages.libraryMsg)
     private final String libraryName;
 
     private final int rack;
 
-    @NotBlank
     private final String location;
 
-    @NotBlank
-    private final String ISBN;
+    @NotBlank(message = ValidationMessages.bookISBNMsg)
+    private final String isbn;
 
-    @NotBlank
+    @NotBlank(message = ValidationMessages.bookTitleMsg)
     private final String title;
 
-    @NotBlank
+    @NotBlank(message = ValidationMessages.bookPublisherMsg)
     private final String publisher;
 
-    @NotBlank
+    @NotBlank(message = ValidationMessages.bookLanguageMsg)
     private final String language;
 
     private final int numberOfPages;
 
-    @NotBlank
+    @NotBlank(message = ValidationMessages.authorMsg)
     private final String authorName;
 
-    @NotNull
     private final Set<String> subjectNames;
 
-    @NotNull
+    @NotNull(message = ValidationMessages.bookFormatMsg)
     private final BookFormat format;
 
-    @NotNull
+    @NotNull(message = ValidationMessages.dateFormatMsg)
     @Temporal(TemporalType.DATE)
     private final Date publicationDate;
 
@@ -61,7 +61,7 @@ public class AddBookItemRequest extends CardValidationRequest
         this.libraryName = libraryName;
         this.rack = rack;
         this.location = location;
-        this.ISBN = ISBN;
+        this.isbn = ISBN;
         this.title = title;
         this.publisher = publisher;
         this.language = language;

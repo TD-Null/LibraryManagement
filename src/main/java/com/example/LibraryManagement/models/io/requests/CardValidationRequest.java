@@ -1,5 +1,6 @@
 package com.example.LibraryManagement.models.io.requests;
 
+import com.example.LibraryManagement.models.io.responses.ValidationMessages;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -15,9 +16,9 @@ import javax.validation.constraints.NotNull;
 @AllArgsConstructor
 public class CardValidationRequest
 {
-    @NotNull
+    @NotNull(message = ValidationMessages.barcodeValidationMsg)
     private final Long barcode;
 
-    @NotBlank
+    @NotBlank(message = ValidationMessages.numberValidationMsg)
     private final String number;
 }

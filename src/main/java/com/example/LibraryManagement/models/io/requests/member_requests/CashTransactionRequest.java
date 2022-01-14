@@ -8,7 +8,6 @@ import javax.validation.constraints.NotNull;
 @Getter
 public class CashTransactionRequest extends CardValidationRequest
 {
-    @NotNull
     private final double cashTendered;
 
     public CashTransactionRequest(Long barcode, String number, double cashTendered)

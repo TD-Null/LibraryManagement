@@ -72,7 +72,7 @@ public class AccountServiceImp implements AccountService
          * a MEMBER or LIBRARIAN and unable to return any account details.
          */
         throw new ApiRequestException("Unable to find user's details within the system.",
-                HttpStatus.UNAUTHORIZED);
+                HttpStatus.NOT_FOUND);
     }
 
     // Authenticates the users credentials with their given library card number and password to login into their account.
@@ -121,7 +121,7 @@ public class AccountServiceImp implements AccountService
         if(memberRepository.findMemberByEmail(email).isPresent())
         {
             throw new ApiRequestException("Failed to create the account with the given credentials.",
-                    HttpStatus.BAD_REQUEST);
+                    HttpStatus.CONFLICT);
         }
 
         // Get the current date when creating this account.
@@ -155,7 +155,7 @@ public class AccountServiceImp implements AccountService
         if(librarianRepository.findLibrarianByEmail(email).isPresent())
         {
             throw new ApiRequestException("Failed to create the account with the given credentials.",
-                    HttpStatus.BAD_REQUEST);
+                    HttpStatus.CONFLICT);
         }
 
         // Get the current date when creating this account.
@@ -221,7 +221,8 @@ public class AccountServiceImp implements AccountService
          * Else, the user is not found within the database as either
          * a MEMBER or LIBRARIAN and unable to return any account details.
          */
-        throw new ApiRequestException("Unable to find user's details within the system.", HttpStatus.UNAUTHORIZED);
+        throw new ApiRequestException("Unable to find user's details within the system.",
+                HttpStatus.NOT_FOUND);
     }
 
     @Transactional
@@ -268,7 +269,7 @@ public class AccountServiceImp implements AccountService
          * a MEMBER or LIBRARIAN and unable to return any account details.
          */
         throw new ApiRequestException("Unable to find user's details within the system.",
-                HttpStatus.BAD_REQUEST);
+                HttpStatus.NOT_FOUND);
     }
 
     // Updates a member's account status using the member's ID and the given status update.
@@ -286,7 +287,7 @@ public class AccountServiceImp implements AccountService
             // If the member's account is already CANCELLED, its status cannot be updated.
             if(currStatus == AccountStatus.CANCELLED)
                 throw new ApiRequestException("The member's account is inactive. The account's status cannot be updated.",
-                        HttpStatus.BAD_REQUEST);
+                        HttpStatus.FORBIDDEN);
 
             // Else, update the member's account status and return a response.
             else
@@ -298,7 +299,7 @@ public class AccountServiceImp implements AccountService
 
         // Else, the account's status cannot be updated as it cannot be found.
         throw new ApiRequestException("Unable to find member's account within the system.",
-                HttpStatus.UNAUTHORIZED);
+                HttpStatus.NOT_FOUND);
     }
 
     @Transactional
@@ -321,12 +322,12 @@ public class AccountServiceImp implements AccountService
             else if(member.getStatus() == AccountStatus.BLACKLISTED)
                 throw new ApiRequestException("Member's account is currently blocked. " +
                         "User cannot cancel their membership currently.",
-                        HttpStatus.BAD_REQUEST);
+                        HttpStatus.FORBIDDEN);
 
             else if(!card.isActive())
                 throw new ApiRequestException("Card is currently inactive, " +
                         "so membership cannot be cancelled.",
-                        HttpStatus.BAD_REQUEST);
+                        HttpStatus.FORBIDDEN);
 
             else if(!card.getCardNumber().equals(cardNumber) || !member.getPassword().equals(password))
                 throw new ApiRequestException("Given credentials are invalid." +
@@ -336,19 +337,20 @@ public class AccountServiceImp implements AccountService
             else if(member.getIssuedBooksTotal() > 0)
                 throw new ApiRequestException("User currently has books still issued to their account." +
                         "Please return any loaned books and cancel any book reservations made.",
-                        HttpStatus.ACCEPTED);
+                        HttpStatus.FORBIDDEN);
 
             else if(member.getTotalFines() > 0)
                 throw new ApiRequestException("User currently has fines still associated with their account." +
                         "Please pay for any fines still present in your account.",
-                        HttpStatus.ACCEPTED);
+                        HttpStatus.FORBIDDEN);
 
             card.setActive(false);
             member.setStatus(AccountStatus.CANCELLED);
             return ResponseEntity.ok(new MessageResponse("User has successfully cancelled their membership."));
         }
 
-        throw new ApiRequestException("User is not a member within the system.", HttpStatus.UNAUTHORIZED);
+        throw new ApiRequestException("User is not a member within the system.",
+                HttpStatus.NOT_FOUND);
     }
 
     @Transactional
@@ -371,12 +373,12 @@ public class AccountServiceImp implements AccountService
             else if(librarian.getStatus() == AccountStatus.BLACKLISTED)
                 throw new ApiRequestException("Librarian's account is currently blocked. " +
                         "User cannot cancel their account currently.",
-                        HttpStatus.BAD_REQUEST);
+                        HttpStatus.FORBIDDEN);
 
             else if(!card.isActive())
                 throw new ApiRequestException("Card is currently inactive, " +
                         "so membership cannot be cancelled.",
-                        HttpStatus.BAD_REQUEST);
+                        HttpStatus.FORBIDDEN);
 
             else if(!card.getCardNumber().equals(cardNumber))
                 throw new ApiRequestException("Given credentials are invalid." +
@@ -388,7 +390,8 @@ public class AccountServiceImp implements AccountService
             return ResponseEntity.ok(new MessageResponse("Librarian's account has been removed from the system."));
         }
 
-        throw new ApiRequestException("User is not a librarian within the system.", HttpStatus.UNAUTHORIZED);
+        throw new ApiRequestException("User is not a librarian within the system.",
+                HttpStatus.NOT_FOUND);
     }
 
     /*

@@ -58,7 +58,7 @@ public class MemberController
         List<BookItem> bookLoans = new ArrayList<>(member.getCheckedOutBooks());
 
         if(bookLoans.isEmpty())
-            throw new ApiRequestException("Member has no books borrowed currently.", HttpStatus.NO_CONTENT);
+            throw new ApiRequestException("Member has no books borrowed currently.", HttpStatus.NOT_FOUND);
 
         return ResponseEntity.ok(bookLoans);
     }
@@ -72,7 +72,7 @@ public class MemberController
         List<BookItem> bookReservations = new ArrayList<>(member.getReservedBooks());
 
         if(bookReservations.isEmpty())
-            throw new ApiRequestException("Member has no books reserved currently.", HttpStatus.NO_CONTENT);
+            throw new ApiRequestException("Member has no books reserved currently.", HttpStatus.NOT_FOUND);
 
         return ResponseEntity.ok(bookReservations);
     }
@@ -86,7 +86,7 @@ public class MemberController
         List<AccountNotification> notifications = new ArrayList<>(member.getNotifications());
 
         if(notifications.isEmpty())
-            throw new ApiRequestException("Member has no notifications currently.", HttpStatus.NO_CONTENT);
+            throw new ApiRequestException("Member has no notifications currently.", HttpStatus.NOT_FOUND);
 
         return ResponseEntity.ok(notifications);
     }
@@ -100,7 +100,7 @@ public class MemberController
         List<Fine> fines = new ArrayList<>(member.getFines());
 
         if(fines.isEmpty())
-            throw new ApiRequestException("Member has no fines currently.", HttpStatus.NO_CONTENT);
+            throw new ApiRequestException("Member has no fines currently.", HttpStatus.NOT_FOUND);
 
         return ResponseEntity.ok(fines);
     }
@@ -125,13 +125,13 @@ public class MemberController
         }
 
         if(!transactions.isEmpty())
-            throw new ApiRequestException("Member has not made any transactions currently.", HttpStatus.NO_CONTENT);
+            throw new ApiRequestException("Member has not made any transactions currently.", HttpStatus.NOT_FOUND);
 
         return ResponseEntity.ok(transactions);
     }
 
     @GetMapping("/checkout/history")
-    public ResponseEntity<List<BookLending>> viewCheckoutHistory(@RequestParam(value = "id") Long barcode,
+    public ResponseEntity<List<BookLending>> viewCheckoutHistory(@RequestParam(value = "barcode") Long barcode,
                                                                  @RequestParam(value = "card") String number)
     {
         Member member = (Member) accountService.barcodeReader(barcode, number,
@@ -139,13 +139,13 @@ public class MemberController
         List<BookLending> checkoutRecords = new ArrayList<>(member.getBookLoans());
 
         if(!checkoutRecords.isEmpty())
-            throw new ApiRequestException("Member has no history of books checked out.", HttpStatus.NO_CONTENT);
+            throw new ApiRequestException("Member has no history of books checked out.", HttpStatus.NOT_FOUND);
 
         return ResponseEntity.ok(checkoutRecords);
     }
 
     @GetMapping("/reserve/history")
-    public ResponseEntity<List<BookReservation>> viewReservationHistory(@RequestParam(value = "id") Long barcode,
+    public ResponseEntity<List<BookReservation>> viewReservationHistory(@RequestParam(value = "barcode") Long barcode,
                                                                         @RequestParam(value = "card") String number)
     {
         Member member = (Member) accountService.barcodeReader(barcode, number,
@@ -153,7 +153,7 @@ public class MemberController
         List<BookReservation> reservationRecords = new ArrayList<>(member.getBookReservations());
 
         if(!reservationRecords.isEmpty())
-            throw new ApiRequestException("Member has no history of book reservations.", HttpStatus.NO_CONTENT);
+            throw new ApiRequestException("Member has no history of book reservations.", HttpStatus.NOT_FOUND);
 
         return ResponseEntity.ok(reservationRecords);
     }

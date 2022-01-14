@@ -1,5 +1,6 @@
 package com.example.LibraryManagement.models.io.requests;
 
+import com.example.LibraryManagement.models.io.responses.ValidationMessages;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -13,8 +14,9 @@ import javax.validation.constraints.NotBlank;
 @AllArgsConstructor
 public class LoginRequest
 {
-    @NotBlank
+    @NotBlank(message = ValidationMessages.cardNumberMsg)
     private final String libraryCardNumber;
-    @NotBlank
+
+    @NotBlank(message = ValidationMessages.passwordMsg)
     private final String password;
 }

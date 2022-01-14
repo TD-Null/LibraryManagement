@@ -7,10 +7,11 @@ import com.example.LibraryManagement.models.books.properties.BookItem;
 import com.example.LibraryManagement.models.books.properties.Subject;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.sql.Date;
+import java.util.Date;
 import java.util.List;
 
 /*
@@ -43,7 +44,7 @@ public class CatalogController
                                                       @RequestParam(value = "title", required = false, defaultValue = "none") String title,
                                                       @RequestParam(value = "author", required = false, defaultValue = "none") String author,
                                                       @RequestParam(value = "subjects", required = false, defaultValue = "none") List<String> subjects,
-                                                      @RequestParam(value = "date", required = false) Date publicationDate)
+                                                      @RequestParam(value = "date", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date publicationDate)
     {
         return viewCatalogService.searchBooks(library, title, author, subjects, publicationDate);
     }

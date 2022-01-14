@@ -55,7 +55,7 @@ public class ValidationService
 
         if(fine.isEmpty())
             throw new ApiRequestException("Unable to find fine within the system.",
-                    HttpStatus.BAD_REQUEST);
+                    HttpStatus.NOT_FOUND);
 
         return fine.get();
     }
@@ -66,7 +66,7 @@ public class ValidationService
 
         if(library.isEmpty())
             throw new ApiRequestException("Unable to find this library.",
-                    HttpStatus.BAD_REQUEST);
+                    HttpStatus.NOT_FOUND);
 
         return library.get();
     }
@@ -77,7 +77,7 @@ public class ValidationService
 
         if(bookItem.isEmpty())
             throw new ApiRequestException("Unable to find book within the system.",
-                    HttpStatus.BAD_REQUEST);
+                    HttpStatus.NOT_FOUND);
 
         return bookItem.get();
     }

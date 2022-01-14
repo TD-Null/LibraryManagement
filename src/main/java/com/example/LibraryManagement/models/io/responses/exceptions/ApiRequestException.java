@@ -13,6 +13,7 @@ import org.springframework.http.HttpStatus;
 public class ApiRequestException extends RuntimeException
 {
     HttpStatus status;
+
     public ApiRequestException(String message, HttpStatus status)
     {
         super(message);

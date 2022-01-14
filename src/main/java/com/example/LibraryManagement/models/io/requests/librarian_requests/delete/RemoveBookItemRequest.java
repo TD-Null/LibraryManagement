@@ -9,7 +9,7 @@ import javax.validation.constraints.NotNull;
 @Getter
 public class RemoveBookItemRequest extends CardValidationRequest
 {
-    @NotNull
+    @NotNull(message = "Please give the barcode of the book.")
     private final Long bookBarcode;
 
     public RemoveBookItemRequest(Long barcode, String number, Long bookBarcode)
