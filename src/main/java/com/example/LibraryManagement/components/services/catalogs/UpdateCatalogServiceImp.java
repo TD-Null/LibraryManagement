@@ -217,14 +217,26 @@ public class UpdateCatalogServiceImp implements UpdateCatalogService
         }
 
         Library library = book.getLibrary();
-        Author author = book.getAuthor();
-        Set<Subject> subjects = book.getSubjects();
 
-        library.removeBookItem(book);
-        author.removeBookItem(book);
+        if(library != null)
+        {
+            library.removeBookItem(book);
+            book.setLibrary(null);
+        }
+
+        Author author = book.getAuthor();
+
+        if(author != null)
+        {
+            author.removeBookItem(book);
+            book.setAuthor(null);
+        }
+
+        Set<Subject> subjects = book.getSubjects();
 
         for(Subject s: subjects)
             s.removeBookItem(book);
+        book.clearSubjects();
 
         book.clearRecords();
 

@@ -129,6 +129,8 @@ public class BookItem extends Book
 
     public void removeSubject(Subject s) { subjects.remove(s); }
 
+    public void clearSubjects() { subjects.clear(); }
+
     public void addLoanRecord(BookLending bl)
     {
         lendingRecords.add(bl);
