@@ -370,15 +370,18 @@ public class MemberServiceImp implements MemberService
         Fine fine = validationService.fineValidation(fineID);
 
         if(!fine.getMember().equals(member))
-            throw new ApiRequestException("Fine is not issued to this user.", HttpStatus.BAD_REQUEST);
+            throw new ApiRequestException("Fine is not issued to this user.",
+                    HttpStatus.BAD_REQUEST);
 
         else if(fine.getAmount() > amount)
-            throw new ApiRequestException("Given amount is not enough to pay for the fine.", HttpStatus.BAD_REQUEST);
+            throw new ApiRequestException("Given amount is not enough to pay for the fine.",
+                    HttpStatus.UNPROCESSABLE_ENTITY);
 
         FineTransaction fineTransaction = new FineTransaction(type, new Date(), amount);
         fineTransactionRepository.save(fineTransaction);
 
-        switch (type) {
+        switch (type)
+        {
             case CREDIT_CARD:
                 if(transaction instanceof CreditCardTransaction)
                 {
@@ -410,7 +413,7 @@ public class MemberServiceImp implements MemberService
                 break;
 
             default:
-                throw new ApiRequestException("Transaction cannot be used.", HttpStatus.BAD_REQUEST);
+                throw new ApiRequestException("Transaction cannot be used.", HttpStatus.UNPROCESSABLE_ENTITY);
         }
 
         fineTransaction.setFine(fine);
