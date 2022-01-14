@@ -25,6 +25,7 @@ import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @AllArgsConstructor
@@ -193,8 +194,15 @@ public class UpdateCatalogServiceImp implements UpdateCatalogService
     public ResponseEntity<MessageResponse> removeLibrary(String libraryName)
     {
         Library library = validationService.libraryValidation(libraryName);
-        library.clearLibrary();
+        Set<BookItem> books = library.getBooks();
 
+        for(BookItem b: books)
+        {
+            b.setLibrary(null);
+            b.removeRack();
+        }
+
+        library.clearLibrary();
         libraryRepository.delete(library);
         return ResponseEntity.ok(new MessageResponse("Library has been successfully removed from the system."));
     }

@@ -125,6 +125,12 @@ public class BookItem extends Book
         locationIdentifier = r.getLocation();
     }
 
+    public void removeRack()
+    {
+        rackNumber= -1;
+        locationIdentifier = "";
+    }
+
     public void addSubject(Subject s) { subjects.add(s); }
 
     public void removeSubject(Subject s) { subjects.remove(s); }
