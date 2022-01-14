@@ -378,7 +378,6 @@ public class MemberServiceImp implements MemberService
                     HttpStatus.UNPROCESSABLE_ENTITY);
 
         FineTransaction fineTransaction = new FineTransaction(type, new Date(), amount);
-        fineTransactionRepository.save(fineTransaction);
 
         switch (type)
         {
@@ -416,6 +415,7 @@ public class MemberServiceImp implements MemberService
                 throw new ApiRequestException("Transaction cannot be used.", HttpStatus.UNPROCESSABLE_ENTITY);
         }
 
+        fineTransactionRepository.save(fineTransaction);
         fineTransaction.setFine(fine);
         fine.setFineTransaction(fineTransaction);
         fine.setPaid(true);
