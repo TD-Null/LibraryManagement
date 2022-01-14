@@ -8,7 +8,6 @@ import lombok.Getter;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.util.Date;
 import java.util.Set;
@@ -34,7 +33,7 @@ public class UpdateBookItemRequest extends CardValidationRequest
     private final int numberOfPages;
 
     @NotBlank(message = ValidationMessages.authorMsg)
-    private final String authorName;
+    private final String author;
 
     private final Set<String> subjectNames;
 
@@ -62,7 +61,7 @@ public class UpdateBookItemRequest extends CardValidationRequest
         this.publisher = publisher;
         this.language = language;
         this.numberOfPages = numberOfPages;
-        this.authorName = authorName;
+        this.author = authorName;
         this.subjectNames = subjectNames;
         this.format = format;
         this.publicationDate = publicationDate;
