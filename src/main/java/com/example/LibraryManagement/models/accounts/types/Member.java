@@ -42,7 +42,10 @@ import java.util.Set;
  */
 @Getter
 @Setter
-@EqualsAndHashCode(callSuper = true)
+@EqualsAndHashCode(callSuper = true,
+        exclude = {"checkedOutBooks", "reservedBooks",
+                "bookLoans", "bookReservations",
+                "notifications", "fines"})
 @NoArgsConstructor
 @Entity
 @Table(uniqueConstraints = {
