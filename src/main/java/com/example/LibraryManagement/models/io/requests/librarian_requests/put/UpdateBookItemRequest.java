@@ -8,6 +8,7 @@ import lombok.Getter;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.util.Date;
 import java.util.Set;
@@ -18,8 +19,8 @@ public class UpdateBookItemRequest extends CardValidationRequest
     @NotNull(message = ValidationMessages.bookBarcodeMsg)
     private final Long bookBarcode;
 
-    @NotBlank(message = ValidationMessages.bookTitleMsg)
-    private final String ISBN;
+    @NotEmpty(message = ValidationMessages.bookISBNMsg)
+    private final String isbn;
 
     @NotBlank(message = ValidationMessages.bookTitleMsg)
     private final String title;
@@ -56,7 +57,7 @@ public class UpdateBookItemRequest extends CardValidationRequest
     {
         super(barcode, number);
         this.bookBarcode = bookBarcode;
-        this.ISBN = ISBN;
+        this.isbn = ISBN;
         this.title = title;
         this.publisher = publisher;
         this.language = language;

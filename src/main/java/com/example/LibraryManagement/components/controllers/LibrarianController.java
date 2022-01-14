@@ -156,7 +156,7 @@ public class LibrarianController
         accountService.barcodeReader(request.getBarcode(), request.getNumber(),
                 AccountType.LIBRARIAN, AccountStatus.ACTIVE);
         return updateCatalogService.addBookItem(request.getLibraryName(), new Rack(request.getRack(), request.getLocation()),
-                request.getISBN(), request.getTitle(), request.getPublisher(), request.getLanguage(), request.getNumberOfPages(),
+                request.getIsbn(), request.getTitle(), request.getPublisher(), request.getLanguage(), request.getNumberOfPages(),
                 request.getAuthorName(), request.getSubjectNames(), request.getFormat(), request.getPublicationDate(),
                 request.isReferenceOnly(), request.getPrice());
     }
@@ -182,7 +182,7 @@ public class LibrarianController
     {
         accountService.barcodeReader(request.getBarcode(), request.getNumber(),
                 AccountType.LIBRARIAN, AccountStatus.ACTIVE);
-        return updateCatalogService.modifyBookItem(request.getBookBarcode(), request.getISBN(), request.getTitle(),
+        return updateCatalogService.modifyBookItem(request.getBookBarcode(), request.getIsbn(), request.getTitle(),
                 request.getPublisher(), request.getLanguage(), request.getNumberOfPages(), request.getAuthorName(),
                 request.getSubjectNames(), request.getFormat(), request.getPublicationDate(), request.isReferenceOnly(),
                 request.getPrice());

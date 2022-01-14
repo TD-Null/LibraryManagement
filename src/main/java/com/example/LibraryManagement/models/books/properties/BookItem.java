@@ -125,6 +125,10 @@ public class BookItem extends Book
         locationIdentifier = r.getLocation();
     }
 
+    public void addSubject(Subject s) { subjects.add(s); }
+
+    public void removeSubject(Subject s) { subjects.remove(s); }
+
     public void addLoanRecord(BookLending bl)
     {
         lendingRecords.add(bl);

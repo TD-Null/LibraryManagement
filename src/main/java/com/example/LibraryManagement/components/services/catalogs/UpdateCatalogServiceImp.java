@@ -68,12 +68,16 @@ public class UpdateCatalogServiceImp implements UpdateCatalogService
         bookItemRepository.save(bookItem);
 
         library.addBookItem(bookItem);
+        bookItem.setLibrary(library);
+
         author.addBookItem(bookItem);
+        bookItem.setAuthor(author);
 
         for(String s: subjects)
         {
             Subject subject = validationService.subjectValidation(s);
             subject.addBookItem(bookItem);
+            bookItem.addSubject(subject);
         }
 
         return ResponseEntity.ok(new MessageResponse("Book has been successfully added to the system."));
@@ -124,6 +128,7 @@ public class UpdateCatalogServiceImp implements UpdateCatalogService
         {
             prevAuthor.removeBookItem(bookItem);
             author.addBookItem(bookItem);
+            bookItem.setAuthor(author);
         }
 
         Set<Subject> prevSubjects = bookItem.getSubjects();
@@ -139,6 +144,7 @@ public class UpdateCatalogServiceImp implements UpdateCatalogService
             if(!newSubjects.contains(s))
             {
                 s.removeBookItem(bookItem);
+                bookItem.removeSubject(s);
             }
         }
 
@@ -147,6 +153,7 @@ public class UpdateCatalogServiceImp implements UpdateCatalogService
             if(!prevSubjects.contains(s))
             {
                 s.addBookItem(bookItem);
+                bookItem.addSubject(s);
             }
         }
 
@@ -164,6 +171,7 @@ public class UpdateCatalogServiceImp implements UpdateCatalogService
         {
             prevLibrary.removeBookItem(book);
             newLibrary.addBookItem(book);
+            book.setLibrary(newLibrary);
         }
 
         book.setRack(r);
