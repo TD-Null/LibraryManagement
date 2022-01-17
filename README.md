@@ -3,8 +3,7 @@ This project consists of a software implementation of a library management syste
 
 ## System Requirements
 The Library Management System will keep these rules in mind when considering its software implementation:
-1. Any member with a membership subscription to the system and a library card will be able to search for books based on library, title, author, subject, and publication date.
-  * These categories are optional and not all parameters need to be filled out to search for books.
+1. Any member with a membership subscription to the system and a library card will be able to search for books based on library, title, author, subject, and publication date. (These categories are optional and not all parameters need to be filled out to search for books.)
 3. Each book will have a unique identification number and other details including a rack number which will help to physically locate the book.
 4. There could be more than one copy of a book, and library members should be able to check-out and reserve any copy. We will call each copy of a book, a book item.
 5. The system should be able to retrieve information like who took a particular book or what are the books checked-out by a specific library member.
