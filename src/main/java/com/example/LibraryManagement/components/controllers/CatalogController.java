@@ -60,7 +60,7 @@ public class CatalogController
     /*
      * All subjects viewing GET request.
      * Returns a 200 response code with all the subjects within the system.
-     * Will return no authirs and a 404 response if there are no authors found within the system.
+     * Will return no authors and a 404 response if there are no authors found within the system.
      */
     @GetMapping("/author")
     public ResponseEntity<List<Author>> viewAllAuthors() { return viewCatalogService.listAllAuthors(); }
