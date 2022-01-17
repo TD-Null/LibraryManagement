@@ -38,10 +38,10 @@ import java.util.List;
  *
  * - Viewing all books currently issued (loans and reservations)
  * - Viewing all account notifications
- * - Viewing all subjects
- * - Viewing all authors
- * - Search books based on library, title, author name, subjects, publication date
- *   (include books based on parameters)
+ * - Viewing all fines issued and transactions made
+ * - Viewing all book checkout and reservation history made on the account
+ * - Borrow, reserve, and renew books
+ * - Cancel membership
  */
 @CrossOrigin(origins = "*", maxAge = 3600)
 @AllArgsConstructor
