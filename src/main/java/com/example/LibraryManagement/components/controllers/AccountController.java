@@ -44,7 +44,8 @@ public class AccountController
 
     /*
      * Authentication POST request.
-     * Expects a valid LoginRequest in the body including the tags {libraryCardNumber, password}.
+     * Expects a valid LoginRequest in the body including the user's library card
+     * number and password.
      * Returns a 200 response code with the details of the user's library card.
      */
     @PostMapping("/login")
