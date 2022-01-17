@@ -32,7 +32,13 @@ import javax.validation.Valid;
 import java.util.List;
 
 /*
+ * Controller component containing the API requests relating to Librarians:
  *
+ * - Viewing all members/librarians
+ * - Registering/adding and removing librarians
+ * - Block/unblock members
+ * - Viewing all member book loans/reservations and fines
+ * - Add/remove and modify libraries, books, subjects, and authors
  */
 @CrossOrigin(origins = "*", maxAge = 3600)
 @AllArgsConstructor

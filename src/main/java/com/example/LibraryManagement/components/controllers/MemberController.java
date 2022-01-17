@@ -34,7 +34,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 /*
+ * Controller component containing the API requests relating to Members:
  *
+ * - Viewing all books currently issued (loans and reservations)
+ * - Viewing all account notifications
+ * - Viewing all subjects
+ * - Viewing all authors
+ * - Search books based on library, title, author name, subjects, publication date
+ *   (include books based on parameters)
  */
 @CrossOrigin(origins = "*", maxAge = 3600)
 @AllArgsConstructor
