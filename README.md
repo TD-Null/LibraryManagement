@@ -1,4 +1,4 @@
-### Library Management System Project
+# Library Management System Project
 This project consists of a software implementation of a library management system, built to simulate the main functions of a library. This systems helps keep in track of book checkouts, reservations, renewals, and returns, as well as members' profiles and subscriptions to the system. Librarians will be responsible for adding, removing, and modifying libraries and books to the system as well as managing the records of book loans and reservations.
 
 ## System Requirements
@@ -12,18 +12,18 @@ The Library Management System will keep these rules in mind when considering its
 7. The system should be able to collect fines for books returned after the due date.
 8. Members should be able to reserve books that are not currently available.
 9. The system should be able to send notifications whenever the reserved books become available, as well as when the book is not returned within the due date.
-10. ach book and member card will have a unique barcode. The system will be able to read barcodes from books and members’ library cards.
+10. Each book and member card will have a unique barcode. The system will be able to read barcodes from books and members’ library cards.
 
 ## Main Components
 
-# Accounts
+### Accounts
 
 
-# Catalog
+### Catalog
 
 
-# Librarians
+### Librarians
 
 
-# Members
+### Members
 
