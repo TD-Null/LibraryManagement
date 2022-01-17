@@ -334,8 +334,9 @@ public class MemberServiceImp implements MemberService
                 book.setStatus(BookStatus.AVAILABLE);
             }
 
-            return ResponseEntity.ok(new MessageResponse
-                    ("Book has been returned late. User cannot renew the book and must pay a fine."));
+            throw new ApiRequestException("Book has been returned late. " +
+                    "User cannot renew the book and must pay a fine.",
+                    HttpStatus.CONFLICT);
         }
 
         else if(book.getCurrReservedMember() != null)
@@ -355,8 +356,9 @@ public class MemberServiceImp implements MemberService
             book.setBorrowed(null);
             book.setDueDate(null);
 
-            return ResponseEntity.ok(new MessageResponse
-                    ("Book is currently reserved for another member and cannot be renewed."));
+            throw new ApiRequestException("Book is currently reserved for another member " +
+                    "and cannot be renewed.",
+                    HttpStatus.CONFLICT);
         }
 
         member.sendNotification(notification);
