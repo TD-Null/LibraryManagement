@@ -11,9 +11,12 @@ The Library Management System will keep these rules in mind when considering its
 6. Members will have limits regarding when they check-out books from system:
    * There should be a maximum limit (5) on how many books are issued to a member.
    * There should be a maximum limit (10) on how many days a member can keep a book.
-7. If a member returns a book past its due date, a fine will be issue to them and they must pay for those fines.
+7. If a member returns a book past its due date, a fine will be issue to them and they must pay for those fines. A member can pay these fines with the following transactions:
+   * Credit card
+   * Check
+   * Cash
 8. The system will send notifications to a member regarding book checkouts, reservations, and renewals.
-9. Each book and member;s library card will have a unique barcode. The system will used these barcode during checkouts, reservations, and renewals.
+9. Each book and member's library card will have a unique barcode. The system will used these barcode during checkouts, reservations, and renewals.
 
 ## Main Components
 
