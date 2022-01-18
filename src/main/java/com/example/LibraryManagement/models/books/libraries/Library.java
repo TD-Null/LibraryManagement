@@ -80,6 +80,4 @@ public class Library
     public void addBookItem(BookItem b) { books.add(b); }
 
     public void removeBookItem(BookItem b) { books.remove(b); }
-
-    public void clearLibrary() { books.clear(); }
 }
