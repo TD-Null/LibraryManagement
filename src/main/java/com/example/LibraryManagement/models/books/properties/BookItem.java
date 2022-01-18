@@ -62,6 +62,7 @@ public class BookItem extends Book
     @Column(name = "Format", nullable = false)
     private BookFormat format;
 
+    @JsonIgnore
     @Column(name = "Status", nullable = false)
     private BookStatus status;
 
@@ -69,12 +70,15 @@ public class BookItem extends Book
     @Column(name = "Publication", nullable = false)
     private Date publicationDate;
 
+    @JsonIgnore
     @Column(name = "Reference")
     private boolean isReferenceOnly;
 
+    @JsonIgnore
     @Column(name = "BorrowedDate")
     private Date borrowed;
 
+    @JsonIgnore
     @Temporal(TemporalType.DATE)
     @Column(name = "DueDate")
     private Date dueDate;
@@ -82,6 +86,7 @@ public class BookItem extends Book
     @Column(name = "Price")
     private double price;
 
+    @JsonIgnore
     @Temporal(TemporalType.DATE)
     @Column(name = "Purchase")
     private Date dateOfPurchase;
@@ -123,12 +128,6 @@ public class BookItem extends Book
     {
         rackNumber = r.getNumber();
         locationIdentifier = r.getLocation();
-    }
-
-    public void removeRack()
-    {
-        rackNumber= -1;
-        locationIdentifier = "";
     }
 
     public void addSubject(Subject s) { subjects.add(s); }

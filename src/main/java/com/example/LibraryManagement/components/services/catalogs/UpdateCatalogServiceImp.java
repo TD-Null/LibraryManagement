@@ -198,18 +198,37 @@ public class UpdateCatalogServiceImp implements UpdateCatalogService
     public ResponseEntity<MessageResponse> removeLibrary(String libraryName)
     {
         Library library = validationService.libraryValidation(libraryName);
-        Set<BookItem> books = library.getBooks();
 
-        for(BookItem b: books)
-        {
-            b.setLibrary(null);
-            b.removeRack();
-        }
+        if(!library.getBooks().isEmpty())
+            throw new ApiRequestException("Library still contains books within the system.",
+                    HttpStatus.CONFLICT);
 
-        library.clearLibrary();
         libraryRepository.delete(library);
         return ResponseEntity.ok(new MessageResponse("Library has been successfully removed from the system."));
     }
+
+//    @Transactional
+//    public ResponseEntity<MessageResponse> clearLibrary(String libraryName)
+//    {
+//
+//        Library library = validationService.libraryValidation(libraryName);
+//
+//        if(!library.getBooks().isEmpty())
+//            throw new ApiRequestException("Library does not contain any books currently.",
+//                    HttpStatus.ACCEPTED);
+//
+//        Set<BookItem> books = library.getBooks();
+//
+//        for(BookItem b: books)
+//        {
+//            if (b.getStatus() == BookStatus.LOANED && b.getCurrLoanMember() != null)
+//                throw new ApiRequestException("Some books are still loaned to members. " +
+//                        "Library cannot be cleared.", HttpStatus.CONFLICT);
+//        }
+//
+//        library.clearLibrary();
+//
+//    }
 
     @Transactional
     public ResponseEntity<MessageResponse> removeBookItem(Long barcode)
