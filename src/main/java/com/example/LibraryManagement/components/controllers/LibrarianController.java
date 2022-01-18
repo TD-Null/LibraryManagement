@@ -203,12 +203,6 @@ public class LibrarianController
                 new Rack(request.getRack(), request.getLocation()));
     }
 
-//    @PutMapping("/catalog/library/book/move")
-//    public ResponseEntity<MessageResponse> moveAllLibraryBooks()
-//    {
-//
-//    }
-
     @PutMapping("/catalog/author/update")
     public ResponseEntity<MessageResponse> updateAuthor(@Valid @RequestBody UpdateAuthorRequest request)
     {
@@ -224,12 +218,6 @@ public class LibrarianController
                 AccountType.LIBRARIAN, AccountStatus.ACTIVE);
         return updateCatalogService.removeLibrary(request.getLibrary());
     }
-
-//    @DeleteMapping("catalog/library/book/remove")
-//    public ResponseEntity<MessageResponse> removeAllLibraryBooks()
-//    {
-//
-//    }
 
     @DeleteMapping("/catalog/book/remove")
     public ResponseEntity<MessageResponse> removeBookItem(@Valid @RequestBody RemoveBookItemRequest request)
