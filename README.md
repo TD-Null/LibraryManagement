@@ -25,7 +25,7 @@ The Library Management System will keep these rules in mind when considering its
 10. Librarians will be essential in adding, modifying, and removing libraries and book items to the system, as well manage the current checkouts and reservations made by members.
 
 ## Main Components
-These will be the main components used for the library management system.
+These will be the main components used for the software implementation of the library management system.
 
 ### Accounts
 
