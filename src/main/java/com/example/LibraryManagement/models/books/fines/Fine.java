@@ -2,6 +2,7 @@ package com.example.LibraryManagement.models.books.fines;
 
 import com.example.LibraryManagement.models.accounts.types.Member;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -38,6 +39,7 @@ public class Fine
     @JoinColumn(name = "member")
     private Member member;
 
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "fineTransaction")
     private FineTransaction fineTransaction;

@@ -34,18 +34,22 @@ public class AccountNotification
     @Column(name = "Email")
     private String email;
 
+    @JsonIgnore
     @NotBlank
     @Column(name = "Street")
     private String streetAddress;
 
+    @JsonIgnore
     @NotBlank
     @Column(name = "City")
     private String city;
 
+    @JsonIgnore
     @NotBlank
     @Column(name = "Zipcode")
     private String zipcode;
 
+    @JsonIgnore
     @NotBlank
     @Column(name = "Country")
     private String country;

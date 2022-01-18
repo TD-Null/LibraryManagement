@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import java.util.Date;
 import java.util.Set;
 
+// Methods used in a service component relating to updating the system's catalog.
 public interface UpdateCatalogService
 {
     ResponseEntity<MessageResponse> addLibrary(String name, String streetAddress, String city,

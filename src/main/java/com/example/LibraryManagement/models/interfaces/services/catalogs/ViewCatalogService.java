@@ -12,7 +12,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
-// Methods used in a service component relating to the catalog.
+// Methods used in a service component relating to viewing the system's catalog.
 public interface ViewCatalogService
 {
     ResponseEntity<List<BookItem>> listAllBooks();
