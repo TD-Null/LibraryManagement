@@ -3,6 +3,7 @@ package com.example.LibraryManagement.models.io.requests.librarian_requests.post
 import com.example.LibraryManagement.models.enums.books.BookFormat;
 import com.example.LibraryManagement.models.io.requests.CardValidationRequest;
 import com.example.LibraryManagement.models.io.responses.ValidationMessages;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Getter;
 
 import javax.persistence.*;
@@ -44,7 +45,7 @@ public class AddBookItemRequest extends CardValidationRequest
     private final BookFormat format;
 
     @NotNull(message = ValidationMessages.dateFormatMsg)
-    @Temporal(TemporalType.DATE)
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private final Date publicationDate;
 
     private final boolean isReferenceOnly;
