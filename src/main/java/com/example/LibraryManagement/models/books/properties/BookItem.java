@@ -20,10 +20,6 @@ import java.util.Set;
  * Description:
  * Any book can have multiple copies, each copy will be considered
  * a book item in our system. Each book item will have a unique barcode.
- *
- * Many BookItem objects can be associated with a single library and be
- * placed on different racks as well as be associated to different or the
- * same authors.
  */
 @Getter
 @Setter
