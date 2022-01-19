@@ -131,7 +131,7 @@ public class MemberController
             }
         }
 
-        if(!transactions.isEmpty())
+        if(transactions.isEmpty())
             throw new ApiRequestException("Member has not made any transactions currently.", HttpStatus.NOT_FOUND);
 
         return ResponseEntity.ok(transactions);
@@ -145,7 +145,7 @@ public class MemberController
                 AccountType.MEMBER, AccountStatus.ACTIVE);
         List<BookLending> checkoutRecords = new ArrayList<>(member.getBookLoans());
 
-        if(!checkoutRecords.isEmpty())
+        if(checkoutRecords.isEmpty())
             throw new ApiRequestException("Member has no history of books checked out.", HttpStatus.NOT_FOUND);
 
         return ResponseEntity.ok(checkoutRecords);
@@ -159,7 +159,7 @@ public class MemberController
                 AccountType.MEMBER, AccountStatus.ACTIVE);
         List<BookReservation> reservationRecords = new ArrayList<>(member.getBookReservations());
 
-        if(!reservationRecords.isEmpty())
+        if(reservationRecords.isEmpty())
             throw new ApiRequestException("Member has no history of book reservations.", HttpStatus.NOT_FOUND);
 
         return ResponseEntity.ok(reservationRecords);
