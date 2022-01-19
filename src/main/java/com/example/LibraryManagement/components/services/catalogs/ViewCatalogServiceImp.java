@@ -17,6 +17,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.*;
 
@@ -125,6 +127,7 @@ public class ViewCatalogServiceImp implements ViewCatalogService
         {
             List<BookItem> booksByPubDate = bookItemRepository.findAllByPublicationDate(publicationDate);
 
+            System.out.println(booksByPubDate);
             for(BookItem b: booksByPubDate)
                 if(!books.contains(b)) books.add(b);
         }

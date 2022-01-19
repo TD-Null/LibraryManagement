@@ -2,6 +2,8 @@ package com.example.LibraryManagement.components.repositories.books;
 
 import com.example.LibraryManagement.models.books.properties.BookItem;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.Date;

@@ -84,7 +84,7 @@ public class CatalogController
                                                       @RequestParam(value = "title", required = false, defaultValue = "none") String title,
                                                       @RequestParam(value = "author", required = false, defaultValue = "none") String author,
                                                       @RequestParam(value = "subjects", required = false, defaultValue = "none") List<String> subjects,
-                                                      @RequestParam(value = "pub_date", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date publicationDate)
+                                                      @RequestParam(value = "pub_date", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date publicationDate)
     {
         return viewCatalogService.searchBooks(library, title, author, subjects, publicationDate);
     }
