@@ -104,7 +104,7 @@ public class MemberServiceImp implements MemberService
             Member loanedMember = book.getCurrLoanMember();
 
             if(!loanedMember.equals(member))
-                throw new ApiRequestException("Sorry, but this book is currently reserved for another member",
+                throw new ApiRequestException("Sorry, but this book is currently loaned to another member",
                         HttpStatus.CONFLICT);
 
             throw new ApiRequestException("This user is already borrowing this book.",
