@@ -65,7 +65,7 @@ public class ValidationService
         Optional<Library> library = libraryRepository.findById(name);
 
         if(library.isEmpty())
-            throw new ApiRequestException("Unable to find this library.",
+            throw new ApiRequestException("Unable to find this library within the system.",
                     HttpStatus.NOT_FOUND);
 
         return library.get();
