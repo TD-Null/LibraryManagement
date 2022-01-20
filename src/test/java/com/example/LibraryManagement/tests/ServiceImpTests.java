@@ -12,16 +12,11 @@ import com.example.LibraryManagement.components.services.accounts.LibrarianServi
 import com.example.LibraryManagement.components.services.accounts.MemberServiceImp;
 import com.example.LibraryManagement.components.services.catalogs.UpdateCatalogServiceImp;
 import com.example.LibraryManagement.components.services.catalogs.ViewCatalogServiceImp;
-import com.example.LibraryManagement.models.interfaces.services.accounts.MemberService;
-import com.example.LibraryManagement.models.interfaces.services.catalogs.UpdateCatalogService;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
 class ServiceImpTests
