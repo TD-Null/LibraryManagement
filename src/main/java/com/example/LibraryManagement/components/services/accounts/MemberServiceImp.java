@@ -57,9 +57,8 @@ public class MemberServiceImp implements MemberService
     private static final double finePerDay = 1.0;
 
     @Transactional
-    public ResponseEntity<BookItem> checkoutBook(Member member, BookItem book)
+    public ResponseEntity<BookItem> checkoutBook(Member member, BookItem book, Date currDate)
     {
-        Date currDate = new Date();
         Date dueDate = new Date(currDate.getTime() + Limitations.MAX_LENDING_DAYS * (1000 * 60 * 60 * 24));
         AccountNotification notification = new AccountNotification(member,
                 currDate, member.getEmail(), member.getAddress(),
@@ -130,9 +129,9 @@ public class MemberServiceImp implements MemberService
     }
 
     @Transactional
-    public ResponseEntity<MessageResponse> returnBook(Member member, BookItem book)
+    public ResponseEntity<MessageResponse> returnBook(Member member, BookItem book, Date currDate)
     {
-        Date returnDate = new Date();
+        Date returnDate = currDate;
         Date dueDate = book.getDueDate();
         AccountNotification notification = new AccountNotification(member, returnDate, member.getEmail(), member.getAddress(),
             "User has returned the book " + book.getTitle() + " on time.");
@@ -199,9 +198,8 @@ public class MemberServiceImp implements MemberService
     }
 
     @Transactional
-    public ResponseEntity<MessageResponse> reserveBook(Member member, BookItem book)
+    public ResponseEntity<MessageResponse> reserveBook(Member member, BookItem book, Date currDate)
     {
-        Date currDate = new Date();
         AccountNotification notification = new AccountNotification(member, currDate, member.getEmail(), member.getAddress(),
                 "User has made a reservation for the book " + book.getTitle() + ".");
         BookReservation bookReservation = new BookReservation(book, member, currDate, ReservationStatus.WAITING);
@@ -249,9 +247,8 @@ public class MemberServiceImp implements MemberService
     }
 
     @Transactional
-    public ResponseEntity<MessageResponse> cancelReservation(Member member, BookItem book)
+    public ResponseEntity<MessageResponse> cancelReservation(Member member, BookItem book, Date currDate)
     {
-        Date currDate = new Date();
         AccountNotification notification = new AccountNotification(member,
                 currDate, member.getEmail(), member.getAddress(),
                 "User has cancelled their reservation for the book " + book.getTitle() + ".");
@@ -278,9 +275,9 @@ public class MemberServiceImp implements MemberService
     }
 
     @Transactional
-    public ResponseEntity<MessageResponse> renewBook(Member member, BookItem book)
+    public ResponseEntity<MessageResponse> renewBook(Member member, BookItem book, Date currDate)
     {
-        Date returnDate = new Date();
+        Date returnDate = currDate;
         Date dueDate = book.getDueDate();
         Date newDueDate = new Date(dueDate.getTime() + Limitations.MAX_LENDING_DAYS * (1000 * 60 * 60 * 24));
         AccountNotification notification = new AccountNotification(member,
@@ -367,8 +364,8 @@ public class MemberServiceImp implements MemberService
     }
 
     @Transactional
-    public ResponseEntity<MessageResponse> payFine(Member member, Long fineID,
-                                                   TransactionType type, Object transaction, double amount)
+    public ResponseEntity<MessageResponse> payFine(Member member, Long fineID, TransactionType type,
+                                                   Object transaction, double amount)
     {
         Fine fine = validationService.fineValidation(fineID);
 

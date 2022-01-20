@@ -31,6 +31,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /*
@@ -172,7 +173,7 @@ public class MemberController
         Member member = (Member) accountService.barcodeReader(request.getBarcode(), request.getNumber(),
                 AccountType.MEMBER, AccountStatus.ACTIVE);
         BookItem book = validationService.bookValidation(bookBarcode);
-        return memberService.checkoutBook(member, book);
+        return memberService.checkoutBook(member, book, new Date());
     }
 
     @PutMapping("/return")
@@ -182,7 +183,7 @@ public class MemberController
         Member member = (Member) accountService.barcodeReader(request.getBarcode(), request.getNumber(),
                 AccountType.MEMBER, AccountStatus.ACTIVE);
         BookItem book = validationService.bookValidation(bookBarcode);
-        return memberService.returnBook(member, book);
+        return memberService.returnBook(member, book, new Date());
     }
 
     @PutMapping("/reserve")
@@ -192,7 +193,7 @@ public class MemberController
         Member member = (Member) accountService.barcodeReader(request.getBarcode(), request.getNumber(),
                 AccountType.MEMBER, AccountStatus.ACTIVE);
         BookItem book = validationService.bookValidation(bookBarcode);
-        return memberService.reserveBook(member, book);
+        return memberService.reserveBook(member, book, new Date());
     }
 
     @PutMapping("/reserve/cancel")
@@ -202,7 +203,7 @@ public class MemberController
         Member member = (Member) accountService.barcodeReader(request.getBarcode(), request.getNumber(),
                 AccountType.MEMBER, AccountStatus.ACTIVE);
         BookItem book = validationService.bookValidation(bookBarcode);
-        return memberService.cancelReservation(member, book);
+        return memberService.cancelReservation(member, book, new Date());
     }
 
     @PutMapping("/renew")
@@ -212,7 +213,7 @@ public class MemberController
         Member member = (Member) accountService.barcodeReader(request.getBarcode(), request.getNumber(),
                 AccountType.MEMBER, AccountStatus.ACTIVE);
         BookItem book = validationService.bookValidation(bookBarcode);
-        return memberService.renewBook(member, book);
+        return memberService.renewBook(member, book, new Date());
     }
 
     @PutMapping("/fines/transaction/card")
