@@ -15,12 +15,15 @@ import com.example.LibraryManagement.components.services.catalogs.ViewCatalogSer
 import com.example.LibraryManagement.models.interfaces.services.accounts.MemberService;
 import com.example.LibraryManagement.models.interfaces.services.catalogs.UpdateCatalogService;
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@ExtendWith(MockitoExtension.class)
 class ServiceImpTests
 {
     // Mock repositories for other services.
@@ -69,7 +72,7 @@ class ServiceImpTests
     private ValidationService validationService;
 
     @BeforeAll
-    void setup()
+    void setUp()
     {
         autoCloseable = MockitoAnnotations.openMocks(this);
         validationService = new ValidationService(libraryCardRepository, fineRepository, bookItemRepository,
@@ -93,7 +96,7 @@ class ServiceImpTests
     }
 
     @Test
-    void registerMember()
+    void registerAccounts()
     {
 //        accountService.registerMember("Daniel Manning",
 //                "0824DM",
@@ -101,22 +104,6 @@ class ServiceImpTests
     }
 
     @Test
-    void registerLibrarian() {
-    }
-
-    @Test
-    void updateAccountDetails() {
-    }
-
-    @Test
-    void changePassword() {
-    }
-
-    @Test
-    void updateMemberStatus() {
-    }
-
-    @Test
-    void cancelMemberAccount() {
+    void updateAccounts() {
     }
 }
