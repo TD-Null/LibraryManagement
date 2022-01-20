@@ -387,11 +387,34 @@ public class AccountServiceImp implements AccountService
 
             card.setActive(false);
             librarian.setStatus(AccountStatus.CANCELLED);
-            return ResponseEntity.ok(new MessageResponse("Librarian's account has been removed from the system."));
+            return ResponseEntity.ok(new MessageResponse(
+                    "Librarian's account has been successfully cancelled within the system."));
         }
 
         throw new ApiRequestException("User is not a librarian within the system.",
                 HttpStatus.NOT_FOUND);
+    }
+
+    // Method used exclusively for testing and deleting members.
+    @Transactional
+    public void deleteMember(Member member, LibraryCard libraryCard)
+    {
+        member.setLibraryCard(null);
+        libraryCard.setMember(null);
+
+        memberRepository.delete(member);
+        libraryCardRepository.delete(libraryCard);
+    }
+
+    // Method used exclusively for testing and deleting librarians.
+    @Transactional
+    public void deleteLibrarian(Librarian librarian, LibraryCard libraryCard)
+    {
+        librarian.setLibraryCard(null);
+        libraryCard.setLibrarian(null);
+
+        librarianRepository.delete(librarian);
+        libraryCardRepository.delete(libraryCard);
     }
 
     /*
