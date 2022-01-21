@@ -56,6 +56,7 @@ public class AccountServiceImpTests
                 "US",
                 "9541087310",
                 new Date()).getBody();
+        member = (Member) accountService.getAccountDetails(memberCard, memberCard.getCardNumber()).getBody();
 
         librarianCard = accountService.registerLibrarian(
                 "Manny South",
@@ -67,6 +68,7 @@ public class AccountServiceImpTests
                 "US",
                 "9543138282",
                 new Date()).getBody();
+        librarian = (Librarian) accountService.getAccountDetails(librarianCard, librarianCard.getCardNumber()).getBody();
     }
 
     // Check if accounts have been registered.
@@ -76,7 +78,6 @@ public class AccountServiceImpTests
     {
         Assertions.assertEquals(AccountType.MEMBER, memberCard.getType());
         Assertions.assertTrue(memberCard.isActive());
-        Assertions.assertEquals("Daniel Manning", memberCard.getMember().getName());
 
         Assertions.assertEquals(AccountType.LIBRARIAN, librarianCard.getType());
         Assertions.assertTrue(librarianCard.isActive());
