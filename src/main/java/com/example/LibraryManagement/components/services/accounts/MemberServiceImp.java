@@ -51,8 +51,6 @@ public class MemberServiceImp implements MemberService
     private final CheckTransactionRepository checkTransactionRepository;
     @Autowired
     private final CashTransactionRepository cashTransactionRepository;
-    @Autowired
-    private final ValidationService validationService;
 
     private static final double finePerDay = 1.0;
 
@@ -364,11 +362,9 @@ public class MemberServiceImp implements MemberService
     }
 
     @Transactional
-    public ResponseEntity<MessageResponse> payFine(Member member, Long fineID, TransactionType type,
+    public ResponseEntity<MessageResponse> payFine(Member member, Fine fine, TransactionType type,
                                                    Object transaction, double amount)
     {
-        Fine fine = validationService.fineValidation(fineID);
-
         if(!fine.getMember().equals(member))
             throw new ApiRequestException("Fine is not issued to this user.",
                     HttpStatus.BAD_REQUEST);

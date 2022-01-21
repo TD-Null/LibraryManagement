@@ -223,7 +223,8 @@ public class MemberController
     {
         Member member = (Member) accountService.barcodeReader(request.getBarcode(), request.getNumber(),
                 AccountType.MEMBER, AccountStatus.ACTIVE);
-        return memberService.payFine(member, fineID, TransactionType.CREDIT_CARD,
+        Fine fine = validationService.fineValidation(fineID);
+        return memberService.payFine(member, fine, TransactionType.CREDIT_CARD,
                 new CreditCardTransaction(request.getName()), request.getAmount());
     }
 
@@ -233,7 +234,8 @@ public class MemberController
     {
         Member member = (Member) accountService.barcodeReader(request.getBarcode(), request.getNumber(),
                 AccountType.MEMBER, AccountStatus.ACTIVE);
-        return memberService.payFine(member, fineID, TransactionType.CHECK,
+        Fine fine = validationService.fineValidation(fineID);
+        return memberService.payFine(member, fine, TransactionType.CHECK,
                 new CheckTransaction(request.getBankName(), request.getCheckNumber()), request.getAmount());
     }
 
@@ -243,7 +245,8 @@ public class MemberController
     {
         Member member = (Member) accountService.barcodeReader(request.getBarcode(), request.getNumber(),
                 AccountType.MEMBER, AccountStatus.ACTIVE);
-        return memberService.payFine(member, fineID, TransactionType.CASH,
+        Fine fine = validationService.fineValidation(fineID);
+        return memberService.payFine(member, fine, TransactionType.CASH,
                 new CashTransaction(request.getCashTendered()), request.getCashTendered());
     }
 
