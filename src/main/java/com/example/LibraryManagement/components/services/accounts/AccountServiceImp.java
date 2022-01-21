@@ -376,37 +376,29 @@ public class AccountServiceImp implements AccountService
      *
      * For example, only librarians can be able to add and modify books.
      */
-    public Object barcodeReader(Long barcode, String number, AccountType type, AccountStatus status)
+    public Object barcodeReader(LibraryCard card, String number, AccountType type, AccountStatus status)
     {
-        Optional<LibraryCard> cardValidation = libraryCardRepository.findById(barcode);
+        if(!card.getCardNumber().equals(number))
+            throw new ApiRequestException("Invalid credentials.", HttpStatus.UNAUTHORIZED);
 
-        // Ensure that the card exists within the database of the system using its barcode.
-        if(cardValidation.isPresent())
+        /*
+         * Check if the card is active and the account type matches to what is
+         * expected. If so, check that the user's account is still active, either
+         * of a MEMBER or LIBRARIAN. If both the library card and user's account is
+         * still active, then the user may proceed.
+         */
+        else if (card.isActive() && card.getType() == type)
         {
-            LibraryCard card = cardValidation.get();
-
-            if(!card.getCardNumber().equals(number))
-                throw new ApiRequestException("Invalid credentials.", HttpStatus.UNAUTHORIZED);
-
-            /*
-             * Check if the card is active and the account type matches to what is
-             * expected. If so, check that the user's account is still active, either
-             * of a MEMBER or LIBRARIAN. If both the library card and user's account is
-             * still active, then the user may proceed.
-             */
-            else if (card.isActive() && card.getType() == type)
+            if(type == AccountType.MEMBER && card.getMember() != null
+                    && card.getMember().getStatus() == status)
             {
-                if(type == AccountType.MEMBER && card.getMember() != null
-                        && card.getMember().getStatus() == status)
-                {
-                    return card.getMember();
-                }
+                return card.getMember();
+            }
 
-                else if(type == AccountType.LIBRARIAN && card.getLibrarian() != null
-                            && card.getLibrarian().getStatus() == status)
-                {
-                    return card.getLibrarian();
-                }
+            else if(type == AccountType.LIBRARIAN && card.getLibrarian() != null
+                        && card.getLibrarian().getStatus() == status)
+            {
+                return card.getLibrarian();
             }
         }
 

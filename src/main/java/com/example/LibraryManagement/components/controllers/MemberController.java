@@ -62,7 +62,8 @@ public class MemberController
     public ResponseEntity<List<BookItem>> viewBooksLoans(@RequestParam(value = "id") Long barcode,
                                                          @RequestParam(value = "card") String number)
     {
-        Member member = (Member) accountService.barcodeReader(barcode, number,
+        LibraryCard card = validationService.cardValidation(barcode);
+        Member member = (Member) accountService.barcodeReader(card, number,
                 AccountType.MEMBER, AccountStatus.ACTIVE);
         List<BookItem> bookLoans = new ArrayList<>(member.getCheckedOutBooks());
 
@@ -76,7 +77,8 @@ public class MemberController
     public ResponseEntity<List<BookItem>> viewReservedBooks(@RequestParam(value = "id") Long barcode,
                                                             @RequestParam(value = "card") String number)
     {
-        Member member = (Member) accountService.barcodeReader(barcode, number,
+        LibraryCard card = validationService.cardValidation(barcode);
+        Member member = (Member) accountService.barcodeReader(card, number,
                 AccountType.MEMBER, AccountStatus.ACTIVE);
         List<BookItem> bookReservations = new ArrayList<>(member.getReservedBooks());
 
@@ -90,7 +92,8 @@ public class MemberController
     public ResponseEntity<List<AccountNotification>> viewNotifications(@RequestParam(value = "id") Long barcode,
                                                                        @RequestParam(value = "card") String number)
     {
-        Member member = (Member) accountService.barcodeReader(barcode, number,
+        LibraryCard card = validationService.cardValidation(barcode);
+        Member member = (Member) accountService.barcodeReader(card, number,
                 AccountType.MEMBER, AccountStatus.ACTIVE);
         List<AccountNotification> notifications = new ArrayList<>(member.getNotifications());
 
@@ -104,7 +107,8 @@ public class MemberController
     public ResponseEntity<List<Fine>> viewFines(@RequestParam(value = "id") Long barcode,
                                                 @RequestParam(value = "card") String number)
     {
-        Member member = (Member) accountService.barcodeReader(barcode, number,
+        LibraryCard card = validationService.cardValidation(barcode);
+        Member member = (Member) accountService.barcodeReader(card, number,
                 AccountType.MEMBER, AccountStatus.ACTIVE);
         List<Fine> fines = new ArrayList<>(member.getFines());
 
@@ -118,7 +122,8 @@ public class MemberController
     public ResponseEntity<List<FineTransaction>> viewTransactions(@RequestParam(value = "id") Long barcode,
                                                                   @RequestParam(value = "card") String number)
     {
-        Member member = (Member) accountService.barcodeReader(barcode, number,
+        LibraryCard card = validationService.cardValidation(barcode);
+        Member member = (Member) accountService.barcodeReader(card, number,
                 AccountType.MEMBER, AccountStatus.ACTIVE);
         List<FineTransaction> transactions = new ArrayList<>();
         List<Fine> fines = new ArrayList<>(member.getFines());
@@ -143,7 +148,8 @@ public class MemberController
     public ResponseEntity<List<BookLending>> viewCheckoutHistory(@RequestParam(value = "barcode") Long barcode,
                                                                  @RequestParam(value = "card") String number)
     {
-        Member member = (Member) accountService.barcodeReader(barcode, number,
+        LibraryCard card = validationService.cardValidation(barcode);
+        Member member = (Member) accountService.barcodeReader(card, number,
                 AccountType.MEMBER, AccountStatus.ACTIVE);
         List<BookLending> checkoutRecords = new ArrayList<>(member.getBookLoans());
 
@@ -157,7 +163,8 @@ public class MemberController
     public ResponseEntity<List<BookReservation>> viewReservationHistory(@RequestParam(value = "barcode") Long barcode,
                                                                         @RequestParam(value = "card") String number)
     {
-        Member member = (Member) accountService.barcodeReader(barcode, number,
+        LibraryCard card = validationService.cardValidation(barcode);
+        Member member = (Member) accountService.barcodeReader(card, number,
                 AccountType.MEMBER, AccountStatus.ACTIVE);
         List<BookReservation> reservationRecords = new ArrayList<>(member.getBookReservations());
 
@@ -171,7 +178,8 @@ public class MemberController
     public ResponseEntity<BookItem> checkoutBook(@Valid @RequestBody CardValidationRequest request,
                                                  @RequestParam(value = "book") Long bookBarcode)
     {
-        Member member = (Member) accountService.barcodeReader(request.getBarcode(), request.getNumber(),
+        LibraryCard card = validationService.cardValidation(request.getBarcode());
+        Member member = (Member) accountService.barcodeReader(card, request.getNumber(),
                 AccountType.MEMBER, AccountStatus.ACTIVE);
         BookItem book = validationService.bookValidation(bookBarcode);
         return memberService.checkoutBook(member, book, new Date());
@@ -181,7 +189,8 @@ public class MemberController
     public ResponseEntity<MessageResponse> returnBook(@Valid @RequestBody CardValidationRequest request,
                                                       @RequestParam(value = "book") Long bookBarcode)
     {
-        Member member = (Member) accountService.barcodeReader(request.getBarcode(), request.getNumber(),
+        LibraryCard card = validationService.cardValidation(request.getBarcode());
+        Member member = (Member) accountService.barcodeReader(card, request.getNumber(),
                 AccountType.MEMBER, AccountStatus.ACTIVE);
         BookItem book = validationService.bookValidation(bookBarcode);
         return memberService.returnBook(member, book, new Date());
@@ -191,7 +200,8 @@ public class MemberController
     public ResponseEntity<MessageResponse> reserveBook(@Valid @RequestBody CardValidationRequest request,
                                                        @RequestParam(value = "book") Long bookBarcode)
     {
-        Member member = (Member) accountService.barcodeReader(request.getBarcode(), request.getNumber(),
+        LibraryCard card = validationService.cardValidation(request.getBarcode());
+        Member member = (Member) accountService.barcodeReader(card, request.getNumber(),
                 AccountType.MEMBER, AccountStatus.ACTIVE);
         BookItem book = validationService.bookValidation(bookBarcode);
         return memberService.reserveBook(member, book, new Date());
@@ -201,7 +211,8 @@ public class MemberController
     public ResponseEntity<MessageResponse> cancelReservation(@Valid @RequestBody CardValidationRequest request,
                                                              @RequestParam(value = "book") Long bookBarcode)
     {
-        Member member = (Member) accountService.barcodeReader(request.getBarcode(), request.getNumber(),
+        LibraryCard card = validationService.cardValidation(request.getBarcode());
+        Member member = (Member) accountService.barcodeReader(card, request.getNumber(),
                 AccountType.MEMBER, AccountStatus.ACTIVE);
         BookItem book = validationService.bookValidation(bookBarcode);
         return memberService.cancelReservation(member, book, new Date());
@@ -211,7 +222,8 @@ public class MemberController
     public ResponseEntity<MessageResponse> renewBook(@Valid @RequestBody CardValidationRequest request,
                                                      @RequestParam(value = "book") Long bookBarcode)
     {
-        Member member = (Member) accountService.barcodeReader(request.getBarcode(), request.getNumber(),
+        LibraryCard card = validationService.cardValidation(request.getBarcode());
+        Member member = (Member) accountService.barcodeReader(card, request.getNumber(),
                 AccountType.MEMBER, AccountStatus.ACTIVE);
         BookItem book = validationService.bookValidation(bookBarcode);
         return memberService.renewBook(member, book, new Date());
@@ -221,7 +233,8 @@ public class MemberController
     public ResponseEntity<MessageResponse> cardTransaction(@Valid @RequestBody CardTransactionRequest request,
                                                            @RequestParam(value = "fine") Long fineID)
     {
-        Member member = (Member) accountService.barcodeReader(request.getBarcode(), request.getNumber(),
+        LibraryCard card = validationService.cardValidation(request.getBarcode());
+        Member member = (Member) accountService.barcodeReader(card, request.getNumber(),
                 AccountType.MEMBER, AccountStatus.ACTIVE);
         Fine fine = validationService.fineValidation(fineID);
         return memberService.payFine(member, fine, TransactionType.CREDIT_CARD,
@@ -232,7 +245,8 @@ public class MemberController
     public ResponseEntity<MessageResponse> checkTransaction(@Valid @RequestBody CheckTransactionRequest request,
                                                             @RequestParam(value = "fine") Long fineID)
     {
-        Member member = (Member) accountService.barcodeReader(request.getBarcode(), request.getNumber(),
+        LibraryCard card = validationService.cardValidation(request.getBarcode());
+        Member member = (Member) accountService.barcodeReader(card, request.getNumber(),
                 AccountType.MEMBER, AccountStatus.ACTIVE);
         Fine fine = validationService.fineValidation(fineID);
         return memberService.payFine(member, fine, TransactionType.CHECK,
@@ -243,7 +257,8 @@ public class MemberController
     public ResponseEntity<MessageResponse> cashTransaction(@Valid @RequestBody CashTransactionRequest request,
                                                            @RequestParam(value = "fine") Long fineID)
     {
-        Member member = (Member) accountService.barcodeReader(request.getBarcode(), request.getNumber(),
+        LibraryCard card = validationService.cardValidation(request.getBarcode());
+        Member member = (Member) accountService.barcodeReader(card, request.getNumber(),
                 AccountType.MEMBER, AccountStatus.ACTIVE);
         Fine fine = validationService.fineValidation(fineID);
         return memberService.payFine(member, fine, TransactionType.CASH,

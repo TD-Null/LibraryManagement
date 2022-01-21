@@ -7,6 +7,7 @@ import com.example.LibraryManagement.components.services.accounts.AccountService
 import com.example.LibraryManagement.models.accounts.LibraryCard;
 import com.example.LibraryManagement.models.accounts.types.Librarian;
 import com.example.LibraryManagement.models.accounts.types.Member;
+import com.example.LibraryManagement.models.enums.accounts.AccountStatus;
 import com.example.LibraryManagement.models.enums.accounts.AccountType;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -69,6 +70,17 @@ public class AccountServiceImpTests
                 new Date()).getBody();
     }
 
+    // Set all variables to null after each test.
+    @AfterEach
+    void tearDown()
+    {
+        accountService = null;
+        member = null;
+        librarian = null;
+        memberCard = null;
+        librarianCard = null;
+    }
+
     // Check if accounts have been registered.
     @Test
     @Order(1)
@@ -80,10 +92,19 @@ public class AccountServiceImpTests
         Assertions.assertEquals(AccountType.MEMBER, memberCard.getType());
         Assertions.assertTrue(memberCard.isActive());
         Assertions.assertEquals(member, memberCard.getMember());
+        Assertions.assertNull(memberCard.getLibrarian());
+        Assertions.assertEquals(member,
+                accountService.barcodeReader(memberCard, memberCard.getCardNumber(),
+                        AccountType.MEMBER, AccountStatus.ACTIVE));
 
         Assertions.assertEquals(AccountType.LIBRARIAN, librarianCard.getType());
         Assertions.assertTrue(librarianCard.isActive());
         Assertions.assertEquals(librarian, librarianCard.getLibrarian());
+        Assertions.assertNull(librarianCard.getMember());
+        Assertions.assertEquals(librarian,
+                accountService.barcodeReader(librarianCard, librarianCard.getCardNumber(),
+                        AccountType.LIBRARIAN, AccountStatus.ACTIVE));
+
     }
 
     @Test
