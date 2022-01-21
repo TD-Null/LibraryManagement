@@ -345,6 +345,7 @@ public class AccountServiceImpTests
     {
         String librarianExceptionMessage = "";
 
+        // Create a new librarian.
         LibraryCard newLibrarianCard = accountService.registerLibrarian(
                 "Librarian",
                 "password",
