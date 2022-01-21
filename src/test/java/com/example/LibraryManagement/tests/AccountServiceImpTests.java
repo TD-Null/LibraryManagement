@@ -7,8 +7,10 @@ import com.example.LibraryManagement.components.services.accounts.AccountService
 import com.example.LibraryManagement.models.accounts.LibraryCard;
 import com.example.LibraryManagement.models.accounts.types.Librarian;
 import com.example.LibraryManagement.models.accounts.types.Member;
+import com.example.LibraryManagement.models.datatypes.Address;
 import com.example.LibraryManagement.models.enums.accounts.AccountStatus;
 import com.example.LibraryManagement.models.enums.accounts.AccountType;
+import com.example.LibraryManagement.models.io.responses.exceptions.ApiRequestException;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -60,10 +62,10 @@ public class AccountServiceImpTests
 
         librarianCard = accountService.registerLibrarian(
                 "Manny South",
-                "1024AM",
-                "manny@mail.com",
-                "manny's street",
-                "manny's city",
+                "1024MS",
+                "librarian@mail.com",
+                "librarian's street",
+                "librarian's city",
                 "444444",
                 "US",
                 "9543138282",
@@ -81,7 +83,7 @@ public class AccountServiceImpTests
         librarianCard = null;
     }
 
-    // Check if accounts have been registered.
+    // Test if accounts have been registered.
     @Test
     @Order(1)
     void registerAccounts()
@@ -104,13 +106,69 @@ public class AccountServiceImpTests
         Assertions.assertEquals(librarian,
                 accountService.barcodeReader(librarianCard, librarianCard.getCardNumber(),
                         AccountType.LIBRARIAN, AccountStatus.ACTIVE));
-
     }
 
+    // Test if accounts are updated properly.
     @Test
     @Order(2)
     void updateAccounts()
     {
+        member = (Member) accountService.getAccountDetails(
+                memberCard, memberCard.getCardNumber()).getBody();
+        librarian = (Librarian) accountService.getAccountDetails(
+                librarianCard, librarianCard.getCardNumber()).getBody();
+        String memberExceptionMessage = "";
+        String librarianExceptionMessage = "";
+
+        accountService.updateAccountDetails(
+                memberCard,
+                memberCard.getCardNumber(),
+                "Daniel Manning",
+                "daniel's street",
+                "daniel's city",
+                "111111",
+                "US",
+                "daniel@mail.com",
+                "9541087310").getBody();
+        accountService.changePassword(memberCard, member.getPassword(), "9035DM");
+        memberExceptionMessage = Assertions.assertThrows(ApiRequestException.class, () -> {
+            accountService.changePassword(memberCard, "1234DM", "1029DM");
+        }).getMessage();
+        Assertions.assertEquals("Invalid password.", memberExceptionMessage);
+
+        accountService.updateAccountDetails(
+                librarianCard,
+                librarianCard.getCardNumber(),
+                "Manny South",
+                "manny's street",
+                "manny's city",
+                "444444",
+                "US",
+                "manny@mail.com",
+                "9543138282").getBody();
+        accountService.changePassword(librarianCard, librarian.getPassword(), "2039MS");
+        librarianExceptionMessage = Assertions.assertThrows(ApiRequestException.class, () -> {
+            accountService.changePassword(librarianCard, "1234DM", "1029DM");
+        }).getMessage();
+        Assertions.assertEquals("Invalid password.", librarianExceptionMessage);
+
+        Assertions.assertEquals("daniel@mail.com", member.getEmail());
+        Assertions.assertEquals(new Address(
+                "daniel's street",
+                        "daniel's city",
+                        "111111",
+                        "US"),
+                member.getAddress());
+        Assertions.assertEquals("9035DM", member.getPassword());
+
+        Assertions.assertEquals("manny@mail.com", librarian.getEmail());
+        Assertions.assertEquals(new Address(
+                        "manny's street",
+                        "manny's city",
+                        "444444",
+                        "US"),
+                librarian.getAddress());
+        Assertions.assertEquals("2039MS", librarian.getPassword());
     }
 
     @Test

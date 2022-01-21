@@ -208,8 +208,7 @@ public class AccountServiceImp implements AccountService
     }
 
     @Transactional
-    public ResponseEntity<MessageResponse> changePassword(LibraryCard card,
-                                                          String originalPassword, String newPassword)
+    public ResponseEntity<MessageResponse> changePassword(LibraryCard card, String originalPassword, String newPassword)
     {
         AccountType type = card.getType();
 
@@ -219,7 +218,7 @@ public class AccountServiceImp implements AccountService
 
             if(!member.getPassword().equals(originalPassword))
             {
-                throw new ApiRequestException("Invalid Password.", HttpStatus.UNAUTHORIZED);
+                throw new ApiRequestException("Invalid password.", HttpStatus.UNAUTHORIZED);
             }
 
             member.setPassword(newPassword);
