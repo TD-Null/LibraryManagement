@@ -10,7 +10,11 @@ import com.example.LibraryManagement.models.accounts.types.Member;
 import com.example.LibraryManagement.models.books.actions.BookLending;
 import com.example.LibraryManagement.models.books.actions.BookReservation;
 import com.example.LibraryManagement.models.books.fines.Fine;
+import com.example.LibraryManagement.models.books.libraries.Library;
 import com.example.LibraryManagement.models.books.libraries.Rack;
+import com.example.LibraryManagement.models.books.properties.Author;
+import com.example.LibraryManagement.models.books.properties.BookItem;
+import com.example.LibraryManagement.models.books.properties.Subject;
 import com.example.LibraryManagement.models.enums.accounts.AccountStatus;
 import com.example.LibraryManagement.models.enums.accounts.AccountType;
 import com.example.LibraryManagement.models.io.requests.CardValidationRequest;
@@ -31,7 +35,9 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /*
  * Controller component containing the API requests relating to Librarians:
@@ -167,9 +173,21 @@ public class LibrarianController
     {
         accountService.barcodeReader(request.getBarcode(), request.getNumber(),
                 AccountType.LIBRARIAN, AccountStatus.ACTIVE);
-        return updateCatalogService.addBookItem(request.getLibraryName(), new Rack(request.getRack(), request.getLocation()),
-                request.getIsbn(), request.getTitle(), request.getPublisher(), request.getLanguage(), request.getNumberOfPages(),
-                request.getAuthor(), request.getSubjectNames(), request.getFormat(), request.getPublicationDate(),
+
+        Library library = validationService.libraryValidation(request.getLibraryName());
+        Author author = validationService.authorValidation(request.getAuthor());
+
+        Set<String> subjectNames = request.getSubjectNames();
+        Set<Subject> subjects = new HashSet<>();
+
+        for(String name: subjectNames)
+        {
+            subjects.add(validationService.subjectValidation(name));
+        }
+
+        return updateCatalogService.addBookItem(library, new Rack(request.getRack(), request.getLocation()),
+                request.getIsbn(), request.getTitle(), request.getPublisher(), request.getLanguage(),
+                request.getNumberOfPages(), author, subjects, request.getFormat(), request.getPublicationDate(),
                 request.isReferenceOnly(), request.getPrice());
     }
 
@@ -194,9 +212,21 @@ public class LibrarianController
     {
         accountService.barcodeReader(request.getBarcode(), request.getNumber(),
                 AccountType.LIBRARIAN, AccountStatus.ACTIVE);
-        return updateCatalogService.modifyBookItem(request.getBookBarcode(), request.getIsbn(), request.getTitle(),
-                request.getPublisher(), request.getLanguage(), request.getNumberOfPages(), request.getAuthor(),
-                request.getSubjectNames(), request.getFormat(), request.getPublicationDate(), request.isReferenceOnly(),
+
+        BookItem book = validationService.bookValidation(request.getBookBarcode());
+        Author author = validationService.authorValidation(request.getAuthor());
+
+        Set<String> subjectNames = request.getSubjectNames();
+        Set<Subject> subjects = new HashSet<>();
+
+        for(String name: subjectNames)
+        {
+            subjects.add(validationService.subjectValidation(name));
+        }
+
+        return updateCatalogService.modifyBookItem(book, request.getIsbn(), request.getTitle(),
+                request.getPublisher(), request.getLanguage(), request.getNumberOfPages(), author,
+                subjects, request.getFormat(), request.getPublicationDate(), request.isReferenceOnly(),
                 request.getPrice());
     }
 
@@ -205,7 +235,11 @@ public class LibrarianController
     {
         accountService.barcodeReader(request.getBarcode(), request.getNumber(),
                 AccountType.LIBRARIAN, AccountStatus.ACTIVE);
-        return updateCatalogService.moveBookItem(request.getBookBarcode(), request.getLibraryName(),
+
+        BookItem book = validationService.bookValidation(request.getBookBarcode());
+        Library library = validationService.libraryValidation(request.getLibraryName());
+
+        return updateCatalogService.moveBookItem(book, library,
                 new Rack(request.getRack(), request.getLocation()));
     }
 
@@ -222,7 +256,8 @@ public class LibrarianController
     {
         accountService.barcodeReader(request.getBarcode(), request.getNumber(),
                 AccountType.LIBRARIAN, AccountStatus.ACTIVE);
-        return updateCatalogService.removeLibrary(request.getLibrary());
+        Library library = validationService.libraryValidation(request.getLibrary());
+        return updateCatalogService.removeLibrary(library);
     }
 
     @DeleteMapping("/catalog/book/remove")
@@ -230,7 +265,8 @@ public class LibrarianController
     {
         accountService.barcodeReader(request.getBarcode(), request.getNumber(),
                 AccountType.LIBRARIAN, AccountStatus.ACTIVE);
-        return updateCatalogService.removeBookItem(request.getBookBarcode());
+        BookItem book = validationService.bookValidation(request.getBookBarcode());
+        return updateCatalogService.removeBookItem(book);
     }
 
     @DeleteMapping("/catalog/subject/remove")

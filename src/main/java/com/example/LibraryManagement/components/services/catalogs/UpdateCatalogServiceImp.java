@@ -42,8 +42,6 @@ public class UpdateCatalogServiceImp implements UpdateCatalogService
     @Autowired
     private final AuthorRepository authorRepository;
     @Autowired
-    private final ValidationService validationService;
-    @Autowired
     private final AccountNotificationRepository notificationRepository;
 
     public ResponseEntity<MessageResponse> addLibrary(String name, String streetAddress, String city,
@@ -58,14 +56,11 @@ public class UpdateCatalogServiceImp implements UpdateCatalogService
     }
 
     @Transactional
-    public ResponseEntity<MessageResponse> addBookItem(String libraryName, Rack rack, String ISBN, String title,
+    public ResponseEntity<MessageResponse> addBookItem(Library library, Rack rack, String ISBN, String title,
                                                        String publisher, String language, int numberOfPages,
-                                                       String authorName, Set<String> subjects, BookFormat format,
+                                                       Author author, Set<Subject> subjects, BookFormat format,
                                                        Date publicationDate, boolean isReferenceOnly, double price)
     {
-        Library library = validationService.libraryValidation(libraryName);
-        Author author = validationService.authorValidation(authorName);
-
         BookItem bookItem = new BookItem(ISBN, title, publisher, language, numberOfPages,
                 rack.getNumber(), rack.getLocation(), format, BookStatus.AVAILABLE, publicationDate,
                 isReferenceOnly, price);
@@ -78,11 +73,10 @@ public class UpdateCatalogServiceImp implements UpdateCatalogService
         library.addBookItem(bookItem);
         author.addBookItem(bookItem);
 
-        for(String s: subjects)
+        for(Subject s: subjects)
         {
-            Subject subject = validationService.subjectValidation(s);
-            subject.addBookItem(bookItem);
-            bookItem.addSubject(subject);
+            s.addBookItem(bookItem);
+            bookItem.addSubject(s);
         }
 
         return ResponseEntity.ok(new MessageResponse("Book has been successfully added to the system."));
@@ -109,47 +103,38 @@ public class UpdateCatalogServiceImp implements UpdateCatalogService
     }
 
     @Transactional
-    public ResponseEntity<MessageResponse> modifyBookItem(Long barcode, String ISBN, String title,
+    public ResponseEntity<MessageResponse> modifyBookItem(BookItem book, String ISBN, String title,
                                                           String publisher, String language, int numberOfPages,
-                                                          String authorName, Set<String> subjects, BookFormat format,
+                                                          Author author, Set<Subject> newSubjects, BookFormat format,
                                                           Date publicationDate, boolean isReferenceOnly, double price)
     {
-        BookItem bookItem = validationService.bookValidation(barcode);
+        book.setISBN(ISBN);
+        book.setTitle(title);
+        book.setPublisher(publisher);
+        book.setLanguage(language);
+        book.setNumberOfPages(numberOfPages);
+        book.setFormat(format);
+        book.setPublicationDate(publicationDate);
+        book.setReferenceOnly(isReferenceOnly);
+        book.setPrice(price);
 
-        bookItem.setISBN(ISBN);
-        bookItem.setTitle(title);
-        bookItem.setPublisher(publisher);
-        bookItem.setLanguage(language);
-        bookItem.setNumberOfPages(numberOfPages);
-        bookItem.setFormat(format);
-        bookItem.setPublicationDate(publicationDate);
-        bookItem.setReferenceOnly(isReferenceOnly);
-        bookItem.setPrice(price);
-
-        Author author = validationService.authorValidation(authorName);
-        Author prevAuthor = bookItem.getAuthor();
+        Author prevAuthor = book.getAuthor();
 
         if(!prevAuthor.equals(author))
         {
-            prevAuthor.removeBookItem(bookItem);
-            author.addBookItem(bookItem);
-            bookItem.setAuthor(author);
+            prevAuthor.removeBookItem(book);
+            author.addBookItem(book);
+            book.setAuthor(author);
         }
 
-        Set<Subject> prevSubjects = bookItem.getSubjects();
-        Set<Subject> newSubjects = new HashSet<>();
-
-        for(String s: subjects)
-        {
-            newSubjects.add(validationService.subjectValidation(s));
-        }
+        Set<Subject> prevSubjects = book.getSubjects();
 
         for(Subject s: prevSubjects)
         {
             if(!newSubjects.contains(s))
             {
-                s.removeBookItem(bookItem);
-                bookItem.removeSubject(s);
+                s.removeBookItem(book);
+                book.removeSubject(s);
             }
         }
 
@@ -157,8 +142,8 @@ public class UpdateCatalogServiceImp implements UpdateCatalogService
         {
             if(!prevSubjects.contains(s))
             {
-                s.addBookItem(bookItem);
-                bookItem.addSubject(s);
+                s.addBookItem(book);
+                book.addSubject(s);
             }
         }
 
@@ -166,11 +151,9 @@ public class UpdateCatalogServiceImp implements UpdateCatalogService
     }
 
     @Transactional
-    public ResponseEntity<MessageResponse> moveBookItem(Long barcode, String libraryName, Rack r)
+    public ResponseEntity<MessageResponse> moveBookItem(BookItem book, Library newLibrary, Rack r)
     {
-        BookItem book = validationService.bookValidation(barcode);
         Library prevLibrary = book.getLibrary();
-        Library newLibrary = validationService.libraryValidation(libraryName);
 
         if(!newLibrary.equals(prevLibrary))
         {
@@ -195,10 +178,8 @@ public class UpdateCatalogServiceImp implements UpdateCatalogService
     }
 
     @Transactional
-    public ResponseEntity<MessageResponse> removeLibrary(String libraryName)
+    public ResponseEntity<MessageResponse> removeLibrary(Library library)
     {
-        Library library = validationService.libraryValidation(libraryName);
-
         if(!library.getBooks().isEmpty())
             throw new ApiRequestException("Library still contains books within the system.",
                     HttpStatus.CONFLICT);
@@ -208,10 +189,8 @@ public class UpdateCatalogServiceImp implements UpdateCatalogService
     }
 
     @Transactional
-    public ResponseEntity<MessageResponse> removeBookItem(Long barcode)
+    public ResponseEntity<MessageResponse> removeBookItem(BookItem book)
     {
-        BookItem book = validationService.bookValidation(barcode);
-
         if(book.getCurrLoanMember() != null && book.getStatus() == BookStatus.LOANED)
             throw new ApiRequestException("This book is currently not available and is loaned to a member.", HttpStatus.ACCEPTED);
 
