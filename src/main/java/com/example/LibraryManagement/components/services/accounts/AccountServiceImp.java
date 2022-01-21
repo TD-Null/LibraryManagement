@@ -129,6 +129,7 @@ public class AccountServiceImp implements AccountService
 
         // Link the library card to the user's account.
         member.setLibraryCard(libraryCard);
+        libraryCard.setMember(member);
 
         // Return the details of the user's library card after the account has been successfully created.
         return ResponseEntity.ok(libraryCard);
@@ -160,6 +161,7 @@ public class AccountServiceImp implements AccountService
 
         // Link the library card to the user's account.
         librarian.setLibraryCard(libraryCard);
+        libraryCard.setLibrarian(librarian);
 
         // Return the details of the user's library card after the account has been successfully created.
         return ResponseEntity.ok(libraryCard);
@@ -365,28 +367,6 @@ public class AccountServiceImp implements AccountService
 
         throw new ApiRequestException("User is not a librarian within the system.",
                 HttpStatus.NOT_FOUND);
-    }
-
-    // Method used exclusively for testing and deleting members.
-    @Transactional
-    public void deleteMember(Member member, LibraryCard libraryCard)
-    {
-        member.setLibraryCard(null);
-        libraryCard.setMember(null);
-
-        memberRepository.delete(member);
-        libraryCardRepository.delete(libraryCard);
-    }
-
-    // Method used exclusively for testing and deleting librarians.
-    @Transactional
-    public void deleteLibrarian(Librarian librarian, LibraryCard libraryCard)
-    {
-        librarian.setLibraryCard(null);
-        libraryCard.setLibrarian(null);
-
-        librarianRepository.delete(librarian);
-        libraryCardRepository.delete(libraryCard);
     }
 
     /*
