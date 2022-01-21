@@ -13,6 +13,7 @@ import com.example.LibraryManagement.models.enums.accounts.AccountType;
 import com.example.LibraryManagement.models.io.responses.exceptions.ApiRequestException;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -33,6 +34,7 @@ public class AccountServiceImpTests
     private MemberRepository memberRepository;
 
     // Services being tested.
+    @InjectMocks
     private AccountServiceImp accountService;
 
     // Sample members and librarians.
@@ -47,8 +49,6 @@ public class AccountServiceImpTests
     @BeforeEach
     void setUp()
     {
-        accountService = new AccountServiceImp(libraryCardRepository, librarianRepository, memberRepository);
-
         memberCard = accountService.registerMember(
                 "Daniel Manning",
                 "0824DM",
@@ -81,7 +81,6 @@ public class AccountServiceImpTests
     @AfterEach
     void tearDown()
     {
-        accountService = null;
         member = null;
         librarian = null;
         memberCard = null;
@@ -93,6 +92,8 @@ public class AccountServiceImpTests
     @Order(1)
     void registerAccounts()
     {
+        // Check if the service has returned the right account information
+        // for both the member and librarian.
         Assertions.assertEquals(AccountType.MEMBER, memberCard.getType());
         Assertions.assertTrue(memberCard.isActive());
         Assertions.assertEquals(member, memberCard.getMember());
@@ -206,6 +207,110 @@ public class AccountServiceImpTests
         String memberExceptionMessage = "";
         String librarianExceptionMessage = "";
 
+        // Check that the account is of a librarian.
+        Assertions.assertEquals(librarian,
+                accountService.barcodeReader(librarianCard, librarianCard.getCardNumber(),
+                        AccountType.LIBRARIAN, AccountStatus.ACTIVE));
 
+        // Have the librarian block the member's account without throwing an exception.
+        Assertions.assertDoesNotThrow(() -> {
+            accountService.updateMemberStatus(member, AccountStatus.BLACKLISTED);
+        });
+        Assertions.assertEquals(AccountStatus.BLACKLISTED, member.getStatus());
+
+        // If the librarian tries to block the member again, an exception should be thrown.
+        librarianExceptionMessage = Assertions.assertThrows(ApiRequestException.class, () -> {
+            accountService.updateMemberStatus(member, AccountStatus.BLACKLISTED);
+        }).getMessage();
+        Assertions.assertEquals("This member's account is already blacklisted.", librarianExceptionMessage);
+
+        // If the member tries to cancel their account while it is blocked, an exception should be thrown.
+        memberExceptionMessage = Assertions.assertThrows(ApiRequestException.class, () -> {
+            accountService.cancelMemberAccount(memberCard,
+                    memberCard.getCardNumber(), member.getPassword());
+        }).getMessage();
+        Assertions.assertEquals("Member's account is currently blocked. " +
+                "User cannot cancel their membership currently.", memberExceptionMessage);
+
+        // Have the librarian unblock the member's account without throwing an exception.
+        Assertions.assertDoesNotThrow(() -> {
+            accountService.updateMemberStatus(member, AccountStatus.ACTIVE);
+        });
+        Assertions.assertEquals(AccountStatus.ACTIVE, member.getStatus());
+
+        // If the librarian tries to unblock the member again, an exception should be thrown.
+        librarianExceptionMessage = Assertions.assertThrows(ApiRequestException.class, () -> {
+            accountService.updateMemberStatus(member, AccountStatus.ACTIVE);
+        }).getMessage();
+        Assertions.assertEquals("This member's account is already active.", librarianExceptionMessage);
+
+        // If the member's library card is inactive and they try to cancel their account,
+        // an exception is thrown.
+        memberCard.setActive(false);
+        memberExceptionMessage = Assertions.assertThrows(ApiRequestException.class, () -> {
+            accountService.cancelMemberAccount(memberCard,
+                    memberCard.getCardNumber(), member.getPassword());
+        }).getMessage();
+        Assertions.assertEquals("Card is currently inactive, " +
+                "so membership cannot be cancelled.", memberExceptionMessage);
+        memberCard.setActive(true);
+
+        // If the member gives the wrong credentials to cancel their account,
+        // an exception should be thrown.
+        memberExceptionMessage = Assertions.assertThrows(ApiRequestException.class, () -> {
+            accountService.cancelMemberAccount(memberCard,
+                    "123456", member.getPassword());
+        }).getMessage();
+        Assertions.assertEquals("Given credentials are invalid." +
+                "Cannot proceed with cancelling member's account", memberExceptionMessage);
+        memberExceptionMessage = Assertions.assertThrows(ApiRequestException.class, () -> {
+            accountService.cancelMemberAccount(memberCard,
+                    memberCard.getCardNumber(), "password");
+        }).getMessage();
+        Assertions.assertEquals("Given credentials are invalid." +
+                "Cannot proceed with cancelling member's account", memberExceptionMessage);
+        memberExceptionMessage = Assertions.assertThrows(ApiRequestException.class, () -> {
+            accountService.cancelMemberAccount(memberCard,
+                    "123456", "password");
+        }).getMessage();
+        Assertions.assertEquals("Given credentials are invalid." +
+                "Cannot proceed with cancelling member's account", memberExceptionMessage);
+
+        // If the member has books still issued to them and tries to cancel their account,
+        // an exception is thrown.
+        member.setIssuedBooksTotal(5);
+        memberExceptionMessage = Assertions.assertThrows(ApiRequestException.class, () -> {
+            accountService.cancelMemberAccount(memberCard,
+                    memberCard.getCardNumber(), member.getPassword());
+        }).getMessage();
+        Assertions.assertEquals("User currently has books still issued to their account." +
+                "Please return any loaned books and cancel any book reservations made.", memberExceptionMessage);
+        member.setIssuedBooksTotal(0);
+
+        // If the member has fines they still have to pay and tries to cancel their account,
+        // an exception is thrown.
+        member.setTotalFines(5);
+        memberExceptionMessage = Assertions.assertThrows(ApiRequestException.class, () -> {
+            accountService.cancelMemberAccount(memberCard,
+                    memberCard.getCardNumber(), member.getPassword());
+        }).getMessage();
+        Assertions.assertEquals("User currently has fines still associated with their account." +
+                "Please pay for any fines still present in your account.", memberExceptionMessage);
+        member.setTotalFines(0);
+
+        // If a member has no issues with their account, then they can cancel their account.
+        Assertions.assertDoesNotThrow(() -> {
+            accountService.cancelMemberAccount(memberCard,
+                    memberCard.getCardNumber(), member.getPassword());
+        });
+        Assertions.assertEquals(AccountStatus.CANCELLED, member.getStatus());
+
+        // If a member tries to cancel their account again,
+        // an exception is thrown.
+        memberExceptionMessage = Assertions.assertThrows(ApiRequestException.class, () -> {
+            accountService.cancelMemberAccount(memberCard,
+                    memberCard.getCardNumber(), member.getPassword());
+        }).getMessage();
+        Assertions.assertEquals("Member has already cancelled this account.", memberExceptionMessage);
     }
 }

@@ -3,7 +3,6 @@ package com.example.LibraryManagement.components.services.accounts;
 import com.example.LibraryManagement.components.repositories.accounts.LibrarianRepository;
 import com.example.LibraryManagement.components.repositories.accounts.LibraryCardRepository;
 import com.example.LibraryManagement.components.repositories.accounts.MemberRepository;
-import com.example.LibraryManagement.components.services.ValidationService;
 import com.example.LibraryManagement.models.accounts.types.Librarian;
 import com.example.LibraryManagement.models.accounts.types.Member;
 import com.example.LibraryManagement.models.accounts.LibraryCard;
@@ -14,6 +13,7 @@ import com.example.LibraryManagement.models.interfaces.services.accounts.Account
 import com.example.LibraryManagement.models.io.responses.MessageResponse;
 import com.example.LibraryManagement.models.io.responses.exceptions.ApiRequestException;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,6 +30,7 @@ import java.util.Random;
  * - User authentication for logging into a user's account
  * - Registering users as members with a newly created account using the user's details
  */
+@Getter
 @AllArgsConstructor
 @Service
 public class AccountServiceImp implements AccountService
@@ -256,18 +257,19 @@ public class AccountServiceImp implements AccountService
 
         // If the member's account is already CANCELLED, its status cannot be updated.
         if(currStatus == AccountStatus.CANCELLED)
-            throw new ApiRequestException("This member's account is inactive. The account's status cannot be updated.",
+            throw new ApiRequestException("This member's account is inactive. " +
+                    "The account's status cannot be updated.",
                     HttpStatus.FORBIDDEN);
 
         // If the member's account is already BLACKLISTED, it cannot be blocked again.
         else if(currStatus == AccountStatus.BLACKLISTED && status == AccountStatus.BLACKLISTED)
-            throw new ApiRequestException("This member's account is already blacklisted",
-                    HttpStatus.BAD_REQUEST);
+            throw new ApiRequestException("This member's account is already blacklisted.",
+                    HttpStatus.FORBIDDEN);
 
         // If the member's account is already ACTIVE, it cannot be unblocked again.
         else if(currStatus == AccountStatus.ACTIVE && status == AccountStatus.ACTIVE)
-            throw new ApiRequestException("This member's account is already active",
-                    HttpStatus.BAD_REQUEST);
+            throw new ApiRequestException("This member's account is already active.",
+                    HttpStatus.FORBIDDEN);
 
         // Else, update the member's account status and return a response.
         member.setStatus(status);
@@ -287,7 +289,7 @@ public class AccountServiceImp implements AccountService
                         HttpStatus.BAD_REQUEST);
 
             else if(member.getStatus() == AccountStatus.CANCELLED)
-                throw new ApiRequestException("Member has already cancelled this account",
+                throw new ApiRequestException("Member has already cancelled this account.",
                         HttpStatus.BAD_REQUEST);
 
             else if(member.getStatus() == AccountStatus.BLACKLISTED)
@@ -321,7 +323,7 @@ public class AccountServiceImp implements AccountService
         }
 
         throw new ApiRequestException("User is not a member within the system.",
-                HttpStatus.NOT_FOUND);
+                HttpStatus.CONFLICT);
     }
 
     @Transactional
@@ -361,7 +363,7 @@ public class AccountServiceImp implements AccountService
         }
 
         throw new ApiRequestException("User is not a librarian within the system.",
-                HttpStatus.NOT_FOUND);
+                HttpStatus.CONFLICT);
     }
 
     /*
