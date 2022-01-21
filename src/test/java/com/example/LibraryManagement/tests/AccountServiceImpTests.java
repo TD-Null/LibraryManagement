@@ -202,7 +202,7 @@ public class AccountServiceImpTests
 
     @Test
     @Order(3)
-    void cancelAccounts()
+    void cancelMemberAccounts()
     {
         String memberExceptionMessage = "";
         String librarianExceptionMessage = "";
@@ -222,7 +222,8 @@ public class AccountServiceImpTests
         librarianExceptionMessage = Assertions.assertThrows(ApiRequestException.class, () -> {
             accountService.updateMemberStatus(member, AccountStatus.BLACKLISTED);
         }).getMessage();
-        Assertions.assertEquals("This member's account is already blacklisted.", librarianExceptionMessage);
+        Assertions.assertEquals("This member's account is already blacklisted.",
+                librarianExceptionMessage);
 
         // If the member tries to cancel their account while it is blocked, an exception should be thrown.
         memberExceptionMessage = Assertions.assertThrows(ApiRequestException.class, () -> {
@@ -242,7 +243,30 @@ public class AccountServiceImpTests
         librarianExceptionMessage = Assertions.assertThrows(ApiRequestException.class, () -> {
             accountService.updateMemberStatus(member, AccountStatus.ACTIVE);
         }).getMessage();
-        Assertions.assertEquals("This member's account is already active.", librarianExceptionMessage);
+        Assertions.assertEquals("This member's account is already active.",
+                librarianExceptionMessage);
+
+        // If the library card is not of a member type and they try to cancel their account,
+        // an exception is thrown
+        memberCard.setType(AccountType.LIBRARIAN);
+        memberExceptionMessage = Assertions.assertThrows(ApiRequestException.class, () -> {
+            accountService.cancelMemberAccount(memberCard,
+                    memberCard.getCardNumber(), member.getPassword());
+        }).getMessage();
+        Assertions.assertEquals("User is not a member within the system.",
+                memberExceptionMessage);
+        memberCard.setType(AccountType.MEMBER);
+
+        // If the member's library card has no member association and they try to cancel their account,
+        // an exception is thrown.
+        memberCard.setMember(null);
+        memberExceptionMessage = Assertions.assertThrows(ApiRequestException.class, () -> {
+            accountService.cancelMemberAccount(memberCard,
+                    memberCard.getCardNumber(), member.getPassword());
+        }).getMessage();
+        Assertions.assertEquals("No member is associated with this card.",
+                memberExceptionMessage);
+        memberCard.setMember(member);
 
         // If the member's library card is inactive and they try to cancel their account,
         // an exception is thrown.
@@ -311,6 +335,37 @@ public class AccountServiceImpTests
             accountService.cancelMemberAccount(memberCard,
                     memberCard.getCardNumber(), member.getPassword());
         }).getMessage();
-        Assertions.assertEquals("Member has already cancelled this account.", memberExceptionMessage);
+        Assertions.assertEquals("Member has already cancelled this account.",
+                memberExceptionMessage);
+    }
+
+    @Test
+    @Order(4)
+    void cancelLibrarianAccounts()
+    {
+        String librarianExceptionMessage = "";
+
+        LibraryCard newLibrarianCard = accountService.registerLibrarian(
+                "Librarian",
+                "password",
+                "lib@mail.com",
+                "street",
+                "city",
+                "123456",
+                "US",
+                "1231231234",
+                new Date()).getBody();
+        Librarian newLibrarian = (Librarian) accountService.getAccountDetails(
+                newLibrarianCard, newLibrarianCard.getCardNumber())
+                .getBody();
+
+        // Check that the accounts are of librarians.
+        Assertions.assertEquals(librarian,
+                accountService.barcodeReader(librarianCard, librarianCard.getCardNumber(),
+                        AccountType.LIBRARIAN, AccountStatus.ACTIVE));
+        Assertions.assertEquals(newLibrarian,
+                accountService.barcodeReader(newLibrarianCard, newLibrarianCard.getCardNumber(),
+                        AccountType.LIBRARIAN, AccountStatus.ACTIVE));
+
     }
 }
