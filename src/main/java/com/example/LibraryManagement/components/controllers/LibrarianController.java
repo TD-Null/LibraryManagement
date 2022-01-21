@@ -125,7 +125,8 @@ public class LibrarianController
         LibraryCard card = validationService.cardValidation(request.getBarcode());
         accountService.barcodeReader(card, request.getNumber(),
                 AccountType.LIBRARIAN, AccountStatus.ACTIVE);
-        return accountService.updateMemberStatus(memberId, AccountStatus.BLACKLISTED);
+        Member member = validationService.memberValidation(memberId);
+        return accountService.updateMemberStatus(member, AccountStatus.BLACKLISTED);
     }
 
     @PutMapping("/account/member/unblock")
@@ -135,7 +136,8 @@ public class LibrarianController
         LibraryCard card = validationService.cardValidation(request.getBarcode());
         accountService.barcodeReader(card, request.getNumber(),
                 AccountType.LIBRARIAN, AccountStatus.ACTIVE);
-        return accountService.updateMemberStatus(memberId, AccountStatus.ACTIVE);
+        Member member = validationService.memberValidation(memberId);
+        return accountService.updateMemberStatus(member, AccountStatus.ACTIVE);
     }
 
     @GetMapping("/records/book_loans")

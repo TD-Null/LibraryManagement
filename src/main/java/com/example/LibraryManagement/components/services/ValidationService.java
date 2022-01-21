@@ -1,12 +1,14 @@
 package com.example.LibraryManagement.components.services;
 
 import com.example.LibraryManagement.components.repositories.accounts.LibraryCardRepository;
+import com.example.LibraryManagement.components.repositories.accounts.MemberRepository;
 import com.example.LibraryManagement.components.repositories.books.AuthorRepository;
 import com.example.LibraryManagement.components.repositories.books.BookItemRepository;
 import com.example.LibraryManagement.components.repositories.books.SubjectRepository;
 import com.example.LibraryManagement.components.repositories.fines.FineRepository;
 import com.example.LibraryManagement.components.repositories.books.LibraryRepository;
 import com.example.LibraryManagement.models.accounts.LibraryCard;
+import com.example.LibraryManagement.models.accounts.types.Member;
 import com.example.LibraryManagement.models.books.fines.Fine;
 import com.example.LibraryManagement.models.books.libraries.Library;
 import com.example.LibraryManagement.models.books.properties.Author;
@@ -28,6 +30,8 @@ public class ValidationService
     @Autowired
     private final LibraryCardRepository libraryCardRepository;
     @Autowired
+    private final MemberRepository memberRepository;
+    @Autowired
     private final FineRepository fineRepository;
     @Autowired
     private final BookItemRepository bookItemRepository;
@@ -47,6 +51,19 @@ public class ValidationService
                     HttpStatus.UNAUTHORIZED);
 
         return card.get();
+    }
+
+    public Member memberValidation(Long memberID)
+    {
+        Optional<Member> member = memberRepository.findById(memberID);
+
+        if(member.isEmpty())
+        {
+            throw new ApiRequestException("Unable to find member's account within the system.",
+                    HttpStatus.NOT_FOUND);
+        }
+
+        return member.get();
     }
 
     public Fine fineValidation(Long ID)

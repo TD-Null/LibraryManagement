@@ -250,32 +250,28 @@ public class AccountServiceImp implements AccountService
 
     // Updates a member's account status using the member's ID and the given status update.
     @Transactional
-    public ResponseEntity<MessageResponse> updateMemberStatus(Long memberID, AccountStatus status)
+    public ResponseEntity<MessageResponse> updateMemberStatus(Member member, AccountStatus status)
     {
-        Optional<Member> memberValidation = memberRepository.findById(memberID);
+        AccountStatus currStatus = member.getStatus();
 
-        // First, validate that the given user is a member within the system.
-        if(memberValidation.isPresent())
-        {
-            Member member = memberValidation.get();
-            AccountStatus currStatus = member.getStatus();
+        // If the member's account is already CANCELLED, its status cannot be updated.
+        if(currStatus == AccountStatus.CANCELLED)
+            throw new ApiRequestException("This member's account is inactive. The account's status cannot be updated.",
+                    HttpStatus.FORBIDDEN);
 
-            // If the member's account is already CANCELLED, its status cannot be updated.
-            if(currStatus == AccountStatus.CANCELLED)
-                throw new ApiRequestException("The member's account is inactive. The account's status cannot be updated.",
-                        HttpStatus.FORBIDDEN);
+        // If the member's account is already BLACKLISTED, it cannot be blocked again.
+        else if(currStatus == AccountStatus.BLACKLISTED && status == AccountStatus.BLACKLISTED)
+            throw new ApiRequestException("This member's account is already blacklisted",
+                    HttpStatus.BAD_REQUEST);
 
-            // Else, update the member's account status and return a response.
-            else
-            {
-                member.setStatus(status);
-                return ResponseEntity.ok(new MessageResponse("Member's account status has been updated successfully."));
-            }
-        }
+        // If the member's account is already ACTIVE, it cannot be unblocked again.
+        else if(currStatus == AccountStatus.ACTIVE && status == AccountStatus.ACTIVE)
+            throw new ApiRequestException("This member's account is already active",
+                    HttpStatus.BAD_REQUEST);
 
-        // Else, the account's status cannot be updated as it cannot be found.
-        throw new ApiRequestException("Unable to find member's account within the system.",
-                HttpStatus.NOT_FOUND);
+        // Else, update the member's account status and return a response.
+        member.setStatus(status);
+        return ResponseEntity.ok(new MessageResponse("Member's account status has been updated successfully."));
     }
 
     @Transactional

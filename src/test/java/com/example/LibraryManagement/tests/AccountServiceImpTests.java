@@ -70,6 +70,11 @@ public class AccountServiceImpTests
                 "US",
                 "9543138282",
                 new Date()).getBody();
+
+        member = (Member) accountService.getAccountDetails(
+                memberCard, memberCard.getCardNumber()).getBody();
+        librarian = (Librarian) accountService.getAccountDetails(
+                librarianCard, librarianCard.getCardNumber()).getBody();
     }
 
     // Set all variables to null after each test.
@@ -88,9 +93,6 @@ public class AccountServiceImpTests
     @Order(1)
     void registerAccounts()
     {
-        member = (Member) accountService.getAccountDetails(memberCard, memberCard.getCardNumber()).getBody();
-        librarian = (Librarian) accountService.getAccountDetails(librarianCard, librarianCard.getCardNumber()).getBody();
-
         Assertions.assertEquals(AccountType.MEMBER, memberCard.getType());
         Assertions.assertTrue(memberCard.isActive());
         Assertions.assertEquals(member, memberCard.getMember());
@@ -113,10 +115,6 @@ public class AccountServiceImpTests
     @Order(2)
     void updateAccounts()
     {
-        member = (Member) accountService.getAccountDetails(
-                memberCard, memberCard.getCardNumber()).getBody();
-        librarian = (Librarian) accountService.getAccountDetails(
-                librarianCard, librarianCard.getCardNumber()).getBody();
         String memberExceptionMessage = "";
         String librarianExceptionMessage = "";
 
@@ -205,5 +203,9 @@ public class AccountServiceImpTests
     @Order(3)
     void cancelAccounts()
     {
+        String memberExceptionMessage = "";
+        String librarianExceptionMessage = "";
+
+
     }
 }

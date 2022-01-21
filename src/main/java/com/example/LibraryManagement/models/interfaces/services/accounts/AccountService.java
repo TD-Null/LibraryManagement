@@ -1,6 +1,7 @@
 package com.example.LibraryManagement.models.interfaces.services.accounts;
 
 import com.example.LibraryManagement.models.accounts.LibraryCard;
+import com.example.LibraryManagement.models.accounts.types.Member;
 import com.example.LibraryManagement.models.enums.accounts.AccountStatus;
 import com.example.LibraryManagement.models.enums.accounts.AccountType;
 import com.example.LibraryManagement.models.io.responses.MessageResponse;
@@ -29,7 +30,7 @@ public interface AccountService
 
     ResponseEntity<MessageResponse> changePassword(LibraryCard card, String originalPassword, String newPassword);
 
-    ResponseEntity<MessageResponse> updateMemberStatus(Long memberID, AccountStatus status);
+    ResponseEntity<MessageResponse> updateMemberStatus(Member member, AccountStatus status);
 
     ResponseEntity<MessageResponse> cancelMemberAccount(LibraryCard card, String cardNumber, String password);
 
