@@ -232,7 +232,7 @@ public class AccountServiceImp implements AccountService
 
             if(!librarian.getPassword().equals(originalPassword))
             {
-                throw new ApiRequestException("Invalid Password.", HttpStatus.UNAUTHORIZED);
+                throw new ApiRequestException("Invalid password.", HttpStatus.UNAUTHORIZED);
             }
 
             librarian.setPassword(newPassword);

@@ -130,6 +130,21 @@ public class AccountServiceImpTests
                 "US",
                 "daniel@mail.com",
                 "9541087310").getBody();
+
+        memberExceptionMessage = Assertions.assertThrows(ApiRequestException.class, () -> {
+            accountService.updateAccountDetails(
+                memberCard,
+                "123456",
+                "Daniel Manning",
+                "daniel's street",
+                "daniel's city",
+                "111111",
+                "US",
+                "daniel@mail.com",
+                "9541087310");
+        }).getMessage();
+        Assertions.assertEquals("Invalid credentials.", memberExceptionMessage);
+
         accountService.changePassword(memberCard, member.getPassword(), "9035DM");
         memberExceptionMessage = Assertions.assertThrows(ApiRequestException.class, () -> {
             accountService.changePassword(memberCard, "1234DM", "1029DM");
@@ -146,9 +161,24 @@ public class AccountServiceImpTests
                 "US",
                 "manny@mail.com",
                 "9543138282").getBody();
+
+        librarianExceptionMessage = Assertions.assertThrows(ApiRequestException.class, () -> {
+            accountService.updateAccountDetails(
+                    librarianCard,
+                    "123456",
+                    "Manny South",
+                    "manny's street",
+                    "manny's city",
+                    "444444",
+                    "US",
+                    "manny@mail.com",
+                    "9543138282");
+        }).getMessage();
+        Assertions.assertEquals("Invalid credentials.", librarianExceptionMessage);
+
         accountService.changePassword(librarianCard, librarian.getPassword(), "2039MS");
         librarianExceptionMessage = Assertions.assertThrows(ApiRequestException.class, () -> {
-            accountService.changePassword(librarianCard, "1234DM", "1029DM");
+            accountService.changePassword(librarianCard, "1234MS", "1029MS");
         }).getMessage();
         Assertions.assertEquals("Invalid password.", librarianExceptionMessage);
 
