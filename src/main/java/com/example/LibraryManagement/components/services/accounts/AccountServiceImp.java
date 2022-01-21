@@ -44,14 +44,8 @@ public class AccountServiceImp implements AccountService
     private final ValidationService validationService;
 
     // Returns the user's account details using their library card's barcode.
-    public ResponseEntity<Object> getAccountDetails(Long barcode, String number)
+    public ResponseEntity<Object> getAccountDetails(LibraryCard card, String number)
     {
-        /*
-         * Ensure that the card exists within the database of the system using its barcode.
-         * Afterwards, get the account user associated with the given library card and if
-         * available, return the user's details.
-         */
-        LibraryCard card = validationService.cardValidation(barcode);
         AccountType type = card.getType();
 
         if(!card.getCardNumber().equals(number))
@@ -115,7 +109,7 @@ public class AccountServiceImp implements AccountService
     @Transactional
     public ResponseEntity<LibraryCard> registerMember(String name, String password, String email,
                                                       String streetAddress, String city, String zipcode,
-                                                      String country, String phoneNumber)
+                                                      String country, String phoneNumber, Date currDate)
     {
         // First, validate that the user's email isn't already being used in the website's other user accounts.
         if(memberRepository.findMemberByEmail(email).isPresent())
@@ -123,9 +117,6 @@ public class AccountServiceImp implements AccountService
             throw new ApiRequestException("Failed to create the account with the given credentials.",
                     HttpStatus.CONFLICT);
         }
-
-        // Get the current date when creating this account.
-        Date currDate = new Date();
 
         // Use the given details of the user to create an account and save to the repository.
         Address address = new Address(streetAddress, city, zipcode, country);
@@ -149,7 +140,7 @@ public class AccountServiceImp implements AccountService
     @Transactional
     public ResponseEntity<LibraryCard> registerLibrarian(String name, String password, String email,
                                                          String streetAddress, String city, String zipcode,
-                                                         String country, String phoneNumber)
+                                                         String country, String phoneNumber, Date currDate)
     {
         // First, validate that the user's email isn't already being used in the website's other user accounts.
         if(librarianRepository.findLibrarianByEmail(email).isPresent())
@@ -157,9 +148,6 @@ public class AccountServiceImp implements AccountService
             throw new ApiRequestException("Failed to create the account with the given credentials.",
                     HttpStatus.CONFLICT);
         }
-
-        // Get the current date when creating this account.
-        Date currDate = new Date();
 
         // Use the given details of the user to create an account and save to the repository.
         Address address = new Address(streetAddress, city, zipcode, country);
@@ -180,16 +168,10 @@ public class AccountServiceImp implements AccountService
     }
 
     @Transactional
-    public ResponseEntity<MessageResponse> updateAccountDetails(Long barcode, String number, String name,
+    public ResponseEntity<MessageResponse> updateAccountDetails(LibraryCard card, String number, String name,
                                                                 String streetAddress, String city, String zipcode,
                                                                 String country, String email, String phoneNumber)
     {
-        /*
-         * Ensure that the card exists within the database of the system using its barcode.
-         * Afterwards, get the account user associated with the given library card and if
-         * available, edit the user's details.
-         */
-        LibraryCard card = validationService.cardValidation(barcode);
         AccountType type = card.getType();
 
         if(!card.getCardNumber().equals(number))
@@ -226,14 +208,9 @@ public class AccountServiceImp implements AccountService
     }
 
     @Transactional
-    public ResponseEntity<MessageResponse> changePassword(Long barcode, String originalPassword, String newPassword)
+    public ResponseEntity<MessageResponse> changePassword(LibraryCard card,
+                                                          String originalPassword, String newPassword)
     {
-        /*
-         * Ensure that the card exists within the database of the system using its barcode.
-         * Afterwards, get the account user associated with the given library card and if
-         * available, change the user's password.
-         */
-        LibraryCard card = validationService.cardValidation(barcode);
         AccountType type = card.getType();
 
         if(type == AccountType.MEMBER && card.getMember() != null)
@@ -303,10 +280,9 @@ public class AccountServiceImp implements AccountService
     }
 
     @Transactional
-    public ResponseEntity<MessageResponse> cancelMemberAccount(Long barcode, String cardNumber, String password)
+    public ResponseEntity<MessageResponse> cancelMemberAccount(LibraryCard card,
+                                                               String cardNumber, String password)
     {
-        LibraryCard card = validationService.cardValidation(barcode);
-
         if(card.getType() == AccountType.MEMBER)
         {
             Member member = card.getMember();
@@ -354,10 +330,8 @@ public class AccountServiceImp implements AccountService
     }
 
     @Transactional
-    public ResponseEntity<MessageResponse> cancelLibrarianAccount(Long barcode, String cardNumber)
+    public ResponseEntity<MessageResponse> cancelLibrarianAccount(LibraryCard card, String cardNumber)
     {
-        LibraryCard card = validationService.cardValidation(barcode);
-
         if(card.getType() == AccountType.LIBRARIAN)
         {
             Librarian librarian = card.getLibrarian();

@@ -22,8 +22,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.junit4.SpringRunner;
+
+import java.util.Date;
 
 @ExtendWith(SpringExtension.class)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -31,16 +34,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 public class ServiceImpTests
 {
     // Services being tested.
-    @Autowired
     private AccountServiceImp accountService;
-    @Autowired
-    private LibrarianServiceImp librarianService;
-    @Autowired
-    private MemberServiceImp memberService;
-    @Autowired
-    private ViewCatalogServiceImp viewCatalogService;
-    @Autowired
-    private UpdateCatalogServiceImp updateCatalogService;
 
     // Sample members and librarians.
     private Member daniel;
@@ -66,7 +60,8 @@ public class ServiceImpTests
                 "daniel's city",
                 "111111",
                 "US",
-                "9541087310").getBody();
+                "9541087310",
+                new Date()).getBody();
         daniel = danielCard.getMember();
 
         sarahCard = accountService.registerMember(
@@ -77,7 +72,8 @@ public class ServiceImpTests
                 "sarah's city",
                 "222222",
                 "US",
-                "9541504231").getBody();
+                "9541504231",
+                new Date()).getBody();
         sarah = sarahCard.getMember();
 
         kyleCard = accountService.registerMember(
@@ -88,7 +84,8 @@ public class ServiceImpTests
                 "kyle's city",
                 "333333",
                 "US",
-                "9542081690").getBody();
+                "9542081690",
+                new Date()).getBody();
         kyle = kyleCard.getMember();
 
         mannyCard = accountService.registerLibrarian(
@@ -99,7 +96,8 @@ public class ServiceImpTests
                 "manny's city",
                 "444444",
                 "US",
-                "9543138282").getBody();
+                "9543138282",
+                new Date()).getBody();
         manny = mannyCard.getLibrarian();
     }
 

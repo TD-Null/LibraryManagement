@@ -3,6 +3,7 @@ package com.example.LibraryManagement.components.controllers;
 import com.example.LibraryManagement.components.services.accounts.AccountServiceImp;
 import com.example.LibraryManagement.components.services.accounts.MemberServiceImp;
 import com.example.LibraryManagement.components.services.ValidationService;
+import com.example.LibraryManagement.models.accounts.LibraryCard;
 import com.example.LibraryManagement.models.accounts.types.Member;
 import com.example.LibraryManagement.models.books.actions.BookLending;
 import com.example.LibraryManagement.models.books.actions.BookReservation;
@@ -249,6 +250,8 @@ public class MemberController
     @DeleteMapping("/cancel")
     public ResponseEntity<MessageResponse> cancelMembership(@Valid @RequestBody CancelMembershipRequest request)
     {
-        return accountService.cancelMemberAccount(request.getBarcode(), request.getNumber(), request.getPassword());
+        LibraryCard libraryCard = validationService.cardValidation(request.getBarcode());
+        return accountService.cancelMemberAccount(libraryCard,
+                request.getNumber(), request.getPassword());
     }
 }

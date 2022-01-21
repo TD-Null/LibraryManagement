@@ -1,5 +1,6 @@
 package com.example.LibraryManagement.components.controllers;
 
+import com.example.LibraryManagement.components.services.ValidationService;
 import com.example.LibraryManagement.components.services.accounts.AccountServiceImp;
 import com.example.LibraryManagement.components.services.catalogs.UpdateCatalogServiceImp;
 import com.example.LibraryManagement.components.services.accounts.LibrarianServiceImp;
@@ -29,6 +30,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import javax.validation.Validator;
+import java.util.Date;
 import java.util.List;
 
 /*
@@ -52,6 +55,8 @@ public class LibrarianController
     private final LibrarianServiceImp librarianService;
     @Autowired
     private final UpdateCatalogServiceImp updateCatalogService;
+    @Autowired
+    private final ValidationService validationService;
 
     @GetMapping("/account/member")
     public ResponseEntity<List<Member>> viewAllMembers(@RequestParam(value = "barcode") Long barcode,
@@ -78,7 +83,8 @@ public class LibrarianController
                 request.getName(), request.getPassword(),
                 request.getEmail(), request.getStreetAddress(),
                 request.getCity(), request.getZipcode(),
-                request.getCountry(), request.getPhoneNumber());
+                request.getCountry(), request.getPhoneNumber(),
+                new Date());
     }
 
     @PostMapping("/account/librarian/add")
@@ -90,7 +96,8 @@ public class LibrarianController
                 request.getName(), request.getPassword(),
                 request.getEmail(), request.getStreetAddress(),
                 request.getCity(), request.getZipcode(),
-                request.getCountry(), request.getPhoneNumber());
+                request.getCountry(), request.getPhoneNumber(),
+                new Date());
     }
 
     @DeleteMapping("account/librarian/remove")
@@ -98,8 +105,8 @@ public class LibrarianController
     {
         accountService.barcodeReader(request.getBarcode(), request.getNumber(),
                 AccountType.LIBRARIAN, AccountStatus.ACTIVE);
-        return accountService.cancelLibrarianAccount(
-                request.getLibrarianCardBarcode(), request.getLibrarianCardNumber());
+        LibraryCard libraryCard = validationService.cardValidation(request.getLibrarianCardBarcode());
+        return accountService.cancelLibrarianAccount(libraryCard, request.getLibrarianCardNumber());
     }
 
     @PutMapping("/account/member/block")

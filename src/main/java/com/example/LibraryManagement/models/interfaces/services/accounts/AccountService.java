@@ -6,32 +6,34 @@ import com.example.LibraryManagement.models.enums.accounts.AccountType;
 import com.example.LibraryManagement.models.io.responses.MessageResponse;
 import org.springframework.http.ResponseEntity;
 
+import java.util.Date;
+
 // Methods used in a service component relating to accounts.
 public interface AccountService
 {
-    ResponseEntity<Object> getAccountDetails(Long barcode, String number);
-
-    ResponseEntity<MessageResponse> updateAccountDetails(Long barcode, String number, String name,
-                                                         String streetAddress, String city, String zipcode,
-                                                         String country, String email, String phoneNumber);
-
-    ResponseEntity<MessageResponse> changePassword(Long barcode, String originalPassword, String newPassword);
+    ResponseEntity<Object> getAccountDetails(LibraryCard card, String number);
 
     ResponseEntity<LibraryCard> authenticateUser(String libraryCardNumber, String password);
 
     ResponseEntity<LibraryCard> registerMember(String name, String password, String email,
                                                String streetAddress, String city, String zipcode,
-                                               String country, String phoneNumber);
+                                               String country, String phoneNumber, Date currDate);
 
     ResponseEntity<LibraryCard> registerLibrarian(String name, String password, String email,
                                                   String streetAddress, String city, String zipcode,
-                                                  String country, String phoneNumber);
+                                                  String country, String phoneNumber, Date currDate);
+
+    ResponseEntity<MessageResponse> updateAccountDetails(LibraryCard card, String number, String name,
+                                                         String streetAddress, String city, String zipcode,
+                                                         String country, String email, String phoneNumber);
+
+    ResponseEntity<MessageResponse> changePassword(LibraryCard card, String originalPassword, String newPassword);
 
     ResponseEntity<MessageResponse> updateMemberStatus(Long memberID, AccountStatus status);
 
-    ResponseEntity<MessageResponse> cancelMemberAccount(Long barcode, String cardNumber, String password);
+    ResponseEntity<MessageResponse> cancelMemberAccount(LibraryCard card, String cardNumber, String password);
 
-    ResponseEntity<MessageResponse> cancelLibrarianAccount(Long barcode, String cardNumber);
+    ResponseEntity<MessageResponse> cancelLibrarianAccount(LibraryCard card, String cardNumber);
 
     Object barcodeReader(Long barcode, String number, AccountType type, AccountStatus status);
 }

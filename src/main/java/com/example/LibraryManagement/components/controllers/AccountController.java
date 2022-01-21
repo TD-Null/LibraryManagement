@@ -1,5 +1,6 @@
 package com.example.LibraryManagement.components.controllers;
 
+import com.example.LibraryManagement.components.services.ValidationService;
 import com.example.LibraryManagement.components.services.accounts.AccountServiceImp;
 import com.example.LibraryManagement.models.accounts.LibraryCard;
 import com.example.LibraryManagement.models.io.requests.*;
@@ -10,6 +11,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import javax.validation.Validator;
+import java.util.Date;
 
 /*
  * Controller component containing the API requests relating to accounts:
@@ -28,6 +31,8 @@ public class AccountController
 {
     @Autowired
     private final AccountServiceImp accountService;
+    @Autowired
+    private final ValidationService validationService;
 
     /*
      * Account details GET request.
@@ -39,7 +44,8 @@ public class AccountController
     public ResponseEntity<Object> viewAccountDetails(@RequestParam(value = "barcode") Long barcode,
                                                      @RequestParam(value = "card") String number)
     {
-        return accountService.getAccountDetails(barcode, number);
+        LibraryCard libraryCard = validationService.cardValidation(barcode);
+        return accountService.getAccountDetails(libraryCard, number);
     }
 
     /*
@@ -66,7 +72,7 @@ public class AccountController
         return accountService.registerMember(signUpRequest.getName(), signUpRequest.getPassword(),
                 signUpRequest.getEmail(), signUpRequest.getStreetAddress(),
                 signUpRequest.getCity(), signUpRequest.getZipcode(),
-                signUpRequest.getCountry(), signUpRequest.getPhoneNumber());
+                signUpRequest.getCountry(), signUpRequest.getPhoneNumber(), new Date());
     }
 
     /*
@@ -79,7 +85,8 @@ public class AccountController
     @PutMapping("/update")
     public ResponseEntity<MessageResponse> editAccountDetails(@Valid @RequestBody UpdateAccountRequest request)
     {
-        return accountService.updateAccountDetails(request.getBarcode(), request.getNumber(),
+        LibraryCard libraryCard = validationService.cardValidation(request.getBarcode());
+        return accountService.updateAccountDetails(libraryCard, request.getNumber(),
                 request.getName(), request.getStreetAddress(), request.getCity(),
                 request.getZipcode(), request.getCountry(), request.getEmail(),
                 request.getPhoneNumber());
@@ -95,6 +102,7 @@ public class AccountController
     @PutMapping("/update/password")
     public ResponseEntity<MessageResponse> changePassword(@Valid @RequestBody ChangePasswordRequest request)
     {
-        return accountService.changePassword(request.getBarcode(), request.getOriginalPassword(), request.getNewPassword());
+        LibraryCard libraryCard = validationService.cardValidation(request.getBarcode());
+        return accountService.changePassword(libraryCard, request.getOriginalPassword(), request.getNewPassword());
     }
 }
