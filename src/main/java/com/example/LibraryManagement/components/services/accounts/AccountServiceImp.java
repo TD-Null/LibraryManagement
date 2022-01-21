@@ -40,8 +40,6 @@ public class AccountServiceImp implements AccountService
     private final LibrarianRepository librarianRepository;
     @Autowired
     private final MemberRepository memberRepository;
-    @Autowired
-    private final ValidationService validationService;
 
     // Returns the user's account details using their library card's barcode.
     public ResponseEntity<Object> getAccountDetails(LibraryCard card, String number)
