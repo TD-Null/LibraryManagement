@@ -116,8 +116,8 @@ public class AccountServiceImpTests
     @Order(2)
     void updateAccounts()
     {
-        String memberExceptionMessage = "";
-        String librarianExceptionMessage = "";
+        String memberExceptionMessage;
+        String librarianExceptionMessage;
 
         accountService.updateAccountDetails(
                 memberCard,
@@ -204,8 +204,8 @@ public class AccountServiceImpTests
     @Order(3)
     void cancelMemberAccounts()
     {
-        String memberExceptionMessage = "";
-        String librarianExceptionMessage = "";
+        String memberExceptionMessage;
+        String librarianExceptionMessage;
 
         // Check that the account is of a librarian.
         Assertions.assertEquals(librarian,
@@ -345,7 +345,7 @@ public class AccountServiceImpTests
     @Order(4)
     void cancelLibrarianAccounts()
     {
-        String librarianExceptionMessage = "";
+        String librarianExceptionMessage;
 
         // Create a new librarian.
         LibraryCard newLibrarianCard = accountService.registerLibrarian(
@@ -395,10 +395,9 @@ public class AccountServiceImpTests
         // If librarian account is already cancelled,
         // an exception is thrown.
         newLibrarian.setStatus(AccountStatus.CANCELLED);
-        librarianExceptionMessage = Assertions.assertThrows(ApiRequestException.class, () -> {
-            accountService.cancelLibrarianAccount(newLibrarianCard,
-                    newLibrarianCard.getCardNumber());
-        }).getMessage();
+        librarianExceptionMessage = Assertions.assertThrows(ApiRequestException.class, () ->
+                accountService.cancelLibrarianAccount(newLibrarianCard,
+                newLibrarianCard.getCardNumber())).getMessage();
         Assertions.assertEquals("Librarian's account has already been cancelled.",
                 librarianExceptionMessage);
         newLibrarian.setStatus(AccountStatus.ACTIVE);
@@ -447,10 +446,9 @@ public class AccountServiceImpTests
 
         // If a librarian's account is being cancelled again,
         // an exception is thrown.
-        librarianExceptionMessage = Assertions.assertThrows(ApiRequestException.class, () -> {
-            accountService.cancelLibrarianAccount(newLibrarianCard,
-                    newLibrarianCard.getCardNumber());
-        }).getMessage();
+        librarianExceptionMessage = Assertions.assertThrows(ApiRequestException.class, () ->
+                accountService.cancelLibrarianAccount(newLibrarianCard,
+                newLibrarianCard.getCardNumber())).getMessage();
         Assertions.assertEquals("Librarian's account has already been cancelled.",
                 librarianExceptionMessage);
     }
