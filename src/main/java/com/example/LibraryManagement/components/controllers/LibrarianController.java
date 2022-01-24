@@ -186,6 +186,7 @@ public class LibrarianController
         accountService.barcodeReader(card, request.getNumber(),
                 AccountType.LIBRARIAN, AccountStatus.ACTIVE);
 
+        validationService.addLibraryValidation(request.getLibraryName());
         return updateCatalogService.addLibrary(request.getLibraryName(), request.getStreetAddress(), request.getCity(),
                 request.getZipcode(), request.getCountry());
     }

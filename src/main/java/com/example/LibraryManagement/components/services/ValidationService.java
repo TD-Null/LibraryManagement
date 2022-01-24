@@ -103,6 +103,13 @@ public class ValidationService
         return library.get();
     }
 
+    public void addLibraryValidation(String library)
+    {
+        if(libraryRepository.existsById(library))
+            throw new ApiRequestException("Library already exists within the system.",
+                    HttpStatus.CONFLICT);
+    }
+
     public BookItem bookValidation(Long barcode)
     {
         Optional<BookItem> bookItem = bookItemRepository.findById(barcode);

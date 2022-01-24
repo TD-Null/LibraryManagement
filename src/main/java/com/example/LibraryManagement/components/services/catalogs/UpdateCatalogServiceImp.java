@@ -47,10 +47,6 @@ public class UpdateCatalogServiceImp implements UpdateCatalogService
     public ResponseEntity<MessageResponse> addLibrary(String name, String streetAddress, String city,
                                                       String zipcode, String country)
     {
-        if(libraryRepository.existsById(name))
-            throw new ApiRequestException("Library already exists within the system.",
-                    HttpStatus.CONFLICT);
-
         libraryRepository.save(new Library(name, new Address(streetAddress, city, zipcode, country)));
         return ResponseEntity.ok(new MessageResponse("Library has been successfully added to the system."));
     }
@@ -180,7 +176,8 @@ public class UpdateCatalogServiceImp implements UpdateCatalogService
     public ResponseEntity<MessageResponse> removeBookItem(BookItem book)
     {
         if(book.getCurrLoanMember() != null && book.getStatus() == BookStatus.LOANED)
-            throw new ApiRequestException("This book is currently not available and is loaned to a member.", HttpStatus.ACCEPTED);
+            throw new ApiRequestException("This book is currently not available and is loaned to a member.",
+                    HttpStatus.CONFLICT);
 
         else if(book.getCurrReservedMember() != null && book.getStatus() == BookStatus.RESERVED)
         {
@@ -227,6 +224,11 @@ public class UpdateCatalogServiceImp implements UpdateCatalogService
     @Transactional
     public ResponseEntity<MessageResponse> removeSubject(Subject subject)
     {
+        Set<BookItem> subjectBooks = subject.getBooks();
+
+        for(BookItem b: subjectBooks)
+            b.removeSubject(subject);
+
         subject.clearBooks();
         subjectRepository.delete(subject);
         return ResponseEntity.ok(new MessageResponse("Subject has been successfully removed from the system."));
