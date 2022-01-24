@@ -23,6 +23,10 @@ import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
+/*
+ * Stores reusable code primarily used for validation within the repositories
+ * of the application.
+ */
 @AllArgsConstructor
 @Service
 public class ValidationService
