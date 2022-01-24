@@ -92,6 +92,9 @@ public class AccountServiceImpTests
     @Order(1)
     void registerAccounts()
     {
+        String memberExceptionMessage;
+        String librarianExceptionMessage;
+
         // Check if the service has returned the right account information
         // for both the member and librarian.
         Assertions.assertEquals(AccountType.MEMBER, memberCard.getType());
@@ -101,6 +104,15 @@ public class AccountServiceImpTests
         Assertions.assertEquals(member,
                 accountService.barcodeReader(memberCard, memberCard.getCardNumber(),
                         AccountType.MEMBER, AccountStatus.ACTIVE));
+        Assertions.assertDoesNotThrow(() -> {
+            accountService.authenticateUser(memberCard, member.getPassword());
+        });
+        memberExceptionMessage = Assertions.assertThrows(ApiRequestException.class, () -> {
+            accountService.authenticateUser(memberCard, "123456");
+        }).getMessage();
+        Assertions.assertEquals("Invalid credentials. " +
+                "(Wrong library card number or password)",
+                memberExceptionMessage);
 
         Assertions.assertEquals(AccountType.LIBRARIAN, librarianCard.getType());
         Assertions.assertTrue(librarianCard.isActive());
@@ -109,6 +121,15 @@ public class AccountServiceImpTests
         Assertions.assertEquals(librarian,
                 accountService.barcodeReader(librarianCard, librarianCard.getCardNumber(),
                         AccountType.LIBRARIAN, AccountStatus.ACTIVE));
+        Assertions.assertDoesNotThrow(() -> {
+            accountService.authenticateUser(librarianCard, librarian.getPassword());
+        });
+        librarianExceptionMessage = Assertions.assertThrows(ApiRequestException.class, () -> {
+            accountService.authenticateUser(librarianCard, "123456");
+        }).getMessage();
+        Assertions.assertEquals("Invalid credentials. " +
+                        "(Wrong library card number or password)",
+                librarianExceptionMessage);
     }
 
     // Test if accounts are updated properly.
