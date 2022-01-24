@@ -39,9 +39,11 @@ public class BookItem extends Book
     @JoinColumn(name = "library_name")
     private Library library;
 
+    @JsonIgnore
     @Column(name = "Rack")
     private int rackNumber;
 
+    @JsonIgnore
     @Column(name = "Location")
     private String locationIdentifier;
 
@@ -109,19 +111,21 @@ public class BookItem extends Book
     private Set<BookReservation> reservationRecords = new HashSet<>();
 
     public BookItem(String ISBN, String title, String publisher,
-                    String language, int numberOfPages, int rackNumber,
-                    String locationIdentifier, BookFormat format, BookStatus status,
-                    Date publicationDate, boolean isReferenceOnly, double price)
+                    String language, int numberOfPages, Rack rack,
+                    BookFormat format, BookStatus status,
+                    Date publicationDate, boolean isReferenceOnly,
+                    double price)
     {
         super(ISBN, title, publisher, language, numberOfPages);
-        this.rackNumber = rackNumber;
-        this.locationIdentifier = locationIdentifier;
+        setRack(rack);
         this.format = format;
         this.status = status;
         this.publicationDate = publicationDate;
         this.isReferenceOnly = isReferenceOnly;
         this.price = price;
     }
+
+    public Rack getRack(Rack r) { return new Rack(rackNumber, locationIdentifier); }
 
     public void setRack(Rack r)
     {

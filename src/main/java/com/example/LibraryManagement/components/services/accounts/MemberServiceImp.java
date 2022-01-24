@@ -52,7 +52,7 @@ public class MemberServiceImp implements MemberService
     @Autowired
     private final CashTransactionRepository cashTransactionRepository;
 
-    private static final double finePerDay = 1.0;
+    private static final double finePerDay = 0.75;
 
     @Transactional
     public ResponseEntity<BookItem> checkoutBook(Member member, BookItem book, Date currDate)

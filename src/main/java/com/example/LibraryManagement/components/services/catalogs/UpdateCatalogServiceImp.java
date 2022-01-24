@@ -61,9 +61,9 @@ public class UpdateCatalogServiceImp implements UpdateCatalogService
                                                        Author author, Set<Subject> subjects, BookFormat format,
                                                        Date publicationDate, boolean isReferenceOnly, double price)
     {
-        BookItem bookItem = new BookItem(ISBN, title, publisher, language, numberOfPages,
-                rack.getNumber(), rack.getLocation(), format, BookStatus.AVAILABLE, publicationDate,
-                isReferenceOnly, price);
+        BookItem bookItem = new BookItem(ISBN, title, publisher, language,
+                numberOfPages, rack, format, BookStatus.AVAILABLE,
+                publicationDate, isReferenceOnly, price);
 
         bookItemRepository.save(bookItem);
 
