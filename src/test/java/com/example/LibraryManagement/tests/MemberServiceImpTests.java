@@ -373,9 +373,8 @@ public class MemberServiceImpTests
     {
         // If a book is currently not loaned to a member and is being returned,
         // an exception is thrown.
-        memberExceptionMessage = Assertions.assertThrows(ApiRequestException.class, () -> {
-            memberService.returnBook(member1, book4, df.parse("2020-10-10"));
-        }).getMessage();
+        memberExceptionMessage = Assertions.assertThrows(ApiRequestException.class, () ->
+                memberService.returnBook(member1, book4, df.parse("2020-10-10"))).getMessage();
         Assertions.assertEquals("Book cannot be returned as it is not " +
                 "currently being loaned to a member.",
                 memberExceptionMessage);
@@ -387,8 +386,29 @@ public class MemberServiceImpTests
         }).getMessage();
         Assertions.assertEquals("This book is not issued to this user.",
                 memberExceptionMessage);
-    }
 
+        // If the book is returned in time by the member, no fine is issued
+        // and the book will be available or currently reserved for another
+        // member if reserved while it was being loaned.
+        Assertions.assertDoesNotThrow(() ->
+                memberService.returnBook(member1, book1,
+                new Date(borrowDate1.getTime() +
+                        5 * (1000 * 60 * 60 * 24))));
+        Assertions.assertNull(book1.getCurrLoanMember());
+        Assertions.assertEquals(1, member1.getIssuedBooksTotal());
+
+        Assertions.assertEquals(BookStatus.RESERVED, book1.getStatus());
+        Assertions.assertEquals(member2, book1.getCurrReservedMember());
+        Assertions.assertDoesNotThrow(() ->
+                memberService.checkoutBook(member2, book1,
+                new Date(borrowDate1.getTime() +
+                        5 * (1000 * 60 * 60 * 24))));
+        Assertions.assertEquals(BookStatus.LOANED, book1.getStatus());
+        Assertions.assertNull(book1.getCurrReservedMember());
+        Assertions.assertEquals(member2, book1.getCurrLoanMember());
+        Assertions.assertEquals(2, member2.getIssuedBooksTotal());
+
+    }
 
     @Test
     @Order(4)
