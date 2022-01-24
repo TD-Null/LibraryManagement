@@ -84,8 +84,8 @@ public class MemberServiceImpTests
     static void setUpAll() throws ParseException
     {
         borrowDate1 = df.parse("2020-10-01");
-        borrowDate2 = df.parse("2020-10-10");
-        borrowDate3 = df.parse("2020-10-05");
+        borrowDate2 = df.parse("2020-10-05");
+        borrowDate3 = df.parse("2020-10-10");
         borrowDate4 = df.parse("2020-10-15");
 
         book1 = new BookItem(
@@ -279,27 +279,126 @@ public class MemberServiceImpTests
         }).getMessage();
         Assertions.assertEquals("This user is already borrowing this book.",
                 memberExceptionMessage);
-
-
     }
 
     @Test
     @Order(2)
     void reserveBook()
     {
+        // If the book is only a reference when reserving a book,
+        // an exception is thrown.
+        book3.setReferenceOnly(true);
+        memberExceptionMessage = Assertions.assertThrows(ApiRequestException.class, () -> {
+            memberService.reserveBook(member1, book3, df.parse("2020-10-03"));
+        }).getMessage();
+        Assertions.assertEquals("Sorry, but this book is only for reference " +
+                        "and cannot be borrowed.",
+                memberExceptionMessage);
+        book3.setReferenceOnly(false);
 
+        // If the book is currently lost,
+        // an exception is thrown.
+        book3.setStatus(BookStatus.LOST);
+        memberExceptionMessage = Assertions.assertThrows(ApiRequestException.class, () -> {
+            memberService.reserveBook(member1, book3, df.parse("2020-10-03"));
+        }).getMessage();
+        Assertions.assertEquals("Sorry, but the book is lost and " +
+                        "cannot be found at the time.",
+                memberExceptionMessage);
+        book3.setStatus(BookStatus.AVAILABLE);
+
+        // If the member is currently at the limit of books issued and
+        // tries to reserve a book, an exception is thrown.
+        int currIssuedBooksTotal = member1.getIssuedBooksTotal();
+        member1.setIssuedBooksTotal(5);
+        memberExceptionMessage = Assertions.assertThrows(ApiRequestException.class, () -> {
+            memberService.reserveBook(member1, book3, df.parse("2020-10-03"));
+        }).getMessage();
+        Assertions.assertEquals("Sorry, but the user is currently at the maximum limit " +
+                        "on how many books can be issued to them.",
+                memberExceptionMessage);
+        member1.setIssuedBooksTotal(currIssuedBooksTotal);
+
+        // If there are no issues with the book or the member,
+        // the member can reserve the book.
+        Assertions.assertDoesNotThrow(() -> {
+            memberService.reserveBook(member1, book3, df.parse("2020-10-03"));
+        });
+        Assertions.assertEquals(member1, book3.getCurrReservedMember());
+        Assertions.assertEquals(BookStatus.RESERVED, book3.getStatus());
+        Assertions.assertEquals(2, member1.getIssuedBooksTotal());
+
+        // A member is able to reserve a book that is currently
+        // loaned to another member.
+        Assertions.assertDoesNotThrow(() -> {
+            memberService.reserveBook(member2, book1, df.parse("2020-10-03"));
+        });
+        Assertions.assertEquals(member2, book1.getCurrReservedMember());
+        Assertions.assertEquals(BookStatus.LOANED, book1.getStatus());
+        Assertions.assertEquals(2, member2.getIssuedBooksTotal());
+
+        // If the books is currently reserved for another member
+        // and a member tries to reserve the book, an exception
+        // is thrown.
+        memberExceptionMessage = Assertions.assertThrows(ApiRequestException.class, () -> {
+            memberService.reserveBook(member2, book3, df.parse("2020-10-03"));
+        }).getMessage();
+        Assertions.assertEquals("Sorry, but this book is currently " +
+                        "reserved for another member",
+                memberExceptionMessage);
+
+        // If a member tries to reserve a book they already reserved,
+        // an exception is thrown.
+        memberExceptionMessage = Assertions.assertThrows(ApiRequestException.class, () -> {
+            memberService.reserveBook(member1, book3, df.parse("2020-10-03"));
+        }).getMessage();
+        Assertions.assertEquals("This user has already reserved this book.",
+                memberExceptionMessage);
+
+        // If the member has the book reserved and is not currently loaned
+        // to another member, then the member can proceed with borrowing the
+        // book.
+        Assertions.assertDoesNotThrow(() -> {
+            memberService.checkoutBook(member1, book3, borrowDate3);
+        });
+        Assertions.assertEquals(member1, book3.getCurrLoanMember());
+        Assertions.assertNull(book3.getCurrReservedMember());
+        Assertions.assertEquals(BookStatus.LOANED, book3.getStatus());
+        Assertions.assertEquals(2, member1.getIssuedBooksTotal());
     }
 
     @Test
     @Order(3)
+    void returnBook()
+    {
+        // If a book is currently not loaned to a member and is being returned,
+        // an exception is thrown.
+        memberExceptionMessage = Assertions.assertThrows(ApiRequestException.class, () -> {
+            memberService.returnBook(member1, book4, df.parse("2020-10-10"));
+        }).getMessage();
+        Assertions.assertEquals("Book cannot be returned as it is not " +
+                "currently being loaned to a member.",
+                memberExceptionMessage);
+
+        // If a book is not being returned by the same member that it is loaned to,
+        // an exception is thrown.
+        memberExceptionMessage = Assertions.assertThrows(ApiRequestException.class, () -> {
+            memberService.returnBook(member2, book3, df.parse("2020-10-10"));
+        }).getMessage();
+        Assertions.assertEquals("This book is not issued to this user.",
+                memberExceptionMessage);
+    }
+
+
+    @Test
+    @Order(4)
     void renewBook()
     {
 
     }
-
     @Test
-    @Order(4)
-    void returnBook()
+    @Order(5)
+    void payFine()
     {
 
     }

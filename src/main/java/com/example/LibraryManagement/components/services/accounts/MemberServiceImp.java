@@ -138,7 +138,8 @@ public class MemberServiceImp implements MemberService
         MessageResponse response = new MessageResponse("Book has been returned.");
 
         if(book.getStatus() != BookStatus.LOANED || book.getCurrLoanMember() == null)
-            throw new ApiRequestException("Book cannot be returned as it is not currently being loaned to a member.",
+            throw new ApiRequestException("Book cannot be returned as it is not " +
+                    "currently being loaned to a member.",
                     HttpStatus.BAD_REQUEST);
 
         else if(!book.getCurrLoanMember().equals(member))
@@ -218,7 +219,8 @@ public class MemberServiceImp implements MemberService
             Member reservedMember = book.getCurrReservedMember();
 
             if(!reservedMember.equals(member))
-                throw new ApiRequestException("Sorry, but this book is currently reserved for another member",
+                throw new ApiRequestException("Sorry, but this book is currently " +
+                        "reserved for another member",
                         HttpStatus.CONFLICT);
 
             throw new ApiRequestException("This user has already reserved this book.",
