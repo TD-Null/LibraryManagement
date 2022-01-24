@@ -117,8 +117,8 @@ public class LibrarianController
         LibraryCard card = validationService.cardValidation(request.getBarcode());
         accountService.barcodeReader(card, request.getNumber(),
                 AccountType.LIBRARIAN, AccountStatus.ACTIVE);
-        LibraryCard libraryCard = validationService.cardValidation(request.getLibrarianCardBarcode());
 
+        LibraryCard libraryCard = validationService.cardValidation(request.getLibrarianCardBarcode());
         return accountService.cancelLibrarianAccount(libraryCard, request.getLibrarianCardNumber());
     }
 
@@ -129,8 +129,8 @@ public class LibrarianController
         LibraryCard card = validationService.cardValidation(request.getBarcode());
         accountService.barcodeReader(card, request.getNumber(),
                 AccountType.LIBRARIAN, AccountStatus.ACTIVE);
-        Member member = validationService.memberValidation(memberId);
 
+        Member member = validationService.memberValidation(memberId);
         return accountService.updateMemberStatus(member, AccountStatus.BLACKLISTED);
     }
 
@@ -141,8 +141,8 @@ public class LibrarianController
         LibraryCard card = validationService.cardValidation(request.getBarcode());
         accountService.barcodeReader(card, request.getNumber(),
                 AccountType.LIBRARIAN, AccountStatus.ACTIVE);
-        Member member = validationService.memberValidation(memberId);
 
+        Member member = validationService.memberValidation(memberId);
         return accountService.updateMemberStatus(member, AccountStatus.ACTIVE);
     }
 
