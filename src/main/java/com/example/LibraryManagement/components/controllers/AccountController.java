@@ -44,8 +44,8 @@ public class AccountController
     public ResponseEntity<Object> viewAccountDetails(@RequestParam(value = "barcode") Long barcode,
                                                      @RequestParam(value = "card") String number)
     {
-        LibraryCard libraryCard = validationService.cardValidation(barcode);
-        return accountService.getAccountDetails(libraryCard, number);
+        LibraryCard card = validationService.cardValidation(barcode);
+        return accountService.getAccountDetails(card, number);
     }
 
     /*
@@ -57,7 +57,8 @@ public class AccountController
     @PostMapping("/login")
     public ResponseEntity<LibraryCard> login(@Valid @RequestBody LoginRequest loginRequest)
     {
-        return accountService.authenticateUser(loginRequest.getLibraryCardNumber(),
+        LibraryCard card = validationService.cardNumberValidation(loginRequest.getLibraryCardNumber());
+        return accountService.authenticateUser(card,
                 loginRequest.getPassword());
     }
 
@@ -85,8 +86,8 @@ public class AccountController
     @PutMapping("/update")
     public ResponseEntity<MessageResponse> editAccountDetails(@Valid @RequestBody UpdateAccountRequest request)
     {
-        LibraryCard libraryCard = validationService.cardValidation(request.getBarcode());
-        return accountService.updateAccountDetails(libraryCard, request.getNumber(),
+        LibraryCard card = validationService.cardValidation(request.getBarcode());
+        return accountService.updateAccountDetails(card, request.getNumber(),
                 request.getName(), request.getStreetAddress(), request.getCity(),
                 request.getZipcode(), request.getCountry(), request.getEmail(),
                 request.getPhoneNumber());
@@ -102,7 +103,7 @@ public class AccountController
     @PutMapping("/update/password")
     public ResponseEntity<MessageResponse> changePassword(@Valid @RequestBody ChangePasswordRequest request)
     {
-        LibraryCard libraryCard = validationService.cardValidation(request.getBarcode());
-        return accountService.changePassword(libraryCard, request.getOriginalPassword(), request.getNewPassword());
+        LibraryCard card = validationService.cardValidation(request.getBarcode());
+        return accountService.changePassword(card, request.getOriginalPassword(), request.getNewPassword());
     }
 }

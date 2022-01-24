@@ -14,7 +14,7 @@ public interface AccountService
 {
     ResponseEntity<Object> getAccountDetails(LibraryCard card, String number);
 
-    ResponseEntity<LibraryCard> authenticateUser(String libraryCardNumber, String password);
+    ResponseEntity<LibraryCard> authenticateUser(LibraryCard card, String password);
 
     ResponseEntity<LibraryCard> registerMember(String name, String password, String email,
                                                String streetAddress, String city, String zipcode,

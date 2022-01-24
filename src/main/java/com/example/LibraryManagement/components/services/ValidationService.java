@@ -53,6 +53,18 @@ public class ValidationService
         return card.get();
     }
 
+    public LibraryCard cardNumberValidation(String cardNumber)
+    {
+        Optional<LibraryCard> card = libraryCardRepository.findLibraryCardByCardNumber(cardNumber);
+
+        if(card.isEmpty())
+            throw new ApiRequestException("Invalid credentials. " +
+                    "(Wrong library card number or password)",
+                    HttpStatus.UNAUTHORIZED);
+
+        return card.get();
+    }
+
     public Member memberValidation(Long memberID)
     {
         Optional<Member> member = memberRepository.findById(memberID);

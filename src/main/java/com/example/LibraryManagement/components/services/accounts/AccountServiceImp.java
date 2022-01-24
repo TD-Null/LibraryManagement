@@ -69,38 +69,31 @@ public class AccountServiceImp implements AccountService
     }
 
     // Authenticates the users credentials with their given library card number and password to login into their account.
-    public ResponseEntity<LibraryCard> authenticateUser(String libraryCardNumber, String password)
+    public ResponseEntity<LibraryCard> authenticateUser(LibraryCard card, String password)
     {
-        Optional<LibraryCard> cardValidation = libraryCardRepository
-                .findLibraryCardByCardNumber(libraryCardNumber);
+        AccountType type = card.getType();
 
-        // Ensure that the card exists within the database of the system using its card number.
-        if(cardValidation.isPresent())
+        /*
+         * Check if the card is active. If so, check that the user's account is
+         * still active, either of a MEMBER or LIBRARIAN, and if the user's password
+         * matches to their account corresponding to the library card's details given.
+         * If the password matches to their account, then the login is successful and
+         * the details of the library card are given.
+         */
+        if(card.isActive() && (
+                (type == AccountType.MEMBER && card.getMember() != null
+                        && card.getMember().getStatus() == AccountStatus.ACTIVE
+                        && card.getMember().getPassword().equals(password)) ||
+                (type == AccountType.LIBRARIAN && card.getLibrarian() != null
+                        && card.getLibrarian().getStatus() == AccountStatus.ACTIVE
+                        && card.getLibrarian().getPassword().equals(password))))
         {
-            LibraryCard card = cardValidation.get();
-            AccountType type = card.getType();
-
-            /*
-             * Check if the card is active. If so, check that the user's account is
-             * still active, either of a MEMBER or LIBRARIAN, and if the user's password
-             * matches to their account corresponding to the library card's details given.
-             * If the password matches to their account, then the login is successful and
-             * the details of the library card are given.
-             */
-            if(card.isActive() && (
-                    (type == AccountType.MEMBER && card.getMember() != null
-                            && card.getMember().getStatus() == AccountStatus.ACTIVE
-                            && card.getMember().getPassword().equals(password)) ||
-                    (type == AccountType.LIBRARIAN && card.getLibrarian() != null
-                            && card.getLibrarian().getStatus() == AccountStatus.ACTIVE
-                            && card.getLibrarian().getPassword().equals(password))))
-            {
-                return ResponseEntity.ok(card);
-            }
+            return ResponseEntity.ok(card);
         }
 
         // Else, throw an API request exception stating that the given credentials were invalid.
-        throw new ApiRequestException("Invalid credentials. (Wrong library card number or password)",
+        throw new ApiRequestException("Invalid credentials. " +
+                "(Wrong library card number or password)",
                 HttpStatus.UNAUTHORIZED);
     }
 
