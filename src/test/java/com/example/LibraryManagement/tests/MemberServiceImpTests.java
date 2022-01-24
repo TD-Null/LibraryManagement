@@ -11,11 +11,13 @@ import com.example.LibraryManagement.components.services.accounts.MemberServiceI
 import com.example.LibraryManagement.models.accounts.types.Member;
 import com.example.LibraryManagement.models.books.libraries.Rack;
 import com.example.LibraryManagement.models.books.properties.BookItem;
+import com.example.LibraryManagement.models.books.properties.Limitations;
 import com.example.LibraryManagement.models.books.properties.Subject;
 import com.example.LibraryManagement.models.datatypes.Address;
 import com.example.LibraryManagement.models.enums.accounts.AccountStatus;
 import com.example.LibraryManagement.models.enums.books.BookFormat;
 import com.example.LibraryManagement.models.enums.books.BookStatus;
+import com.example.LibraryManagement.models.io.responses.exceptions.ApiRequestException;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -23,6 +25,8 @@ import org.mockito.Mock;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /*
@@ -64,9 +68,26 @@ public class MemberServiceImpTests
     private static Member member1;
     private static Member member2;
 
+    // Used date pattern and format and dates for checkout and reservations.
+    private static String datePattern = "yyyy-MM-dd";
+    private static SimpleDateFormat df = new SimpleDateFormat(datePattern);
+    private static Date borrowDate1;
+    private static Date borrowDate2;
+    private static Date borrowDate3;
+    private static Date borrowDate4;
+
+    // Exception messages.
+    private String memberExceptionMessage;
+    private String librarianExceptionMessage;
+
     @BeforeAll
-    static void setUpAll()
+    static void setUpAll() throws ParseException
     {
+        borrowDate1 = df.parse("2020-10-01");
+        borrowDate2 = df.parse("2020-10-10");
+        borrowDate3 = df.parse("2020-10-05");
+        borrowDate4 = df.parse("2020-10-15");
+
         book1 = new BookItem(
                 "921-1-90-113401-2",
                 "Action Romance Book",
@@ -172,8 +193,93 @@ public class MemberServiceImpTests
 
     @Test
     @Order(1)
-    void borrowBook()
+    void borrowBook() throws ParseException
     {
+        // If the book is only a reference when borrowing a book,
+        // an exception is thrown.
+        book1.setReferenceOnly(true);
+        memberExceptionMessage = Assertions.assertThrows(ApiRequestException.class, () -> {
+            memberService.checkoutBook(member1, book1, borrowDate1);
+        }).getMessage();
+        Assertions.assertEquals("Sorry, but this book is only for reference " +
+                "and cannot be borrowed.",
+                memberExceptionMessage);
+        book1.setReferenceOnly(false);
+
+        // If the book is currently lost,
+        // an exception is thrown.
+        book1.setStatus(BookStatus.LOST);
+        memberExceptionMessage = Assertions.assertThrows(ApiRequestException.class, () -> {
+            memberService.checkoutBook(member1, book1, borrowDate1);
+        }).getMessage();
+        Assertions.assertEquals("Sorry, but the book is lost and " +
+                        "cannot be found at the time.",
+                memberExceptionMessage);
+        book1.setStatus(BookStatus.AVAILABLE);
+
+        // If the member is currently at the limit of books issued and
+        // tries to borrow a book, an exception is thrown.
+        member1.setIssuedBooksTotal(5);
+        memberExceptionMessage = Assertions.assertThrows(ApiRequestException.class, () -> {
+            memberService.checkoutBook(member1, book1, borrowDate1);
+        }).getMessage();
+        Assertions.assertEquals("Sorry, but the user is currently at the maximum limit " +
+                        "on how many books can be issued to them.",
+                memberExceptionMessage);
+        member1.setIssuedBooksTotal(0);
+
+        // If there are no issues with the member or the book, the
+        // member will be able to checkout the book.
+        Assertions.assertDoesNotThrow(() -> {
+            memberService.checkoutBook(member1, book1, borrowDate1);
+        });
+        Assertions.assertEquals(member1, book1.getCurrLoanMember());
+        Assertions.assertEquals(BookStatus.LOANED, book1.getStatus());
+        Assertions.assertEquals(borrowDate1, book1.getBorrowed());
+        Assertions.assertEquals(new Date(borrowDate1.getTime() +
+                Limitations.MAX_LENDING_DAYS * (1000 * 60 * 60 * 24)),
+                book1.getDueDate());
+        Assertions.assertEquals(1, member1.getIssuedBooksTotal());
+
+        Assertions.assertDoesNotThrow(() -> {
+            memberService.checkoutBook(member2, book2, borrowDate2);
+        });
+        Assertions.assertEquals(member2, book2.getCurrLoanMember());
+        Assertions.assertEquals(BookStatus.LOANED, book2.getStatus());
+        Assertions.assertEquals(borrowDate2, book2.getBorrowed());
+        Assertions.assertEquals(new Date(borrowDate2.getTime() +
+                        Limitations.MAX_LENDING_DAYS * (1000 * 60 * 60 * 24)),
+                book2.getDueDate());
+        Assertions.assertEquals(1, member2.getIssuedBooksTotal());
+
+        // If another member tries to checkout a book that is already loaned,
+        // an exception is thrown.
+        memberExceptionMessage = Assertions.assertThrows(ApiRequestException.class, () -> {
+            memberService.checkoutBook(member2, book1, borrowDate2);
+        }).getMessage();
+        Assertions.assertEquals("Sorry, but this book is " +
+                        "currently loaned to another member",
+                memberExceptionMessage);
+        memberExceptionMessage = Assertions.assertThrows(ApiRequestException.class, () -> {
+            memberService.checkoutBook(member1, book2, borrowDate1);
+        }).getMessage();
+        Assertions.assertEquals("Sorry, but this book is " +
+                        "currently loaned to another member",
+                memberExceptionMessage);
+
+        // If a member tries to borrow the book again after it is loaned to them,
+        // an exception is thrown.
+        memberExceptionMessage = Assertions.assertThrows(ApiRequestException.class, () -> {
+            memberService.checkoutBook(member1, book1, borrowDate1);
+        }).getMessage();
+        Assertions.assertEquals("This user is already borrowing this book.",
+                memberExceptionMessage);
+        memberExceptionMessage = Assertions.assertThrows(ApiRequestException.class, () -> {
+            memberService.checkoutBook(member2, book2, borrowDate2);
+        }).getMessage();
+        Assertions.assertEquals("This user is already borrowing this book.",
+                memberExceptionMessage);
+
 
     }
 

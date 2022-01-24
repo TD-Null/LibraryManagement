@@ -45,9 +45,13 @@ public class AccountServiceImpTests
     private Member member;
     private Librarian librarian;
 
-    // Sample library cards;
+    // Sample library cards.
     private LibraryCard memberCard;
     private LibraryCard librarianCard;
+
+    // Exception messages.
+    private String memberExceptionMessage;
+    private String librarianExceptionMessage;
 
     // Add members and librarians before testing.
     @BeforeEach
@@ -96,9 +100,6 @@ public class AccountServiceImpTests
     @Order(1)
     void registerAccounts()
     {
-        String memberExceptionMessage;
-        String librarianExceptionMessage;
-
         // Check if the service has returned the right account information
         // for both the member and librarian.
         Assertions.assertEquals(AccountType.MEMBER, memberCard.getType());
@@ -141,9 +142,6 @@ public class AccountServiceImpTests
     @Order(2)
     void updateAccounts()
     {
-        String memberExceptionMessage;
-        String librarianExceptionMessage;
-
         accountService.updateAccountDetails(
                 memberCard,
                 memberCard.getCardNumber(),
@@ -229,9 +227,6 @@ public class AccountServiceImpTests
     @Order(3)
     void cancelMemberAccounts()
     {
-        String memberExceptionMessage;
-        String librarianExceptionMessage;
-
         // Check that the account is of a librarian.
         Assertions.assertEquals(librarian,
                 accountService.barcodeReader(librarianCard, librarianCard.getCardNumber(),
@@ -370,8 +365,6 @@ public class AccountServiceImpTests
     @Order(4)
     void cancelLibrarianAccounts()
     {
-        String librarianExceptionMessage;
-
         // Create a new librarian.
         LibraryCard newLibrarianCard = accountService.registerLibrarian(
                 "Librarian",

@@ -101,7 +101,8 @@ public class MemberServiceImp implements MemberService
             Member loanedMember = book.getCurrLoanMember();
 
             if(!loanedMember.equals(member))
-                throw new ApiRequestException("Sorry, but this book is currently loaned to another member",
+                throw new ApiRequestException("Sorry, but this book is " +
+                        "currently loaned to another member",
                         HttpStatus.CONFLICT);
 
             throw new ApiRequestException("This user is already borrowing this book.",
@@ -109,7 +110,8 @@ public class MemberServiceImp implements MemberService
         }
 
         else if(book.getStatus() == BookStatus.LOST)
-            throw new ApiRequestException("Sorry, but the book is lost and cannot be found at the time.",
+            throw new ApiRequestException("Sorry, but the book is lost and " +
+                    "cannot be found at the time.",
                     HttpStatus.CONFLICT);
 
         bookLendingRepository.save(bookLoan);
