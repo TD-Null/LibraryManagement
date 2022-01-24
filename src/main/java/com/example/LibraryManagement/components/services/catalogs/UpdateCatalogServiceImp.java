@@ -84,10 +84,6 @@ public class UpdateCatalogServiceImp implements UpdateCatalogService
 
     public ResponseEntity<MessageResponse> addSubject(String subject)
     {
-        if(subjectRepository.existsById(subject))
-            throw new ApiRequestException("Subject already exists within the system.",
-                    HttpStatus.CONFLICT);
-
         subjectRepository.save(new Subject(subject));
         return ResponseEntity.ok(new MessageResponse("Subject has been successfully added to the system."));
     }
