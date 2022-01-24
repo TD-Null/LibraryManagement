@@ -21,11 +21,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Optional;
 
 /*
- * Stores reusable code primarily used for validation within the repositories
- * of the application.
+ * Service with reusable code primarily used for validation
+ * within the repositories of the application.
  */
 @AllArgsConstructor
 @Service
@@ -74,10 +75,8 @@ public class ValidationService
         Optional<Member> member = memberRepository.findById(memberID);
 
         if(member.isEmpty())
-        {
             throw new ApiRequestException("Unable to find member's account within the system.",
                     HttpStatus.NOT_FOUND);
-        }
 
         return member.get();
     }
@@ -117,21 +116,53 @@ public class ValidationService
 
     public Subject subjectValidation(String name)
     {
-        if(!subjectRepository.existsById(name))
-        {
-            subjectRepository.save(new Subject(name));
-        }
+        Optional<Subject> subject = subjectRepository.findById(name);
 
-        return subjectRepository.getById(name);
+        if(subject.isEmpty())
+            throw new ApiRequestException("Subject does not exist within the system.",
+                    HttpStatus.NOT_FOUND);
+
+        return subject.get();
+    }
+
+    public void addSubjectValidation(String subject)
+    {
+        if(subjectRepository.existsById(subject))
+            throw new ApiRequestException("Subject already exists within the system.",
+                    HttpStatus.CONFLICT);
+    }
+
+    public Subject addBookSubjectValidation(String subject)
+    {
+        if(!subjectRepository.existsById(subject))
+            subjectRepository.save(new Subject(subject));
+
+        return subjectRepository.getById(subject);
     }
 
     public Author authorValidation(String name)
     {
-        if(!authorRepository.existsById(name))
-        {
-            authorRepository.save(new Author(name));
-        }
+        Optional<Author> author = authorRepository.findById(name);
 
-        return authorRepository.getById(name);
+        if(author.isEmpty())
+            throw new ApiRequestException("Author does not exist within the system.",
+                    HttpStatus.NOT_FOUND);
+
+        return author.get();
+    }
+
+    public void addAuthorValidation(String author)
+    {
+        if(authorRepository.existsById(author))
+            throw new ApiRequestException("Author already exists within the system.",
+                    HttpStatus.CONFLICT);
+    }
+
+    public Author addBookAuthorValidation(String author)
+    {
+        if(!authorRepository.existsById(author))
+            authorRepository.save(new Author(author));
+
+        return authorRepository.getById(author);
     }
 }

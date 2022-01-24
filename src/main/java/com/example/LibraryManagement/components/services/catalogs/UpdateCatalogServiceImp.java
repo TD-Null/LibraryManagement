@@ -94,10 +94,6 @@ public class UpdateCatalogServiceImp implements UpdateCatalogService
 
     public ResponseEntity<MessageResponse> addAuthor(String author, String description)
     {
-        if(authorRepository.existsById(author))
-            throw new ApiRequestException("Author already exists within the system.",
-                    HttpStatus.CONFLICT);
-
         authorRepository.save(new Author(author, description));
         return ResponseEntity.ok(new MessageResponse("Author has been successfully added to the system."));
     }
@@ -167,12 +163,8 @@ public class UpdateCatalogServiceImp implements UpdateCatalogService
     }
 
     @Transactional
-    public ResponseEntity<MessageResponse> modifyAuthor(String name, String description)
+    public ResponseEntity<MessageResponse> modifyAuthor(Author author, String description)
     {
-        if(!authorRepository.existsById(name))
-            throw new ApiRequestException("Author does not exist within the system.", HttpStatus.BAD_REQUEST);
-
-        Author author = authorRepository.getById(name);
         author.setDescription(description);
         return ResponseEntity.ok(new MessageResponse("Author has been updated successfully within the system."));
     }
@@ -228,8 +220,8 @@ public class UpdateCatalogServiceImp implements UpdateCatalogService
 
         for(Subject s: subjects)
             s.removeBookItem(book);
-        book.clearSubjects();
 
+        book.clearSubjects();
         book.clearRecords();
 
         bookItemRepository.delete(book);
@@ -237,27 +229,16 @@ public class UpdateCatalogServiceImp implements UpdateCatalogService
     }
 
     @Transactional
-    public ResponseEntity<MessageResponse> removeSubject(String name)
+    public ResponseEntity<MessageResponse> removeSubject(Subject subject)
     {
-        if(!subjectRepository.existsById(name))
-            throw new ApiRequestException("Subject does not exist within the system.",
-                    HttpStatus.NOT_FOUND);
-
-        Subject subject = subjectRepository.getById(name);
         subject.clearBooks();
         subjectRepository.delete(subject);
         return ResponseEntity.ok(new MessageResponse("Subject has been successfully removed from the system."));
     }
 
     @Transactional
-    public ResponseEntity<MessageResponse> removeAuthor(String name)
+    public ResponseEntity<MessageResponse> removeAuthor(Author author)
     {
-        if(!authorRepository.existsById(name))
-            throw new ApiRequestException("Author does not exist within the system.",
-                    HttpStatus.NOT_FOUND);
-
-        Author author = authorRepository.getById(name);
-
         if(!author.getBooks().isEmpty())
             throw new ApiRequestException("Author is still associated with books within the system.",
                     HttpStatus.CONFLICT);

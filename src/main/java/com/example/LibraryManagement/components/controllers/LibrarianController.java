@@ -70,6 +70,7 @@ public class LibrarianController
         LibraryCard card = validationService.cardValidation(barcode);
         accountService.barcodeReader(card, number,
                 AccountType.LIBRARIAN, AccountStatus.ACTIVE);
+
         return librarianService.listAllMembers();
     }
 
@@ -80,6 +81,7 @@ public class LibrarianController
         LibraryCard card = validationService.cardValidation(barcode);
         accountService.barcodeReader(card, number,
                 AccountType.LIBRARIAN, AccountStatus.ACTIVE);
+
         return librarianService.listAllLibrarians();
     }
 
@@ -100,6 +102,7 @@ public class LibrarianController
         LibraryCard card = validationService.cardValidation(request.getBarcode());
         accountService.barcodeReader(card, request.getNumber(),
                 AccountType.LIBRARIAN, AccountStatus.ACTIVE);
+
         return accountService.registerLibrarian(
                 request.getName(), request.getPassword(),
                 request.getEmail(), request.getStreetAddress(),
@@ -115,6 +118,7 @@ public class LibrarianController
         accountService.barcodeReader(card, request.getNumber(),
                 AccountType.LIBRARIAN, AccountStatus.ACTIVE);
         LibraryCard libraryCard = validationService.cardValidation(request.getLibrarianCardBarcode());
+
         return accountService.cancelLibrarianAccount(libraryCard, request.getLibrarianCardNumber());
     }
 
@@ -126,6 +130,7 @@ public class LibrarianController
         accountService.barcodeReader(card, request.getNumber(),
                 AccountType.LIBRARIAN, AccountStatus.ACTIVE);
         Member member = validationService.memberValidation(memberId);
+
         return accountService.updateMemberStatus(member, AccountStatus.BLACKLISTED);
     }
 
@@ -137,6 +142,7 @@ public class LibrarianController
         accountService.barcodeReader(card, request.getNumber(),
                 AccountType.LIBRARIAN, AccountStatus.ACTIVE);
         Member member = validationService.memberValidation(memberId);
+
         return accountService.updateMemberStatus(member, AccountStatus.ACTIVE);
     }
 
@@ -147,6 +153,7 @@ public class LibrarianController
         LibraryCard card = validationService.cardValidation(barcode);
         accountService.barcodeReader(card, number,
                 AccountType.LIBRARIAN, AccountStatus.ACTIVE);
+
         return librarianService.listAllBookLoans();
     }
 
@@ -157,6 +164,7 @@ public class LibrarianController
         LibraryCard card = validationService.cardValidation(barcode);
         accountService.barcodeReader(card, number,
                 AccountType.LIBRARIAN, AccountStatus.ACTIVE);
+
         return librarianService.listAllBookReservations();
     }
 
@@ -167,6 +175,7 @@ public class LibrarianController
         LibraryCard card = validationService.cardValidation(barcode);
         accountService.barcodeReader(card, number,
                 AccountType.LIBRARIAN, AccountStatus.ACTIVE);
+
         return librarianService.listAllFines();
     }
 
@@ -176,6 +185,7 @@ public class LibrarianController
         LibraryCard card = validationService.cardValidation(request.getBarcode());
         accountService.barcodeReader(card, request.getNumber(),
                 AccountType.LIBRARIAN, AccountStatus.ACTIVE);
+
         return updateCatalogService.addLibrary(request.getLibraryName(), request.getStreetAddress(), request.getCity(),
                 request.getZipcode(), request.getCountry());
     }
@@ -188,14 +198,14 @@ public class LibrarianController
                 AccountType.LIBRARIAN, AccountStatus.ACTIVE);
 
         Library library = validationService.libraryValidation(request.getLibraryName());
-        Author author = validationService.authorValidation(request.getAuthor());
+        Author author = validationService.addBookAuthorValidation(request.getAuthor());
 
         Set<String> subjectNames = request.getSubjectNames();
         Set<Subject> subjects = new HashSet<>();
 
         for(String name: subjectNames)
         {
-            subjects.add(validationService.subjectValidation(name));
+            subjects.add(validationService.addBookSubjectValidation(name));
         }
 
         return updateCatalogService.addBookItem(library, new Rack(request.getRack(), request.getLocation()),
@@ -210,6 +220,8 @@ public class LibrarianController
         LibraryCard card = validationService.cardValidation(request.getBarcode());
         accountService.barcodeReader(card, request.getNumber(),
                 AccountType.LIBRARIAN, AccountStatus.ACTIVE);
+
+        validationService.addSubjectValidation(request.getSubject());
         return updateCatalogService.addSubject(request.getSubject());
     }
 
@@ -219,6 +231,8 @@ public class LibrarianController
         LibraryCard card = validationService.cardValidation(request.getBarcode());
         accountService.barcodeReader(card, request.getNumber(),
                 AccountType.LIBRARIAN, AccountStatus.ACTIVE);
+
+        validationService.addAuthorValidation(request.getAuthor());
         return updateCatalogService.addAuthor(request.getAuthor(), request.getDescription());
     }
 
@@ -230,14 +244,14 @@ public class LibrarianController
                 AccountType.LIBRARIAN, AccountStatus.ACTIVE);
 
         BookItem book = validationService.bookValidation(request.getBookBarcode());
-        Author author = validationService.authorValidation(request.getAuthor());
+        Author author = validationService.addBookAuthorValidation(request.getAuthor());
 
         Set<String> subjectNames = request.getSubjectNames();
         Set<Subject> subjects = new HashSet<>();
 
         for(String name: subjectNames)
         {
-            subjects.add(validationService.subjectValidation(name));
+            subjects.add(validationService.addBookSubjectValidation(name));
         }
 
         return updateCatalogService.modifyBookItem(book, request.getIsbn(), request.getTitle(),
@@ -255,7 +269,6 @@ public class LibrarianController
 
         BookItem book = validationService.bookValidation(request.getBookBarcode());
         Library library = validationService.libraryValidation(request.getLibraryName());
-
         return updateCatalogService.moveBookItem(book, library,
                 new Rack(request.getRack(), request.getLocation()));
     }
@@ -266,7 +279,9 @@ public class LibrarianController
         LibraryCard card = validationService.cardValidation(request.getBarcode());
         accountService.barcodeReader(card, request.getNumber(),
                 AccountType.LIBRARIAN, AccountStatus.ACTIVE);
-        return updateCatalogService.modifyAuthor(request.getAuthor(), request.getDescription());
+
+        Author author = validationService.authorValidation(request.getAuthor());
+        return updateCatalogService.modifyAuthor(author, request.getDescription());
     }
 
     @DeleteMapping("catalog/library/remove")
@@ -275,6 +290,7 @@ public class LibrarianController
         LibraryCard card = validationService.cardValidation(request.getBarcode());
         accountService.barcodeReader(card, request.getNumber(),
                 AccountType.LIBRARIAN, AccountStatus.ACTIVE);
+
         Library library = validationService.libraryValidation(request.getLibrary());
         return updateCatalogService.removeLibrary(library);
     }
@@ -285,6 +301,7 @@ public class LibrarianController
         LibraryCard card = validationService.cardValidation(request.getBarcode());
         accountService.barcodeReader(card, request.getNumber(),
                 AccountType.LIBRARIAN, AccountStatus.ACTIVE);
+
         BookItem book = validationService.bookValidation(request.getBookBarcode());
         return updateCatalogService.removeBookItem(book);
     }
@@ -295,7 +312,9 @@ public class LibrarianController
         LibraryCard card = validationService.cardValidation(request.getBarcode());
         accountService.barcodeReader(card, request.getNumber(),
                 AccountType.LIBRARIAN, AccountStatus.ACTIVE);
-        return updateCatalogService.removeSubject(request.getSubject());
+
+        Subject subject = validationService.subjectValidation(request.getSubject());
+        return updateCatalogService.removeSubject(subject);
     }
 
     @DeleteMapping("/catalog/author/remove")
@@ -304,6 +323,8 @@ public class LibrarianController
         LibraryCard card = validationService.cardValidation(request.getBarcode());
         accountService.barcodeReader(card, request.getNumber(),
                 AccountType.LIBRARIAN, AccountStatus.ACTIVE);
-        return updateCatalogService.removeAuthor(request.getAuthor());
+
+        Author author = validationService.authorValidation(request.getAuthor());
+        return updateCatalogService.removeAuthor(author);
     }
 }
