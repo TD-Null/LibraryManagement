@@ -25,6 +25,10 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.Date;
 
+/*
+ * Test cases used to test the logic and processes of
+ * the member service.
+ */
 @ExtendWith(SpringExtension.class)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @SpringBootTest
