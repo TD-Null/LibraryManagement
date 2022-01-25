@@ -10,6 +10,10 @@ import com.example.LibraryManagement.components.repositories.fines.FineTransacti
 import com.example.LibraryManagement.components.services.accounts.MemberServiceImp;
 import com.example.LibraryManagement.models.accounts.types.Member;
 import com.example.LibraryManagement.models.books.fines.Fine;
+import com.example.LibraryManagement.models.books.fines.FineTransaction;
+import com.example.LibraryManagement.models.books.fines.transactions.CashTransaction;
+import com.example.LibraryManagement.models.books.fines.transactions.CheckTransaction;
+import com.example.LibraryManagement.models.books.fines.transactions.CreditCardTransaction;
 import com.example.LibraryManagement.models.books.libraries.Rack;
 import com.example.LibraryManagement.models.books.properties.BookItem;
 import com.example.LibraryManagement.models.books.properties.Limitations;
@@ -18,6 +22,7 @@ import com.example.LibraryManagement.models.datatypes.Address;
 import com.example.LibraryManagement.models.enums.accounts.AccountStatus;
 import com.example.LibraryManagement.models.enums.books.BookFormat;
 import com.example.LibraryManagement.models.enums.books.BookStatus;
+import com.example.LibraryManagement.models.enums.fines.TransactionType;
 import com.example.LibraryManagement.models.io.responses.exceptions.ApiRequestException;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -632,6 +637,27 @@ public class MemberServiceImpTests
     @Order(5)
     void payFine()
     {
+        Set<Fine> fines = member2.getFines();
+
+        CreditCardTransaction cardTransaction = new CreditCardTransaction(
+                "David Stuart");
+        CheckTransaction checkTransaction = new CheckTransaction(
+                "Bank of America", "108-065-1278"
+        );
+        CashTransaction cashTransaction = new CashTransaction(0.75);
+
+        memberExceptionMessage = Assertions.assertThrows(ApiRequestException.class, () -> {
+            memberService.payFine(member1, fines.stream().findFirst().get(),
+                    TransactionType.CREDIT_CARD, cardTransaction,0);
+        }).getMessage();
+        Assertions.assertEquals("Fine is not issued to this user.",
+                memberExceptionMessage);
+        memberExceptionMessage = Assertions.assertThrows(ApiRequestException.class, () -> {
+            memberService.payFine(member2, fines.stream().findFirst().get(),
+                    TransactionType.CREDIT_CARD, cardTransaction,0);
+        }).getMessage();
+        Assertions.assertEquals("Fine is not issued to this user.",
+                memberExceptionMessage);
 
     }
 }

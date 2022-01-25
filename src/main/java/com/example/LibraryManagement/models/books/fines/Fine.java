@@ -44,5 +44,9 @@ public class Fine
     @JoinColumn(name = "fineTransaction")
     private FineTransaction fineTransaction;
 
-    public Fine(double amount) { this.amount = amount; }
+    public Fine(double amount, Member member)
+    {
+        this.amount = amount;
+        this.member = member;
+    }
 }

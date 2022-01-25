@@ -161,7 +161,7 @@ public class MemberServiceImp implements MemberService
                             + " for returning the book " + book.getTitle()
                             + " late.");
 
-            member.addFine(new Fine(fine));
+            member.addFine(new Fine(fine, member));
             notificationRepository.save(fineNotification);
             member.sendNotification(fineNotification);
         }
@@ -310,7 +310,7 @@ public class MemberServiceImp implements MemberService
                             + " for returning the book " + book.getTitle()
                             + " late.");
 
-            member.addFine(new Fine(fine));
+            member.addFine(new Fine(fine, member));
             notificationRepository.save(fineNotification);
             member.sendNotification(fineNotification);
             member.returnBookItem(book, currDate);
