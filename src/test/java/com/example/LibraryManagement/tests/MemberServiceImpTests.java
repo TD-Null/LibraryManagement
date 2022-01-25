@@ -11,7 +11,6 @@ import com.example.LibraryManagement.components.services.accounts.MemberServiceI
 import com.example.LibraryManagement.models.accounts.types.Member;
 import com.example.LibraryManagement.models.books.fines.Fine;
 import com.example.LibraryManagement.models.books.libraries.Rack;
-import com.example.LibraryManagement.models.books.properties.Book;
 import com.example.LibraryManagement.models.books.properties.BookItem;
 import com.example.LibraryManagement.models.books.properties.Limitations;
 import com.example.LibraryManagement.models.books.properties.Subject;
@@ -81,7 +80,6 @@ public class MemberServiceImpTests
 
     // Exception messages.
     private String memberExceptionMessage;
-    private String librarianExceptionMessage;
 
     @BeforeAll
     static void setUpAll() throws ParseException
@@ -412,8 +410,9 @@ public class MemberServiceImpTests
     {
         // If a book is currently not loaned to a member and is being returned,
         // an exception is thrown.
-        memberExceptionMessage = Assertions.assertThrows(ApiRequestException.class, () ->
-                memberService.returnBook(member1, book4, df.parse("2020-10-10"))).getMessage();
+        memberExceptionMessage = Assertions.assertThrows(ApiRequestException.class, () -> {
+            memberService.returnBook(member1, book4, df.parse("2020-10-10"));
+        }).getMessage();
         Assertions.assertEquals("Book cannot be returned as it is not " +
                 "currently being loaned to a member.",
                 memberExceptionMessage);
@@ -511,6 +510,69 @@ public class MemberServiceImpTests
     @Order(4)
     void renewBook()
     {
+        // If a book is currently not loaned to a member and is being renewed,
+        // an exception is thrown.
+        memberExceptionMessage = Assertions.assertThrows(ApiRequestException.class, () -> {
+                memberService.renewBook(member1, book4, df.parse("2020-10-15"));
+        }).getMessage();
+        Assertions.assertEquals("Book cannot be renewed as it is not " +
+                        "currently being loaned to a member.",
+                memberExceptionMessage);
+
+        // If a book is not being renewed by the same member that it is loaned to,
+        // an exception is thrown.
+        memberExceptionMessage = Assertions.assertThrows(ApiRequestException.class, () -> {
+            memberService.renewBook(member2, book3, df.parse("2020-10-15"));
+        }).getMessage();
+        Assertions.assertEquals("This book is not issued to this user.",
+                memberExceptionMessage);
+
+        // If there are no issues with the book or member,
+        // then the book can be renewed with an additional
+        // 10 days added to the due date.
+        Assertions.assertEquals(new Date(borrowDate3.getTime() +
+                        Limitations.MAX_LENDING_DAYS *
+                                (1000 * 60 * 60 * 24)),
+                book3.getDueDate());
+        Assertions.assertDoesNotThrow(() -> {
+            memberService.renewBook(member1, book3, book3.getDueDate());
+        });
+        Assertions.assertEquals(new Date(borrowDate3.getTime() +
+                Limitations.MAX_LENDING_DAYS * 2 *
+                (1000 * 60 * 60 * 24)),
+                book3.getDueDate());
+
+        // If the book is returned in time of the renewal date,
+        // no fine is issued.
+        Assertions.assertDoesNotThrow(() -> {
+            memberService.returnBook(member1, book3,
+                    new Date(borrowDate3.getTime() +
+                            Limitations.MAX_LENDING_DAYS * 2 *
+                                    (1000 * 60 * 60 * 24)));
+        });
+        Assertions.assertEquals(BookStatus.AVAILABLE, book3.getStatus());
+        Assertions.assertNull(book3.getCurrLoanMember());
+        Assertions.assertEquals(0, member1.getIssuedBooksTotal());
+        Assertions.assertEquals(0, member1.getTotalFines());
+
+        // If a book is being renewed and is being reserved by another
+        // member, then the member will not be able to renew their
+        // borrowed book.
+        Assertions.assertDoesNotThrow(() -> {
+            memberService.checkoutBook(member2, book1, borrowDate1);
+        });
+        Assertions.assertEquals(BookStatus.LOANED, book1.getStatus());
+        Assertions.assertEquals(member2, book1.getCurrLoanMember());
+        Assertions.assertEquals(1, member2.getIssuedBooksTotal());
+
+        Assertions.assertDoesNotThrow(() -> {
+            memberService.reserveBook(member1, book1, borrowDate1);
+        });
+        Assertions.assertEquals(BookStatus.LOANED, book1.getStatus());
+        Assertions.assertEquals(member1, book1.getCurrReservedMember());
+        Assertions.assertEquals(1, member1.getIssuedBooksTotal());
+
+
 
     }
 

@@ -129,20 +129,22 @@ public class MemberServiceImp implements MemberService
     @Transactional
     public ResponseEntity<MessageResponse> returnBook(Member member, BookItem book, Date currDate)
     {
+        Member loanedMember = book.getCurrLoanMember();
+
+        if(book.getStatus() != BookStatus.LOANED || loanedMember == null)
+            throw new ApiRequestException("Book cannot be returned as it is not " +
+                    "currently being loaned to a member.",
+                    HttpStatus.BAD_REQUEST);
+
+        else if(!loanedMember.equals(member))
+            throw new ApiRequestException("This book is not issued to this user.",
+                    HttpStatus.BAD_REQUEST);
+
         Date returnDate = currDate;
         Date dueDate = book.getDueDate();
         AccountNotification notification = new AccountNotification(member, returnDate, member.getEmail(), member.getAddress(),
             "User has returned the book " + book.getTitle() + " on time.");
         MessageResponse response = new MessageResponse("Book has been returned.");
-
-        if(book.getStatus() != BookStatus.LOANED || book.getCurrLoanMember() == null)
-            throw new ApiRequestException("Book cannot be returned as it is not " +
-                    "currently being loaned to a member.",
-                    HttpStatus.BAD_REQUEST);
-
-        else if(!book.getCurrLoanMember().equals(member))
-            throw new ApiRequestException("This book is not issued to this user.",
-                    HttpStatus.BAD_REQUEST);
 
         member.returnBookItem(book, returnDate);
 
@@ -249,18 +251,19 @@ public class MemberServiceImp implements MemberService
     @Transactional
     public ResponseEntity<MessageResponse> cancelReservation(Member member, BookItem book, Date currDate)
     {
-        AccountNotification notification = new AccountNotification(member,
-                currDate, member.getEmail(), member.getAddress(),
-                "User has cancelled their reservation for the book " + book.getTitle() + ".");
         Member reservedMember = book.getCurrReservedMember();
 
-        if(reservedMember == null)
+        if(book.getStatus() == BookStatus.AVAILABLE ||reservedMember == null)
             throw new ApiRequestException("This book is not being reserved by anyone.",
                     HttpStatus.BAD_REQUEST);
 
         else if(!reservedMember.equals(member))
             throw new ApiRequestException("This book is being reserved by another user.",
                     HttpStatus.BAD_REQUEST);
+
+        AccountNotification notification = new AccountNotification(member,
+                currDate, member.getEmail(), member.getAddress(),
+                "User has cancelled their reservation for the book " + book.getTitle() + ".");
 
         notificationRepository.save(notification);
         member.sendNotification(notification);
@@ -277,20 +280,23 @@ public class MemberServiceImp implements MemberService
     @Transactional
     public ResponseEntity<MessageResponse> renewBook(Member member, BookItem book, Date currDate)
     {
+        Member loanedMember = book.getCurrLoanMember();
+
+        if(book.getStatus() != BookStatus.LOANED || loanedMember == null)
+            throw new ApiRequestException("Book cannot be renewed as it is not " +
+                    "currently being loaned to a member.",
+                    HttpStatus.BAD_REQUEST);
+
+        else if(!loanedMember.equals(member))
+            throw new ApiRequestException("This book is not issued to this user.",
+                    HttpStatus.BAD_REQUEST);
+
         Date returnDate = currDate;
         Date dueDate = book.getDueDate();
         Date newDueDate = new Date(dueDate.getTime() + Limitations.MAX_LENDING_DAYS * (1000 * 60 * 60 * 24));
         AccountNotification notification = new AccountNotification(member,
                 returnDate, member.getEmail(), member.getAddress(),
                 "User has renewed the book " + book.getTitle() + ".");
-
-        if(book.getStatus() != BookStatus.LOANED || book.getCurrLoanMember() == null)
-            throw new ApiRequestException("Book cannot be renewed as it is not currently being loaned to a member.",
-                    HttpStatus.BAD_REQUEST);
-
-        else if(!book.getCurrLoanMember().equals(member))
-            throw new ApiRequestException("This book is not issued to this user.",
-                    HttpStatus.BAD_REQUEST);
 
         if(dueDate.compareTo(returnDate) < 0)
         {
@@ -347,8 +353,8 @@ public class MemberServiceImp implements MemberService
 
             notificationRepository.save(notification);
             reservedMember.sendNotification(reservationNotification);
-            book.setStatus(BookStatus.RESERVED);
 
+            book.setStatus(BookStatus.RESERVED);
             book.setCurrLoanMember(null);
             book.setBorrowed(null);
             book.setDueDate(null);
@@ -360,6 +366,7 @@ public class MemberServiceImp implements MemberService
 
         member.sendNotification(notification);
         member.renewBookItem(book, dueDate, newDueDate);
+        book.setDueDate(newDueDate);
         return ResponseEntity.ok(new MessageResponse("Book has been renewed for the user."));
     }
 
