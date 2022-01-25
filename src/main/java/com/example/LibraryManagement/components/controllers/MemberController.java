@@ -181,6 +181,7 @@ public class MemberController
         LibraryCard card = validationService.cardValidation(request.getBarcode());
         Member member = (Member) accountService.barcodeReader(card, request.getNumber(),
                 AccountType.MEMBER, AccountStatus.ACTIVE);
+
         BookItem book = validationService.bookValidation(bookBarcode);
         return memberService.checkoutBook(member, book, new Date());
     }
@@ -192,6 +193,7 @@ public class MemberController
         LibraryCard card = validationService.cardValidation(request.getBarcode());
         Member member = (Member) accountService.barcodeReader(card, request.getNumber(),
                 AccountType.MEMBER, AccountStatus.ACTIVE);
+
         BookItem book = validationService.bookValidation(bookBarcode);
         return memberService.returnBook(member, book, new Date());
     }
@@ -203,6 +205,7 @@ public class MemberController
         LibraryCard card = validationService.cardValidation(request.getBarcode());
         Member member = (Member) accountService.barcodeReader(card, request.getNumber(),
                 AccountType.MEMBER, AccountStatus.ACTIVE);
+
         BookItem book = validationService.bookValidation(bookBarcode);
         return memberService.reserveBook(member, book, new Date());
     }
@@ -214,6 +217,7 @@ public class MemberController
         LibraryCard card = validationService.cardValidation(request.getBarcode());
         Member member = (Member) accountService.barcodeReader(card, request.getNumber(),
                 AccountType.MEMBER, AccountStatus.ACTIVE);
+
         BookItem book = validationService.bookValidation(bookBarcode);
         return memberService.cancelReservation(member, book, new Date());
     }
@@ -225,6 +229,7 @@ public class MemberController
         LibraryCard card = validationService.cardValidation(request.getBarcode());
         Member member = (Member) accountService.barcodeReader(card, request.getNumber(),
                 AccountType.MEMBER, AccountStatus.ACTIVE);
+
         BookItem book = validationService.bookValidation(bookBarcode);
         return memberService.renewBook(member, book, new Date());
     }
@@ -236,6 +241,7 @@ public class MemberController
         LibraryCard card = validationService.cardValidation(request.getBarcode());
         Member member = (Member) accountService.barcodeReader(card, request.getNumber(),
                 AccountType.MEMBER, AccountStatus.ACTIVE);
+
         Fine fine = validationService.fineValidation(fineID);
         return memberService.payFine(member, fine, TransactionType.CREDIT_CARD,
                 new CreditCardTransaction(request.getName()), request.getAmount());
@@ -248,6 +254,7 @@ public class MemberController
         LibraryCard card = validationService.cardValidation(request.getBarcode());
         Member member = (Member) accountService.barcodeReader(card, request.getNumber(),
                 AccountType.MEMBER, AccountStatus.ACTIVE);
+
         Fine fine = validationService.fineValidation(fineID);
         return memberService.payFine(member, fine, TransactionType.CHECK,
                 new CheckTransaction(request.getBankName(), request.getCheckNumber()), request.getAmount());
@@ -260,6 +267,7 @@ public class MemberController
         LibraryCard card = validationService.cardValidation(request.getBarcode());
         Member member = (Member) accountService.barcodeReader(card, request.getNumber(),
                 AccountType.MEMBER, AccountStatus.ACTIVE);
+
         Fine fine = validationService.fineValidation(fineID);
         return memberService.payFine(member, fine, TransactionType.CASH,
                 new CashTransaction(request.getCashTendered()), request.getCashTendered());
