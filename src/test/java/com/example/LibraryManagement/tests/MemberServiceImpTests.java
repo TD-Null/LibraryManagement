@@ -572,6 +572,22 @@ public class MemberServiceImpTests
         Assertions.assertEquals(member1, book1.getCurrReservedMember());
         Assertions.assertEquals(1, member1.getIssuedBooksTotal());
 
+        memberExceptionMessage = Assertions.assertThrows(ApiRequestException.class, () -> {
+            memberService.renewBook(member2, book1, borrowDate1);
+        }).getMessage();
+        Assertions.assertEquals("Book is currently reserved for another member " +
+                "and cannot be renewed.",
+                memberExceptionMessage);
+        Assertions.assertEquals(BookStatus.RESERVED, book1.getStatus());
+        Assertions.assertEquals(member1, book1.getCurrReservedMember());
+        Assertions.assertEquals(0, member2.getIssuedBooksTotal());
+
+        Assertions.assertDoesNotThrow(() -> {
+            memberService.cancelReservation(member1, book1, borrowDate1);
+        });
+        Assertions.assertEquals(BookStatus.AVAILABLE, book1.getStatus());
+        Assertions.assertNull(book1.getCurrReservedMember());
+        Assertions.assertEquals(0, member1.getIssuedBooksTotal());
 
 
     }

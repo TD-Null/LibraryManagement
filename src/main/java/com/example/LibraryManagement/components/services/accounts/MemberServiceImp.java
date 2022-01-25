@@ -313,6 +313,7 @@ public class MemberServiceImp implements MemberService
             member.addFine(new Fine(fine));
             notificationRepository.save(fineNotification);
             member.sendNotification(fineNotification);
+            member.returnBookItem(book, currDate);
 
             book.setCurrLoanMember(null);
             book.setBorrowed(null);
@@ -344,6 +345,16 @@ public class MemberServiceImp implements MemberService
 
         else if(book.getCurrReservedMember() != null)
         {
+            AccountNotification renewalFailureNotification = new AccountNotification(member,
+                    returnDate, member.getEmail(), member.getAddress(),
+                    "User was unable to renew the book " + book.getTitle() +
+                            " as it is currently reserved for another member. " +
+                            "Book " + book.getTitle() + " has been returned.");
+
+            notificationRepository.save(renewalFailureNotification);
+            member.sendNotification(renewalFailureNotification);
+            member.returnBookItem(book, currDate);
+
             Member reservedMember = book.getCurrReservedMember();
             reservedMember.updatedPendingReservation(book);
 
