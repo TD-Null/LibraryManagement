@@ -52,8 +52,6 @@ public class MemberServiceImp implements MemberService
     @Autowired
     private final CashTransactionRepository cashTransactionRepository;
 
-    private static final double finePerDay = 0.75;
-
     @Transactional
     public ResponseEntity<BookItem> checkoutBook(Member member, BookItem book, Date currDate)
     {
@@ -152,7 +150,7 @@ public class MemberServiceImp implements MemberService
         {
             long diffInMillies = Math.abs(returnDate.getTime() - dueDate.getTime());
             long diff = TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS);
-            double fine = finePerDay * diff;
+            double fine = Limitations.FINE_PER_DAY * diff;
 
             response = new MessageResponse("Book has been returned late. User must pay a fine.");
             AccountNotification fineNotification = new AccountNotification(member,
@@ -262,7 +260,7 @@ public class MemberServiceImp implements MemberService
 
         else if(!reservedMember.equals(member))
             throw new ApiRequestException("This book is being reserved by another user.",
-                    HttpStatus.CONFLICT);
+                    HttpStatus.BAD_REQUEST);
 
         notificationRepository.save(notification);
         member.sendNotification(notification);
@@ -298,7 +296,7 @@ public class MemberServiceImp implements MemberService
         {
             long diffInMillies = Math.abs(returnDate.getTime() - dueDate.getTime());
             long diff = TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS);
-            double fine = finePerDay * diff;
+            double fine = Limitations.FINE_PER_DAY * diff;
 
             AccountNotification fineNotification = new AccountNotification(member,
                     returnDate, member.getEmail(), member.getAddress(),

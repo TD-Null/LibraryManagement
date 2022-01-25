@@ -9,6 +9,7 @@ import com.example.LibraryManagement.components.repositories.fines.CreditCardTra
 import com.example.LibraryManagement.components.repositories.fines.FineTransactionRepository;
 import com.example.LibraryManagement.components.services.accounts.MemberServiceImp;
 import com.example.LibraryManagement.models.accounts.types.Member;
+import com.example.LibraryManagement.models.books.fines.Fine;
 import com.example.LibraryManagement.models.books.libraries.Rack;
 import com.example.LibraryManagement.models.books.properties.Book;
 import com.example.LibraryManagement.models.books.properties.BookItem;
@@ -242,7 +243,6 @@ public class MemberServiceImpTests
                 Limitations.MAX_LENDING_DAYS * (1000 * 60 * 60 * 24)),
                 book1.getDueDate());
         Assertions.assertEquals(1, member1.getIssuedBooksTotal());
-        Assertions.assertEquals(1, member1.getCheckedOutBooks().size());
 
         Assertions.assertDoesNotThrow(() -> {
             memberService.checkoutBook(member2, book2, borrowDate2);
@@ -254,7 +254,6 @@ public class MemberServiceImpTests
                         Limitations.MAX_LENDING_DAYS * (1000 * 60 * 60 * 24)),
                 book2.getDueDate());
         Assertions.assertEquals(1, member2.getIssuedBooksTotal());
-        Assertions.assertEquals(1, member2.getCheckedOutBooks().size());
 
         // If another member tries to checkout a book that is already loaned,
         // an exception is thrown.
@@ -370,8 +369,41 @@ public class MemberServiceImpTests
         Assertions.assertEquals(BookStatus.LOANED, book3.getStatus());
         Assertions.assertEquals(2, member1.getIssuedBooksTotal());
 
-        // Members can also cancel their reservations on the book they made.
+        // Members cannot borrow books that already reserved for a member.
+        Assertions.assertDoesNotThrow(() -> {
+                memberService.reserveBook(member2, book4, df.parse("2020-10-03"));
+        });
+        Assertions.assertEquals(member2, book4.getCurrReservedMember());
+        Assertions.assertEquals(BookStatus.RESERVED, book4.getStatus());
+        Assertions.assertEquals(3, member2.getIssuedBooksTotal());
 
+        memberExceptionMessage = Assertions.assertThrows(ApiRequestException.class, () -> {
+            memberService.checkoutBook(member1, book4, df.parse("2020-10-03"));
+        }).getMessage();
+        Assertions.assertEquals("Sorry, but this book is currently reserved for another member",
+                memberExceptionMessage);
+
+        // Members can also cancel their reservations. A reservation cannot be
+        // cancelled by a member if it isn't reserved by anyone or it is being
+        // reserved by another member.
+        memberExceptionMessage = Assertions.assertThrows(ApiRequestException.class, () -> {
+            memberService.cancelReservation(member1, book4, df.parse("2020-10-03"));
+        }).getMessage();
+        Assertions.assertEquals("This book is being reserved by another user.",
+                memberExceptionMessage);
+
+        Assertions.assertDoesNotThrow(() -> {
+            memberService.cancelReservation(member2, book4, df.parse("2020-10-03"));
+        });
+        Assertions.assertNull(book4.getCurrReservedMember());
+        Assertions.assertEquals(BookStatus.AVAILABLE, book4.getStatus());
+        Assertions.assertEquals(2, member2.getIssuedBooksTotal());
+
+        memberExceptionMessage = Assertions.assertThrows(ApiRequestException.class, () -> {
+            memberService.cancelReservation(member2, book4, df.parse("2020-10-03"));
+        }).getMessage();
+        Assertions.assertEquals("This book is not being reserved by anyone.",
+                memberExceptionMessage);
     }
 
     @Test
@@ -397,13 +429,13 @@ public class MemberServiceImpTests
         // If the book is returned in time by the member, no fine is issued
         // and the book will be available or currently reserved for another
         // member if reserved while it was being loaned.
-        Assertions.assertDoesNotThrow(() ->
-                memberService.returnBook(member1, book1,
-                new Date(borrowDate1.getTime() +
-                        5 * (1000 * 60 * 60 * 24))));
+        Assertions.assertDoesNotThrow(() -> {
+            memberService.returnBook(member1, book1,
+                    new Date(borrowDate1.getTime() +
+                            5 * (1000 * 60 * 60 * 24)));
+        });
         Assertions.assertNull(book1.getCurrLoanMember());
         Assertions.assertEquals(1, member1.getIssuedBooksTotal());;
-
 
         Assertions.assertEquals(BookStatus.RESERVED, book1.getStatus());
         Assertions.assertEquals(member2, book1.getCurrReservedMember());
@@ -415,6 +447,64 @@ public class MemberServiceImpTests
         Assertions.assertNull(book1.getCurrReservedMember());
         Assertions.assertEquals(member2, book1.getCurrLoanMember());
         Assertions.assertEquals(2, member2.getIssuedBooksTotal());
+
+        // If a book is returned late, then a fine is issued to the member.
+        // The fine increases linearly based on how many days the book was
+        // returned late.
+        Assertions.assertDoesNotThrow(() -> {
+            memberService.returnBook(member2, book1,
+                    new Date(book1.getBorrowed().getTime() +
+                            (Limitations.MAX_LENDING_DAYS + 1) *
+                                    (1000 * 60 * 60 * 24)));
+        });
+        Assertions.assertEquals(BookStatus.AVAILABLE, book1.getStatus());
+        Assertions.assertNull(book1.getCurrLoanMember());
+        Assertions.assertEquals(1, member2.getIssuedBooksTotal());
+        Assertions.assertEquals(1, member2.getTotalFines());
+
+        // Check that there exists a fine of a book that
+        // has been returned 1 day late.
+        boolean checkFineAmount = false;
+
+        for(Fine f: member2.getFines())
+        {
+            if(f.getAmount() == Limitations.FINE_PER_DAY * 1)
+            {
+                checkFineAmount = true;
+                break;
+            }
+        }
+
+        Assertions.assertTrue(checkFineAmount);
+
+        Assertions.assertEquals(Limitations.FINE_PER_DAY * 1,
+                member2.getFines().stream().findFirst().get().getAmount());
+
+        Assertions.assertDoesNotThrow(() -> {
+            memberService.returnBook(member2, book2,
+                    new Date(book2.getBorrowed().getTime() +
+                            (Limitations.MAX_LENDING_DAYS + 5) *
+                                    (1000 * 60 * 60 * 24)));
+        });
+        Assertions.assertEquals(BookStatus.AVAILABLE, book1.getStatus());
+        Assertions.assertNull(book1.getCurrLoanMember());
+        Assertions.assertEquals(0, member2.getIssuedBooksTotal());
+        Assertions.assertEquals(2, member2.getTotalFines());
+
+        // Check that there exists a fine of a book that
+        // has been returned 5 days late.
+        checkFineAmount = false;
+
+        for(Fine f: member2.getFines())
+        {
+            if(f.getAmount() == Limitations.FINE_PER_DAY * 5)
+            {
+                checkFineAmount = true;
+                break;
+            }
+        }
+
+        Assertions.assertTrue(checkFineAmount);
     }
 
     @Test
@@ -423,6 +513,7 @@ public class MemberServiceImpTests
     {
 
     }
+
     @Test
     @Order(5)
     void payFine()

@@ -12,4 +12,5 @@ public class Limitations
 {
     public static final int MAX_ISSUED_BOOKS = 5;
     public static final int MAX_LENDING_DAYS = 10;
+    public static final double FINE_PER_DAY = 0.75;
 }
