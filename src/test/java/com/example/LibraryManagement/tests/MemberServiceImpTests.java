@@ -637,8 +637,9 @@ public class MemberServiceImpTests
     @Order(5)
     void payFine()
     {
+        // A member can be able to pay their fines using either a
+        // credit card, check, or cash transaction.
         Set<Fine> fines = member2.getFines();
-
         CreditCardTransaction cardTransaction = new CreditCardTransaction(
                 "David Stuart");
         CheckTransaction checkTransaction = new CheckTransaction(
@@ -646,17 +647,21 @@ public class MemberServiceImpTests
         );
         CashTransaction cashTransaction = new CashTransaction(0.75);
 
+        // If the fine is being paid by the wrong member,
+        // an exception is thrown.
         memberExceptionMessage = Assertions.assertThrows(ApiRequestException.class, () -> {
             memberService.payFine(member1, fines.stream().findFirst().get(),
                     TransactionType.CREDIT_CARD, cardTransaction,0);
         }).getMessage();
         Assertions.assertEquals("Fine is not issued to this user.",
                 memberExceptionMessage);
+
+        // If the amount paid is not enough to pay the fine
         memberExceptionMessage = Assertions.assertThrows(ApiRequestException.class, () -> {
             memberService.payFine(member2, fines.stream().findFirst().get(),
                     TransactionType.CREDIT_CARD, cardTransaction,0);
         }).getMessage();
-        Assertions.assertEquals("Fine is not issued to this user.",
+        Assertions.assertEquals("Given amount is not enough to pay for the fine.",
                 memberExceptionMessage);
 
     }

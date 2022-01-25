@@ -401,6 +401,7 @@ public class MemberServiceImp implements MemberService
                 if(transaction instanceof CreditCardTransaction)
                 {
                     CreditCardTransaction cardTransaction = (CreditCardTransaction) transaction;
+                    cardTransaction.setFineTransaction(fineTransaction);
                     creditCardTransactionRepository.save(cardTransaction);
                     fineTransaction.setCreditCardTransaction(cardTransaction);
                 }
@@ -411,6 +412,7 @@ public class MemberServiceImp implements MemberService
                 if(transaction instanceof CheckTransaction)
                 {
                     CheckTransaction checkTransaction = (CheckTransaction) transaction;
+                    checkTransaction.setFineTransaction(fineTransaction);
                     checkTransactionRepository.save(checkTransaction);
                     fineTransaction.setCheckTransaction(checkTransaction);
                 }
@@ -421,6 +423,7 @@ public class MemberServiceImp implements MemberService
                 if(transaction instanceof CashTransaction)
                 {
                     CashTransaction cashTransaction = (CashTransaction) transaction;
+                    cashTransaction.setFineTransaction(fineTransaction);
                     cashTransactionRepository.save(cashTransaction);
                     fineTransaction.setCashTransaction(cashTransaction);
                 }
