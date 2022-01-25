@@ -10,6 +10,7 @@ import com.example.LibraryManagement.components.repositories.fines.FineTransacti
 import com.example.LibraryManagement.components.services.accounts.MemberServiceImp;
 import com.example.LibraryManagement.models.accounts.types.Member;
 import com.example.LibraryManagement.models.books.libraries.Rack;
+import com.example.LibraryManagement.models.books.properties.Book;
 import com.example.LibraryManagement.models.books.properties.BookItem;
 import com.example.LibraryManagement.models.books.properties.Limitations;
 import com.example.LibraryManagement.models.books.properties.Subject;
@@ -28,6 +29,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Set;
 
 /*
  * Test cases used to test the logic and processes of
@@ -240,6 +242,7 @@ public class MemberServiceImpTests
                 Limitations.MAX_LENDING_DAYS * (1000 * 60 * 60 * 24)),
                 book1.getDueDate());
         Assertions.assertEquals(1, member1.getIssuedBooksTotal());
+        Assertions.assertEquals(1, member1.getCheckedOutBooks().size());
 
         Assertions.assertDoesNotThrow(() -> {
             memberService.checkoutBook(member2, book2, borrowDate2);
@@ -251,6 +254,7 @@ public class MemberServiceImpTests
                         Limitations.MAX_LENDING_DAYS * (1000 * 60 * 60 * 24)),
                 book2.getDueDate());
         Assertions.assertEquals(1, member2.getIssuedBooksTotal());
+        Assertions.assertEquals(1, member2.getCheckedOutBooks().size());
 
         // If another member tries to checkout a book that is already loaned,
         // an exception is thrown.
@@ -365,6 +369,9 @@ public class MemberServiceImpTests
         Assertions.assertNull(book3.getCurrReservedMember());
         Assertions.assertEquals(BookStatus.LOANED, book3.getStatus());
         Assertions.assertEquals(2, member1.getIssuedBooksTotal());
+
+        // Members can also cancel their reservations on the book they made.
+
     }
 
     @Test
@@ -395,7 +402,8 @@ public class MemberServiceImpTests
                 new Date(borrowDate1.getTime() +
                         5 * (1000 * 60 * 60 * 24))));
         Assertions.assertNull(book1.getCurrLoanMember());
-        Assertions.assertEquals(1, member1.getIssuedBooksTotal());
+        Assertions.assertEquals(1, member1.getIssuedBooksTotal());;
+
 
         Assertions.assertEquals(BookStatus.RESERVED, book1.getStatus());
         Assertions.assertEquals(member2, book1.getCurrReservedMember());
@@ -407,7 +415,6 @@ public class MemberServiceImpTests
         Assertions.assertNull(book1.getCurrReservedMember());
         Assertions.assertEquals(member2, book1.getCurrLoanMember());
         Assertions.assertEquals(2, member2.getIssuedBooksTotal());
-
     }
 
     @Test
