@@ -589,7 +589,43 @@ public class MemberServiceImpTests
         Assertions.assertNull(book1.getCurrReservedMember());
         Assertions.assertEquals(0, member1.getIssuedBooksTotal());
 
+        // If a member attempts to renew a book, but has done so past
+        // the due date, an exception is thrown.
+        Assertions.assertDoesNotThrow(() -> {
+            memberService.checkoutBook(member2, book1, borrowDate1);
+        });
+        Assertions.assertEquals(BookStatus.LOANED, book1.getStatus());
+        Assertions.assertEquals(member2, book1.getCurrLoanMember());
+        Assertions.assertEquals(1, member2.getIssuedBooksTotal());
 
+        memberExceptionMessage = Assertions.assertThrows(ApiRequestException.class, () -> {
+            memberService.renewBook(member2, book1,
+                            new Date(book1.getBorrowed().getTime() +
+                                    (Limitations.MAX_LENDING_DAYS + 3) *
+                                            (1000 * 60 * 60 * 24)));
+        }).getMessage();
+        Assertions.assertEquals("Book has been returned late. " +
+                        "User cannot renew the book and must pay a fine.",
+                memberExceptionMessage);
+        Assertions.assertEquals(BookStatus.AVAILABLE, book1.getStatus());
+        Assertions.assertNull(book1.getCurrLoanMember());
+        Assertions.assertEquals(0, member2.getIssuedBooksTotal());
+        Assertions.assertEquals(3, member2.getTotalFines());
+
+        // Check that there exists a fine of a book that
+        // has been returned 5 days late.
+        boolean checkFineAmount = false;
+
+        for(Fine f: member2.getFines())
+        {
+            if(f.getAmount() == Limitations.FINE_PER_DAY * 3)
+            {
+                checkFineAmount = true;
+                break;
+            }
+        }
+
+        Assertions.assertTrue(checkFineAmount);
     }
 
     @Test
