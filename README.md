@@ -47,7 +47,23 @@ Each user registered into the system will have a single account associated to th
 * Edit Account/Change Password - Any user will be able to edit their account's personal details and change their password.
 
 ### Catalog
+The catalog contains all the books within the library management system, including libraries, authors, and subjects that can be associated to books.
 
+* Libraries - Contains the books within the system. Books cannot be added to the system unless they are within a library.
+  * Each library will have their unique name and an address of the location of the library.
+  * Each library can be empty or contain many books, with each book being place on a rack. 
+    * The rack is labelled with a number and a location identifer.
+* Authors - Contains the writers of the books within the system.
+  * Each author will have a unique name and an optional description.
+  * Each author can have no books or be writers of many books within the system.
+* Subjects - Contains the genres that can be labelled onto books
+  * Each book can have one or many subjects labelled. 
+* Search - Any user can use the catalog to search through books based on
+   * Library
+   * Title 
+   * Author
+   * Subject
+   * Publication Date 
 
 ### Librarians
 
