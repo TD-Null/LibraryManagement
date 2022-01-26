@@ -28,7 +28,9 @@ The Library Management System will keep these rules in mind when considering its
 These will be the main components used for the software implementation of the library management system.
 
 ### Accounts
+Each user registered into the system will have a single account associated to them. These users could either be librarians or members, each with their own different authorizations to certain requests. Each user will also have a single library card associated to their account that will be given to them once they have registered an account in the system.
 
+* Signup/Register - 
 
 ### Catalog
 
