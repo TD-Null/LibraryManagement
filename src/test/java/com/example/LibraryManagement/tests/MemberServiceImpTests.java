@@ -640,6 +640,7 @@ public class MemberServiceImpTests
         // A member can be able to pay their fines using either a
         // credit card, check, or cash transaction.
         Set<Fine> fines = member2.getFines();
+        int totalFines = member2.getTotalFines();
         CreditCardTransaction cardTransaction = new CreditCardTransaction(
                 "David Stuart");
         CheckTransaction checkTransaction = new CheckTransaction(
@@ -650,7 +651,8 @@ public class MemberServiceImpTests
         // If the fine is being paid by the wrong member,
         // an exception is thrown.
         memberExceptionMessage = Assertions.assertThrows(ApiRequestException.class, () -> {
-            memberService.payFine(member1,
+            memberService.payFine(
+                    member1,
                     fines.stream().findFirst().get(),
                     TransactionType.CREDIT_CARD,
                     cardTransaction,
@@ -663,7 +665,8 @@ public class MemberServiceImpTests
         // If the amount paid is not enough to pay the fine,
         // an exception is thrown.
         memberExceptionMessage = Assertions.assertThrows(ApiRequestException.class, () -> {
-            memberService.payFine(member2,
+            memberService.payFine(
+                    member2,
                     fines.stream().findFirst().get(),
                     TransactionType.CREDIT_CARD,
                     cardTransaction,
@@ -677,7 +680,8 @@ public class MemberServiceImpTests
         // types of transactions or the expected transaction type,
         // an exception is thrown.
         memberExceptionMessage = Assertions.assertThrows(ApiRequestException.class, () -> {
-            memberService.payFine(member2,
+            memberService.payFine(
+                    member2,
                     fines.stream().findFirst().get(),
                     TransactionType.CREDIT_CARD,
                     cashTransaction,
@@ -686,6 +690,98 @@ public class MemberServiceImpTests
         }).getMessage();
         Assertions.assertEquals("Unexpected transaction made.",
                 memberExceptionMessage);
+
+        // If there are no issues with making transactions,
+        // the user can pay of their fines.
+        for(Fine f: fines)
+        {
+            if(totalFines == 3)
+            {
+                Assertions.assertDoesNotThrow(() -> {
+                    memberService.payFine(
+                            member2,
+                            f,
+                            TransactionType.CREDIT_CARD,
+                            cardTransaction,
+                            f.getAmount(),
+                            df.parse("2020-10-20"));
+                });
+                Assertions.assertTrue(f.isPaid());
+                Assertions.assertNotNull(f.getFineTransaction());
+                Assertions.assertNotNull(f.getFineTransaction()
+                        .getCreditCardTransaction());
+                Assertions.assertNull(f.getFineTransaction()
+                        .getCheckTransaction());
+                Assertions.assertNull(f.getFineTransaction()
+                        .getCashTransaction());
+                Assertions.assertEquals(TransactionType.CREDIT_CARD,
+                        f.getFineTransaction().getType());
+                Assertions.assertEquals(f.getAmount(),
+                        f.getFineTransaction().getAmount());
+                Assertions.assertEquals(2, member2.getTotalFines());
+                totalFines--;
+            }
+
+            else if(totalFines == 2)
+            {
+                Assertions.assertDoesNotThrow(() -> {
+                    memberService.payFine(
+                            member2,
+                            f,
+                            TransactionType.CHECK,
+                            checkTransaction,
+                            f.getAmount(),
+                            df.parse("2020-10-20"));
+                });
+                Assertions.assertTrue(f.isPaid());
+                Assertions.assertNotNull(f.getFineTransaction());
+                Assertions.assertNull(f.getFineTransaction()
+                        .getCreditCardTransaction());
+                Assertions.assertNotNull(f.getFineTransaction()
+                        .getCheckTransaction());
+                Assertions.assertNull(f.getFineTransaction()
+                        .getCashTransaction());
+                Assertions.assertEquals(TransactionType.CHECK,
+                        f.getFineTransaction().getType());
+                Assertions.assertEquals(f.getAmount(),
+                        f.getFineTransaction().getAmount());
+                Assertions.assertEquals(1, member2.getTotalFines());
+                totalFines--;
+            }
+
+            else if(totalFines == 1)
+            {
+                cashTransaction.setCashTendered(f.getAmount());
+
+                Assertions.assertDoesNotThrow(() -> {
+                    memberService.payFine(
+                            member2,
+                            f,
+                            TransactionType.CASH,
+                            cashTransaction,
+                            f.getAmount(),
+                            df.parse("2020-10-20"));
+                });
+                Assertions.assertTrue(f.isPaid());
+                Assertions.assertNotNull(f.getFineTransaction());
+                Assertions.assertNull(f.getFineTransaction()
+                        .getCreditCardTransaction());
+                Assertions.assertNull(f.getFineTransaction()
+                        .getCheckTransaction());
+                Assertions.assertNotNull(f.getFineTransaction()
+                        .getCashTransaction());
+                Assertions.assertEquals(TransactionType.CASH,
+                        f.getFineTransaction().getType());
+                Assertions.assertEquals(f.getAmount(),
+                        f.getFineTransaction().getAmount());
+                Assertions.assertEquals(f.getAmount(),
+                        f.getFineTransaction()
+                                .getCashTransaction()
+                                .getCashTendered());
+                Assertions.assertEquals(0, member2.getTotalFines());
+                totalFines--;
+            }
+        }
 
     }
 }
