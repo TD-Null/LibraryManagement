@@ -680,19 +680,6 @@ public class MemberServiceImpTests
             memberService.payFine(member2,
                     fines.stream().findFirst().get(),
                     TransactionType.CREDIT_CARD,
-                    new FineTransaction(TransactionType.CREDIT_CARD,
-                            df.parse("2020-10-20"),
-                            10),
-                    10,
-                    df.parse("2020-10-20"));
-        }).getMessage();
-        Assertions.assertEquals("Unexpected transaction made.",
-                memberExceptionMessage);
-
-        memberExceptionMessage = Assertions.assertThrows(ApiRequestException.class, () -> {
-            memberService.payFine(member2,
-                    fines.stream().findFirst().get(),
-                    TransactionType.CREDIT_CARD,
                     cashTransaction,
                     10,
                     df.parse("2020-10-20"));
