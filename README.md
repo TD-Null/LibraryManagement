@@ -33,11 +33,11 @@ Each user registered into the system will have a single account associated to th
 * Signup/Register - Any new user, both a librarian and member, will be able to register an account to system. 
   * Each account upon successful registration will be given a library card with a random 6-digit card number and a label of either a librarian or member to that card depending on what type of account is being created. 
   * When a user starts creating their account, they will need to input their
-    1. Name
-    2. Password
-    3. Email Address
-    4. Home Address
-    5. Phone Number
+    * Name
+    * Password
+    * Email Address
+    * Home Address
+    * Phone Number
   * Each account must have a unique email address, otherwise the user will not be able to register their account to the system. This is to avoid account duplication by the same user.
 * Login - Any user that has already created an account can login using their library card number and password assocaited to their account. After inputting their credentials, the input will be authenticated. If the right credentials were inputted, then the user will be able to login to the system. If invalid credentials were inputted, then a message will be sent that either the wrong library card number of password was inputted.
 * View Account - Any user will be able to view their personal details they 
