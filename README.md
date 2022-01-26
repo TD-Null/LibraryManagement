@@ -43,7 +43,8 @@ Each user registered into the system will have a single account associated to th
   * Their credentials will be authenticate once they have been submitted to the system. 
     * If the credentials are validated, then the user will be able to login to the system. 
     * If the credentials are invalidated, then a message will be sent that either the wrong library card number of password was inputted.
-* View Account - Any user will be able to view their personal details they 
+* View Account - Any user will be able to view their personal details associated to their account.
+* Edit Account/Change Password - Any user will be able to edit their account's personal details and change their password.
 
 ### Catalog
 
