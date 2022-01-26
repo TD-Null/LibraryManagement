@@ -383,7 +383,7 @@ public class MemberServiceImp implements MemberService
 
     @Transactional
     public ResponseEntity<MessageResponse> payFine(Member member, Fine fine, TransactionType type,
-                                                   Object transaction, double amount)
+                                                   Object transaction, double amount, Date currDate)
     {
         if(!fine.getMember().equals(member))
             throw new ApiRequestException("Fine is not issued to this user.",
@@ -393,7 +393,7 @@ public class MemberServiceImp implements MemberService
             throw new ApiRequestException("Given amount is not enough to pay for the fine.",
                     HttpStatus.UNPROCESSABLE_ENTITY);
 
-        FineTransaction fineTransaction = new FineTransaction(type, new Date(), amount);
+        FineTransaction fineTransaction = new FineTransaction(type, currDate, amount);
 
         switch (type)
         {
@@ -406,6 +406,10 @@ public class MemberServiceImp implements MemberService
                     fineTransaction.setCreditCardTransaction(cardTransaction);
                 }
 
+                else
+                    throw new ApiRequestException("Unexpected transaction made.",
+                            HttpStatus.UNPROCESSABLE_ENTITY);
+
                 break;
 
             case CHECK:
@@ -416,6 +420,10 @@ public class MemberServiceImp implements MemberService
                     checkTransactionRepository.save(checkTransaction);
                     fineTransaction.setCheckTransaction(checkTransaction);
                 }
+
+                else
+                    throw new ApiRequestException("Unexpected transaction made.",
+                            HttpStatus.UNPROCESSABLE_ENTITY);
 
                 break;
 
@@ -428,10 +436,15 @@ public class MemberServiceImp implements MemberService
                     fineTransaction.setCashTransaction(cashTransaction);
                 }
 
+                else
+                    throw new ApiRequestException("Unexpected transaction made.",
+                            HttpStatus.UNPROCESSABLE_ENTITY);
+
                 break;
 
             default:
-                throw new ApiRequestException("Transaction cannot be used.", HttpStatus.UNPROCESSABLE_ENTITY);
+                throw new ApiRequestException("Transaction cannot be used.",
+                        HttpStatus.UNPROCESSABLE_ENTITY);
         }
 
         fineTransactionRepository.save(fineTransaction);

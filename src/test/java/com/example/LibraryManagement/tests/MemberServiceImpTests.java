@@ -645,23 +645,59 @@ public class MemberServiceImpTests
         CheckTransaction checkTransaction = new CheckTransaction(
                 "Bank of America", "108-065-1278"
         );
-        CashTransaction cashTransaction = new CashTransaction(0.75);
+        CashTransaction cashTransaction = new CashTransaction(0);
 
         // If the fine is being paid by the wrong member,
         // an exception is thrown.
         memberExceptionMessage = Assertions.assertThrows(ApiRequestException.class, () -> {
-            memberService.payFine(member1, fines.stream().findFirst().get(),
-                    TransactionType.CREDIT_CARD, cardTransaction,0);
+            memberService.payFine(member1,
+                    fines.stream().findFirst().get(),
+                    TransactionType.CREDIT_CARD,
+                    cardTransaction,
+                    0,
+                    df.parse("2020-10-20"));
         }).getMessage();
         Assertions.assertEquals("Fine is not issued to this user.",
                 memberExceptionMessage);
 
-        // If the amount paid is not enough to pay the fine
+        // If the amount paid is not enough to pay the fine,
+        // an exception is thrown.
         memberExceptionMessage = Assertions.assertThrows(ApiRequestException.class, () -> {
-            memberService.payFine(member2, fines.stream().findFirst().get(),
-                    TransactionType.CREDIT_CARD, cardTransaction,0);
+            memberService.payFine(member2,
+                    fines.stream().findFirst().get(),
+                    TransactionType.CREDIT_CARD,
+                    cardTransaction,
+                    0,
+                    df.parse("2020-10-20"));
         }).getMessage();
         Assertions.assertEquals("Given amount is not enough to pay for the fine.",
+                memberExceptionMessage);
+
+        // If the transaction given doesn't match with any of the
+        // types of transactions or the expected transaction type,
+        // an exception is thrown.
+        memberExceptionMessage = Assertions.assertThrows(ApiRequestException.class, () -> {
+            memberService.payFine(member2,
+                    fines.stream().findFirst().get(),
+                    TransactionType.CREDIT_CARD,
+                    new FineTransaction(TransactionType.CREDIT_CARD,
+                            df.parse("2020-10-20"),
+                            10),
+                    10,
+                    df.parse("2020-10-20"));
+        }).getMessage();
+        Assertions.assertEquals("Unexpected transaction made.",
+                memberExceptionMessage);
+
+        memberExceptionMessage = Assertions.assertThrows(ApiRequestException.class, () -> {
+            memberService.payFine(member2,
+                    fines.stream().findFirst().get(),
+                    TransactionType.CREDIT_CARD,
+                    cashTransaction,
+                    10,
+                    df.parse("2020-10-20"));
+        }).getMessage();
+        Assertions.assertEquals("Unexpected transaction made.",
                 memberExceptionMessage);
 
     }

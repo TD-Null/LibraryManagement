@@ -29,5 +29,5 @@ public interface MemberService
     ResponseEntity<MessageResponse> renewBook(Member member, BookItem book, Date currDate);
 
     ResponseEntity<MessageResponse> payFine(Member member, Fine fine, TransactionType type,
-                                            Object Transaction, double amount);
+                                            Object Transaction, double amount, Date currDate);
 }

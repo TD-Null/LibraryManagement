@@ -244,7 +244,8 @@ public class MemberController
 
         Fine fine = validationService.fineValidation(fineID);
         return memberService.payFine(member, fine, TransactionType.CREDIT_CARD,
-                new CreditCardTransaction(request.getName()), request.getAmount());
+                new CreditCardTransaction(request.getName()), request.getAmount(),
+                new Date());
     }
 
     @PutMapping("/fines/transaction/check")
@@ -257,7 +258,8 @@ public class MemberController
 
         Fine fine = validationService.fineValidation(fineID);
         return memberService.payFine(member, fine, TransactionType.CHECK,
-                new CheckTransaction(request.getBankName(), request.getCheckNumber()), request.getAmount());
+                new CheckTransaction(request.getBankName(), request.getCheckNumber()), request.getAmount(),
+                new Date());
     }
 
     @PutMapping("/fines/transaction/cash")
@@ -270,7 +272,8 @@ public class MemberController
 
         Fine fine = validationService.fineValidation(fineID);
         return memberService.payFine(member, fine, TransactionType.CASH,
-                new CashTransaction(request.getCashTendered()), request.getCashTendered());
+                new CashTransaction(request.getCashTendered()), request.getCashTendered(),
+                new Date());
     }
 
     @DeleteMapping("/cancel")
