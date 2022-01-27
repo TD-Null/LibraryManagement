@@ -537,15 +537,15 @@ public class MemberServiceImpTests
         // 10 days added to the due date.
         Assertions.assertEquals(new Date(borrowDate3.getTime() +
                         Limitations.MAX_LENDING_DAYS *
-                                (1000 * 60 * 60 * 24)),
-                book3.getDueDate());
+                        (1000 * 60 * 60 * 24)),
+                        book3.getDueDate());
         Assertions.assertDoesNotThrow(() -> {
             memberService.renewBook(member1, book3, book3.getDueDate());
         });
         Assertions.assertEquals(new Date(borrowDate3.getTime() +
-                Limitations.MAX_LENDING_DAYS * 2 *
-                (1000 * 60 * 60 * 24)),
-                book3.getDueDate());
+                        Limitations.MAX_LENDING_DAYS * 2 *
+                        (1000 * 60 * 60 * 24)),
+                        book3.getDueDate());
 
         // If the book is returned in time of the renewal date,
         // no fine is issued.
@@ -553,7 +553,7 @@ public class MemberServiceImpTests
             memberService.returnBook(member1, book3,
                     new Date(borrowDate3.getTime() +
                             Limitations.MAX_LENDING_DAYS * 2 *
-                                    (1000 * 60 * 60 * 24)));
+                            (1000 * 60 * 60 * 24)));
         });
         Assertions.assertEquals(BookStatus.AVAILABLE, book3.getStatus());
         Assertions.assertNull(book3.getCurrLoanMember());
@@ -607,7 +607,7 @@ public class MemberServiceImpTests
             memberService.renewBook(member2, book1,
                             new Date(book1.getBorrowed().getTime() +
                                     (Limitations.MAX_LENDING_DAYS + 3) *
-                                            (1000 * 60 * 60 * 24)));
+                                    (1000 * 60 * 60 * 24)));
         }).getMessage();
         Assertions.assertEquals("Book has been returned late. " +
                         "User cannot renew the book and must pay a fine.",
