@@ -81,4 +81,28 @@ Librarians are responsible for adding, modifying, and removing objects within th
 * Add/Modify/Remove Authors - Authors can be added and removed within the system. Each author can have multiple books associated to them within the system. Optionally, authors can be modified to add or change their current description.
 
 ### Members
+Members will primarily use their accounts to borrow, reserve, renew, and return books. Their accounts also have a limited amount of books that can be issued to their account through both book loans and reservations, and must return any borrowed books within the due date, otherwise they will have to pay a fine.
 
+* View Book Loans/Reservations - View the current borrowed and reserved books in a member's account.
+* View Book Loans/Reservations Records - View the member's history of book loans and reservations made in their account.
+* View Fines/Transactions - View fines issued to a member due to late book returns and transactions made to pay fines.
+* View Notifications - View notifcations on a member's account that were sent after either a book checkout, reservations, renewal, return, etc.
+* Checkout Book - Borrow a selected book from the system. The book cannot be borrowed if
+  * The book is a reference only
+  * The book is currently loeaned to another member
+  * The book is currently reserved for another member   
+* Reserve Book - Reserve a selected book from the system. This can be done even a book is currently loaned to a member and only one member can reserve a book at a time.
+* Cancel Reservation - Cancel a reserved book from the member's account. 
+* Renew Book - Renew a borrowed book's due date from the member's account.
+  * The book must be renewed before the due date in order to renew it. If a book is returned late, than the book will be returned to the system and the member is issued a fine.
+  * The book cannot be renewed if another member has reserved the book and will be returned to the system.
+* Return Book - Return a borrow book from the member's account.
+  * If a book is return late, a fine is issued to the member and the member must pay depending on how many days the book has been returned late.
+* Pay Fine - Pay for a fine in a member's account with either the 3 types of transactions
+  * Credit Card
+  * Check
+  * Cash 
+* Cancel Membership - Cancels a member's account and library card within the system.
+  * Members must input their library card number and password credentials and must be validated before they can cancel their membership.
+  * Members cannot cancel their account if they have books still issues to them, either through checkouts or reservations, and must return thos books or cancel reservations before they can cancel their membership.
+  * Members cannot cancel their account if thye still have fines that are not paid yet and must all be paid before they can cancel their membership.
