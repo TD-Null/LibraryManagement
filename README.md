@@ -66,7 +66,19 @@ The catalog contains all the books within the library management system, includi
    * Publication Date 
 
 ### Librarians
+Librarians are responsible for adding, modifying, and removing objects within the system.
 
+* View all Members/Librarians - View all user accounts, both members and librarians, within the system.
+* Add/Remove Librarians - Optionally add or remove librarians from the system.
+* Block/Unblock Members - Librarians can block members to prevent them from doing any actions within the system. They can also unblock those members to allow them to proceed with any action within the system.
+* View all Book Loans/Reservations - View all records of book loans and reservations made within the system by members. This will contain information of the date of when the action was made and the what book a member has borrowed or reserverd.
+* Add/Remove Library - Librarians can add/remove libraries to the system which will contain the books. Libraries cannot only be removed if they are empty, in other words have no books associated to them.
+* Add/Modify/Remove Book - Librarians can add, modify, and remove books within the system.
+  * When modifying books, not only can its properties be changed but new subjects can be added and a new author can be associated to the book.
+  * Another way of modifying the book is by moving the book to another library and rack within the system. The library it is being moved to has to exist within the system in order to modify the books location.
+  * Removing books will remove the association it has with the library, subjects, and author within its properties. The book will no longer be listed under the previously associated library, subjects, and author when viewed in the catalog.
+* Add/Remove Subjects - Subjects can be added and removed within the system. Multiple subjects can be associated to multiple books within the system.
+* Add/Modify/Remove Authors - Authors can be added and removed within the system. Each author can have multiple books associated to them within the system. Optionally, authors can be modified to add or change their current description.
 
 ### Members
 
