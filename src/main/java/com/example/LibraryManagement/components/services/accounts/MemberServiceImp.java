@@ -51,15 +51,10 @@ public class MemberServiceImp implements MemberService
     private final CheckTransactionRepository checkTransactionRepository;
     @Autowired
     private final CashTransactionRepository cashTransactionRepository;
-    @Autowired
-    private final ValidationService validationService;
-
-    private static final double finePerDay = 1.0;
 
     @Transactional
-    public ResponseEntity<BookItem> checkoutBook(Member member, BookItem book)
+    public ResponseEntity<BookItem> checkoutBook(Member member, BookItem book, Date currDate)
     {
-        Date currDate = new Date();
         Date dueDate = new Date(currDate.getTime() + Limitations.MAX_LENDING_DAYS * (1000 * 60 * 60 * 24));
         AccountNotification notification = new AccountNotification(member,
                 currDate, member.getEmail(), member.getAddress(),
@@ -104,7 +99,8 @@ public class MemberServiceImp implements MemberService
             Member loanedMember = book.getCurrLoanMember();
 
             if(!loanedMember.equals(member))
-                throw new ApiRequestException("Sorry, but this book is currently loaned to another member",
+                throw new ApiRequestException("Sorry, but this book is " +
+                        "currently loaned to another member",
                         HttpStatus.CONFLICT);
 
             throw new ApiRequestException("This user is already borrowing this book.",
@@ -112,7 +108,8 @@ public class MemberServiceImp implements MemberService
         }
 
         else if(book.getStatus() == BookStatus.LOST)
-            throw new ApiRequestException("Sorry, but the book is lost and cannot be found at the time.",
+            throw new ApiRequestException("Sorry, but the book is lost and " +
+                    "cannot be found at the time.",
                     HttpStatus.CONFLICT);
 
         bookLendingRepository.save(bookLoan);
@@ -130,21 +127,24 @@ public class MemberServiceImp implements MemberService
     }
 
     @Transactional
-    public ResponseEntity<MessageResponse> returnBook(Member member, BookItem book)
+    public ResponseEntity<MessageResponse> returnBook(Member member, BookItem book, Date currDate)
     {
-        Date returnDate = new Date();
+        Member loanedMember = book.getCurrLoanMember();
+
+        if(book.getStatus() != BookStatus.LOANED || loanedMember == null)
+            throw new ApiRequestException("Book cannot be returned as it is not " +
+                    "currently being loaned to a member.",
+                    HttpStatus.BAD_REQUEST);
+
+        else if(!loanedMember.equals(member))
+            throw new ApiRequestException("This book is not issued to this user.",
+                    HttpStatus.BAD_REQUEST);
+
+        Date returnDate = currDate;
         Date dueDate = book.getDueDate();
         AccountNotification notification = new AccountNotification(member, returnDate, member.getEmail(), member.getAddress(),
             "User has returned the book " + book.getTitle() + " on time.");
         MessageResponse response = new MessageResponse("Book has been returned.");
-
-        if(book.getStatus() != BookStatus.LOANED || book.getCurrLoanMember() == null)
-            throw new ApiRequestException("Book cannot be returned as it is not currently being loaned to a member.",
-                    HttpStatus.BAD_REQUEST);
-
-        else if(!book.getCurrLoanMember().equals(member))
-            throw new ApiRequestException("This book is not issued to this user.",
-                    HttpStatus.BAD_REQUEST);
 
         member.returnBookItem(book, returnDate);
 
@@ -152,7 +152,7 @@ public class MemberServiceImp implements MemberService
         {
             long diffInMillies = Math.abs(returnDate.getTime() - dueDate.getTime());
             long diff = TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS);
-            double fine = finePerDay * diff;
+            double fine = Limitations.FINE_PER_DAY * diff;
 
             response = new MessageResponse("Book has been returned late. User must pay a fine.");
             AccountNotification fineNotification = new AccountNotification(member,
@@ -161,7 +161,7 @@ public class MemberServiceImp implements MemberService
                             + " for returning the book " + book.getTitle()
                             + " late.");
 
-            member.addFine(new Fine(fine));
+            member.addFine(new Fine(fine, member));
             notificationRepository.save(fineNotification);
             member.sendNotification(fineNotification);
         }
@@ -199,9 +199,8 @@ public class MemberServiceImp implements MemberService
     }
 
     @Transactional
-    public ResponseEntity<MessageResponse> reserveBook(Member member, BookItem book)
+    public ResponseEntity<MessageResponse> reserveBook(Member member, BookItem book, Date currDate)
     {
-        Date currDate = new Date();
         AccountNotification notification = new AccountNotification(member, currDate, member.getEmail(), member.getAddress(),
                 "User has made a reservation for the book " + book.getTitle() + ".");
         BookReservation bookReservation = new BookReservation(book, member, currDate, ReservationStatus.WAITING);
@@ -220,7 +219,8 @@ public class MemberServiceImp implements MemberService
             Member reservedMember = book.getCurrReservedMember();
 
             if(!reservedMember.equals(member))
-                throw new ApiRequestException("Sorry, but this book is currently reserved for another member",
+                throw new ApiRequestException("Sorry, but this book is currently " +
+                        "reserved for another member",
                         HttpStatus.CONFLICT);
 
             throw new ApiRequestException("This user has already reserved this book.",
@@ -249,21 +249,21 @@ public class MemberServiceImp implements MemberService
     }
 
     @Transactional
-    public ResponseEntity<MessageResponse> cancelReservation(Member member, BookItem book)
+    public ResponseEntity<MessageResponse> cancelReservation(Member member, BookItem book, Date currDate)
     {
-        Date currDate = new Date();
-        AccountNotification notification = new AccountNotification(member,
-                currDate, member.getEmail(), member.getAddress(),
-                "User has cancelled their reservation for the book " + book.getTitle() + ".");
         Member reservedMember = book.getCurrReservedMember();
 
-        if(reservedMember == null)
+        if(book.getStatus() == BookStatus.AVAILABLE ||reservedMember == null)
             throw new ApiRequestException("This book is not being reserved by anyone.",
                     HttpStatus.BAD_REQUEST);
 
         else if(!reservedMember.equals(member))
             throw new ApiRequestException("This book is being reserved by another user.",
-                    HttpStatus.CONFLICT);
+                    HttpStatus.BAD_REQUEST);
+
+        AccountNotification notification = new AccountNotification(member,
+                currDate, member.getEmail(), member.getAddress(),
+                "User has cancelled their reservation for the book " + book.getTitle() + ".");
 
         notificationRepository.save(notification);
         member.sendNotification(notification);
@@ -278,28 +278,31 @@ public class MemberServiceImp implements MemberService
     }
 
     @Transactional
-    public ResponseEntity<MessageResponse> renewBook(Member member, BookItem book)
+    public ResponseEntity<MessageResponse> renewBook(Member member, BookItem book, Date currDate)
     {
-        Date returnDate = new Date();
+        Member loanedMember = book.getCurrLoanMember();
+
+        if(book.getStatus() != BookStatus.LOANED || loanedMember == null)
+            throw new ApiRequestException("Book cannot be renewed as it is not " +
+                    "currently being loaned to a member.",
+                    HttpStatus.BAD_REQUEST);
+
+        else if(!loanedMember.equals(member))
+            throw new ApiRequestException("This book is not issued to this user.",
+                    HttpStatus.BAD_REQUEST);
+
+        Date returnDate = currDate;
         Date dueDate = book.getDueDate();
         Date newDueDate = new Date(dueDate.getTime() + Limitations.MAX_LENDING_DAYS * (1000 * 60 * 60 * 24));
         AccountNotification notification = new AccountNotification(member,
                 returnDate, member.getEmail(), member.getAddress(),
                 "User has renewed the book " + book.getTitle() + ".");
 
-        if(book.getStatus() != BookStatus.LOANED || book.getCurrLoanMember() == null)
-            throw new ApiRequestException("Book cannot be renewed as it is not currently being loaned to a member.",
-                    HttpStatus.BAD_REQUEST);
-
-        else if(!book.getCurrLoanMember().equals(member))
-            throw new ApiRequestException("This book is not issued to this user.",
-                    HttpStatus.BAD_REQUEST);
-
         if(dueDate.compareTo(returnDate) < 0)
         {
             long diffInMillies = Math.abs(returnDate.getTime() - dueDate.getTime());
             long diff = TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS);
-            double fine = finePerDay * diff;
+            double fine = Limitations.FINE_PER_DAY * diff;
 
             AccountNotification fineNotification = new AccountNotification(member,
                     returnDate, member.getEmail(), member.getAddress(),
@@ -307,9 +310,10 @@ public class MemberServiceImp implements MemberService
                             + " for returning the book " + book.getTitle()
                             + " late.");
 
-            member.addFine(new Fine(fine));
+            member.addFine(new Fine(fine, member));
             notificationRepository.save(fineNotification);
             member.sendNotification(fineNotification);
+            member.returnBookItem(book, currDate);
 
             book.setCurrLoanMember(null);
             book.setBorrowed(null);
@@ -341,6 +345,16 @@ public class MemberServiceImp implements MemberService
 
         else if(book.getCurrReservedMember() != null)
         {
+            AccountNotification renewalFailureNotification = new AccountNotification(member,
+                    returnDate, member.getEmail(), member.getAddress(),
+                    "User was unable to renew the book " + book.getTitle() +
+                            " as it is currently reserved for another member. " +
+                            "Book " + book.getTitle() + " has been returned.");
+
+            notificationRepository.save(renewalFailureNotification);
+            member.sendNotification(renewalFailureNotification);
+            member.returnBookItem(book, currDate);
+
             Member reservedMember = book.getCurrReservedMember();
             reservedMember.updatedPendingReservation(book);
 
@@ -350,8 +364,8 @@ public class MemberServiceImp implements MemberService
 
             notificationRepository.save(notification);
             reservedMember.sendNotification(reservationNotification);
-            book.setStatus(BookStatus.RESERVED);
 
+            book.setStatus(BookStatus.RESERVED);
             book.setCurrLoanMember(null);
             book.setBorrowed(null);
             book.setDueDate(null);
@@ -363,15 +377,14 @@ public class MemberServiceImp implements MemberService
 
         member.sendNotification(notification);
         member.renewBookItem(book, dueDate, newDueDate);
+        book.setDueDate(newDueDate);
         return ResponseEntity.ok(new MessageResponse("Book has been renewed for the user."));
     }
 
     @Transactional
-    public ResponseEntity<MessageResponse> payFine(Member member, Long fineID,
-                                                   TransactionType type, Object transaction, double amount)
+    public ResponseEntity<MessageResponse> payFine(Member member, Fine fine, TransactionType type,
+                                                   Object transaction, double amount, Date currDate)
     {
-        Fine fine = validationService.fineValidation(fineID);
-
         if(!fine.getMember().equals(member))
             throw new ApiRequestException("Fine is not issued to this user.",
                     HttpStatus.BAD_REQUEST);
@@ -380,7 +393,7 @@ public class MemberServiceImp implements MemberService
             throw new ApiRequestException("Given amount is not enough to pay for the fine.",
                     HttpStatus.UNPROCESSABLE_ENTITY);
 
-        FineTransaction fineTransaction = new FineTransaction(type, new Date(), amount);
+        FineTransaction fineTransaction = new FineTransaction(type, currDate, amount);
 
         switch (type)
         {
@@ -388,9 +401,14 @@ public class MemberServiceImp implements MemberService
                 if(transaction instanceof CreditCardTransaction)
                 {
                     CreditCardTransaction cardTransaction = (CreditCardTransaction) transaction;
+                    cardTransaction.setFineTransaction(fineTransaction);
                     creditCardTransactionRepository.save(cardTransaction);
                     fineTransaction.setCreditCardTransaction(cardTransaction);
                 }
+
+                else
+                    throw new ApiRequestException("Unexpected transaction made.",
+                            HttpStatus.UNPROCESSABLE_ENTITY);
 
                 break;
 
@@ -398,9 +416,14 @@ public class MemberServiceImp implements MemberService
                 if(transaction instanceof CheckTransaction)
                 {
                     CheckTransaction checkTransaction = (CheckTransaction) transaction;
+                    checkTransaction.setFineTransaction(fineTransaction);
                     checkTransactionRepository.save(checkTransaction);
                     fineTransaction.setCheckTransaction(checkTransaction);
                 }
+
+                else
+                    throw new ApiRequestException("Unexpected transaction made.",
+                            HttpStatus.UNPROCESSABLE_ENTITY);
 
                 break;
 
@@ -408,14 +431,20 @@ public class MemberServiceImp implements MemberService
                 if(transaction instanceof CashTransaction)
                 {
                     CashTransaction cashTransaction = (CashTransaction) transaction;
+                    cashTransaction.setFineTransaction(fineTransaction);
                     cashTransactionRepository.save(cashTransaction);
                     fineTransaction.setCashTransaction(cashTransaction);
                 }
 
+                else
+                    throw new ApiRequestException("Unexpected transaction made.",
+                            HttpStatus.UNPROCESSABLE_ENTITY);
+
                 break;
 
             default:
-                throw new ApiRequestException("Transaction cannot be used.", HttpStatus.UNPROCESSABLE_ENTITY);
+                throw new ApiRequestException("Transaction cannot be used.",
+                        HttpStatus.UNPROCESSABLE_ENTITY);
         }
 
         fineTransactionRepository.save(fineTransaction);

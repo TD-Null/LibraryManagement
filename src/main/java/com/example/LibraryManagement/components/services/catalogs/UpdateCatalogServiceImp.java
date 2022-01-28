@@ -42,33 +42,24 @@ public class UpdateCatalogServiceImp implements UpdateCatalogService
     @Autowired
     private final AuthorRepository authorRepository;
     @Autowired
-    private final ValidationService validationService;
-    @Autowired
     private final AccountNotificationRepository notificationRepository;
 
     public ResponseEntity<MessageResponse> addLibrary(String name, String streetAddress, String city,
                                                       String zipcode, String country)
     {
-        if(libraryRepository.existsById(name))
-            throw new ApiRequestException("Library already exists within the system.",
-                    HttpStatus.CONFLICT);
-
         libraryRepository.save(new Library(name, new Address(streetAddress, city, zipcode, country)));
         return ResponseEntity.ok(new MessageResponse("Library has been successfully added to the system."));
     }
 
     @Transactional
-    public ResponseEntity<MessageResponse> addBookItem(String libraryName, Rack rack, String ISBN, String title,
+    public ResponseEntity<MessageResponse> addBookItem(Library library, Rack rack, String ISBN, String title,
                                                        String publisher, String language, int numberOfPages,
-                                                       String authorName, Set<String> subjects, BookFormat format,
+                                                       Author author, Set<Subject> subjects, BookFormat format,
                                                        Date publicationDate, boolean isReferenceOnly, double price)
     {
-        Library library = validationService.libraryValidation(libraryName);
-        Author author = validationService.authorValidation(authorName);
-
-        BookItem bookItem = new BookItem(ISBN, title, publisher, language, numberOfPages,
-                rack.getNumber(), rack.getLocation(), format, BookStatus.AVAILABLE, publicationDate,
-                isReferenceOnly, price);
+        BookItem bookItem = new BookItem(ISBN, title, publisher, language,
+                numberOfPages, rack, format, BookStatus.AVAILABLE,
+                publicationDate, isReferenceOnly, price);
 
         bookItemRepository.save(bookItem);
 
@@ -78,11 +69,10 @@ public class UpdateCatalogServiceImp implements UpdateCatalogService
         library.addBookItem(bookItem);
         author.addBookItem(bookItem);
 
-        for(String s: subjects)
+        for(Subject s: subjects)
         {
-            Subject subject = validationService.subjectValidation(s);
-            subject.addBookItem(bookItem);
-            bookItem.addSubject(subject);
+            s.addBookItem(bookItem);
+            bookItem.addSubject(s);
         }
 
         return ResponseEntity.ok(new MessageResponse("Book has been successfully added to the system."));
@@ -90,66 +80,49 @@ public class UpdateCatalogServiceImp implements UpdateCatalogService
 
     public ResponseEntity<MessageResponse> addSubject(String subject)
     {
-        if(subjectRepository.existsById(subject))
-            throw new ApiRequestException("Subject already exists within the system.",
-                    HttpStatus.CONFLICT);
-
         subjectRepository.save(new Subject(subject));
         return ResponseEntity.ok(new MessageResponse("Subject has been successfully added to the system."));
     }
 
     public ResponseEntity<MessageResponse> addAuthor(String author, String description)
     {
-        if(authorRepository.existsById(author))
-            throw new ApiRequestException("Author already exists within the system.",
-                    HttpStatus.CONFLICT);
-
         authorRepository.save(new Author(author, description));
         return ResponseEntity.ok(new MessageResponse("Author has been successfully added to the system."));
     }
 
     @Transactional
-    public ResponseEntity<MessageResponse> modifyBookItem(Long barcode, String ISBN, String title,
+    public ResponseEntity<MessageResponse> modifyBookItem(BookItem book, String ISBN, String title,
                                                           String publisher, String language, int numberOfPages,
-                                                          String authorName, Set<String> subjects, BookFormat format,
+                                                          Author author, Set<Subject> newSubjects, BookFormat format,
                                                           Date publicationDate, boolean isReferenceOnly, double price)
     {
-        BookItem bookItem = validationService.bookValidation(barcode);
+        book.setISBN(ISBN);
+        book.setTitle(title);
+        book.setPublisher(publisher);
+        book.setLanguage(language);
+        book.setNumberOfPages(numberOfPages);
+        book.setFormat(format);
+        book.setPublicationDate(publicationDate);
+        book.setReferenceOnly(isReferenceOnly);
+        book.setPrice(price);
 
-        bookItem.setISBN(ISBN);
-        bookItem.setTitle(title);
-        bookItem.setPublisher(publisher);
-        bookItem.setLanguage(language);
-        bookItem.setNumberOfPages(numberOfPages);
-        bookItem.setFormat(format);
-        bookItem.setPublicationDate(publicationDate);
-        bookItem.setReferenceOnly(isReferenceOnly);
-        bookItem.setPrice(price);
-
-        Author author = validationService.authorValidation(authorName);
-        Author prevAuthor = bookItem.getAuthor();
+        Author prevAuthor = book.getAuthor();
 
         if(!prevAuthor.equals(author))
         {
-            prevAuthor.removeBookItem(bookItem);
-            author.addBookItem(bookItem);
-            bookItem.setAuthor(author);
+            prevAuthor.removeBookItem(book);
+            author.addBookItem(book);
+            book.setAuthor(author);
         }
 
-        Set<Subject> prevSubjects = bookItem.getSubjects();
-        Set<Subject> newSubjects = new HashSet<>();
-
-        for(String s: subjects)
-        {
-            newSubjects.add(validationService.subjectValidation(s));
-        }
+        Set<Subject> prevSubjects = book.getSubjects();
 
         for(Subject s: prevSubjects)
         {
             if(!newSubjects.contains(s))
             {
-                s.removeBookItem(bookItem);
-                bookItem.removeSubject(s);
+                s.removeBookItem(book);
+                book.removeSubject(s);
             }
         }
 
@@ -157,8 +130,8 @@ public class UpdateCatalogServiceImp implements UpdateCatalogService
         {
             if(!prevSubjects.contains(s))
             {
-                s.addBookItem(bookItem);
-                bookItem.addSubject(s);
+                s.addBookItem(book);
+                book.addSubject(s);
             }
         }
 
@@ -166,11 +139,9 @@ public class UpdateCatalogServiceImp implements UpdateCatalogService
     }
 
     @Transactional
-    public ResponseEntity<MessageResponse> moveBookItem(Long barcode, String libraryName, Rack r)
+    public ResponseEntity<MessageResponse> moveBookItem(BookItem book, Library newLibrary, Rack r)
     {
-        BookItem book = validationService.bookValidation(barcode);
         Library prevLibrary = book.getLibrary();
-        Library newLibrary = validationService.libraryValidation(libraryName);
 
         if(!newLibrary.equals(prevLibrary))
         {
@@ -184,21 +155,15 @@ public class UpdateCatalogServiceImp implements UpdateCatalogService
     }
 
     @Transactional
-    public ResponseEntity<MessageResponse> modifyAuthor(String name, String description)
+    public ResponseEntity<MessageResponse> modifyAuthor(Author author, String description)
     {
-        if(!authorRepository.existsById(name))
-            throw new ApiRequestException("Author does not exist within the system.", HttpStatus.BAD_REQUEST);
-
-        Author author = authorRepository.getById(name);
         author.setDescription(description);
         return ResponseEntity.ok(new MessageResponse("Author has been updated successfully within the system."));
     }
 
     @Transactional
-    public ResponseEntity<MessageResponse> removeLibrary(String libraryName)
+    public ResponseEntity<MessageResponse> removeLibrary(Library library)
     {
-        Library library = validationService.libraryValidation(libraryName);
-
         if(!library.getBooks().isEmpty())
             throw new ApiRequestException("Library still contains books within the system.",
                     HttpStatus.CONFLICT);
@@ -208,12 +173,11 @@ public class UpdateCatalogServiceImp implements UpdateCatalogService
     }
 
     @Transactional
-    public ResponseEntity<MessageResponse> removeBookItem(Long barcode)
+    public ResponseEntity<MessageResponse> removeBookItem(BookItem book)
     {
-        BookItem book = validationService.bookValidation(barcode);
-
         if(book.getCurrLoanMember() != null && book.getStatus() == BookStatus.LOANED)
-            throw new ApiRequestException("This book is currently not available and is loaned to a member.", HttpStatus.ACCEPTED);
+            throw new ApiRequestException("This book is currently not available and is loaned to a member.",
+                    HttpStatus.CONFLICT);
 
         else if(book.getCurrReservedMember() != null && book.getStatus() == BookStatus.RESERVED)
         {
@@ -249,8 +213,8 @@ public class UpdateCatalogServiceImp implements UpdateCatalogService
 
         for(Subject s: subjects)
             s.removeBookItem(book);
-        book.clearSubjects();
 
+        book.clearSubjects();
         book.clearRecords();
 
         bookItemRepository.delete(book);
@@ -258,27 +222,21 @@ public class UpdateCatalogServiceImp implements UpdateCatalogService
     }
 
     @Transactional
-    public ResponseEntity<MessageResponse> removeSubject(String name)
+    public ResponseEntity<MessageResponse> removeSubject(Subject subject)
     {
-        if(!subjectRepository.existsById(name))
-            throw new ApiRequestException("Subject does not exist within the system.",
-                    HttpStatus.NOT_FOUND);
+        Set<BookItem> subjectBooks = subject.getBooks();
 
-        Subject subject = subjectRepository.getById(name);
+        for(BookItem b: subjectBooks)
+            b.removeSubject(subject);
+
         subject.clearBooks();
         subjectRepository.delete(subject);
         return ResponseEntity.ok(new MessageResponse("Subject has been successfully removed from the system."));
     }
 
     @Transactional
-    public ResponseEntity<MessageResponse> removeAuthor(String name)
+    public ResponseEntity<MessageResponse> removeAuthor(Author author)
     {
-        if(!authorRepository.existsById(name))
-            throw new ApiRequestException("Author does not exist within the system.",
-                    HttpStatus.NOT_FOUND);
-
-        Author author = authorRepository.getById(name);
-
         if(!author.getBooks().isEmpty())
             throw new ApiRequestException("Author is still associated with books within the system.",
                     HttpStatus.CONFLICT);

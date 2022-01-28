@@ -4,7 +4,6 @@ import com.example.LibraryManagement.components.repositories.books.AuthorReposit
 import com.example.LibraryManagement.components.repositories.books.BookItemRepository;
 import com.example.LibraryManagement.components.repositories.books.LibraryRepository;
 import com.example.LibraryManagement.components.repositories.books.SubjectRepository;
-import com.example.LibraryManagement.components.services.ValidationService;
 import com.example.LibraryManagement.models.books.libraries.Library;
 import com.example.LibraryManagement.models.books.properties.Author;
 import com.example.LibraryManagement.models.books.properties.BookItem;
@@ -34,8 +33,6 @@ public class ViewCatalogServiceImp implements ViewCatalogService
     private final AuthorRepository authorRepository;
     @Autowired
     private final SubjectRepository subjectRepository;
-    @Autowired
-    private final ValidationService validationService;
 
     public ResponseEntity<List<BookItem>> listAllBooks()
     {
@@ -87,11 +84,16 @@ public class ViewCatalogServiceImp implements ViewCatalogService
 
         if(!libraryName.equals("none"))
         {
-            Library library = validationService.libraryValidation(libraryName);
-            Set<BookItem> libraryBooks = library.getBooks();
+            Optional<Library> libraryValidation = libraryRepository.findById(libraryName);
 
-            for(BookItem b: libraryBooks)
-                if(!books.contains(b)) books.add(b);
+            if(libraryValidation.isPresent())
+            {
+                Library library = libraryValidation.get();
+                Set<BookItem> libraryBooks = library.getBooks();
+
+                for (BookItem b : libraryBooks)
+                    if (!books.contains(b)) books.add(b);
+            }
         }
 
         if(!title.equals("none"))
@@ -104,22 +106,32 @@ public class ViewCatalogServiceImp implements ViewCatalogService
 
         if(!authorName.equals("none"))
         {
-            Author author = validationService.authorValidation(authorName);
-            Set<BookItem> booksByAuthor = author.getBooks();
+            Optional<Author> authorValidation = authorRepository.findById(authorName);
 
-            for(BookItem b: booksByAuthor)
-                if(!books.contains(b)) books.add(b);
+            if(authorValidation.isPresent())
+            {
+                Author author = authorValidation.get();
+                Set<BookItem> booksByAuthor = author.getBooks();
+
+                for (BookItem b : booksByAuthor)
+                    if (!books.contains(b)) books.add(b);
+            }
         }
 
         if(!subjects.contains("none"))
         {
             for(String name: subjects)
             {
-                Subject subject = validationService.subjectValidation(name);
-                Set<BookItem> booksBySubject = subject.getBooks();
+                Optional<Subject> subjectValidation = subjectRepository.findById(name);
 
-                for(BookItem b: booksBySubject)
-                    if(!books.contains(b)) books.add(b);
+                if(subjectValidation.isPresent())
+                {
+                    Subject subject = subjectValidation.get();
+                    Set<BookItem> booksBySubject = subject.getBooks();
+
+                    for (BookItem b : booksBySubject)
+                        if (!books.contains(b)) books.add(b);
+                }
             }
         }
 
