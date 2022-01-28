@@ -47,7 +47,21 @@ public class ValidationService
     @Autowired
     private final AuthorRepository authorRepository;
 
-    public LibraryCard cardValidation(Long barcode)
+    public LibraryCard cardValidation(Long barcode, String number)
+    {
+        Optional<LibraryCard> card = libraryCardRepository.findById(barcode);
+
+        if(card.isEmpty())
+            throw new ApiRequestException("Unable to find library card within the system.",
+                    HttpStatus.UNAUTHORIZED);
+
+        else if(!card.get().getCardNumber().equals(number))
+            throw new ApiRequestException("Invalid credentials.", HttpStatus.UNAUTHORIZED);
+
+        return card.get();
+    }
+
+    public LibraryCard cardBarcodeValidation(Long barcode)
     {
         Optional<LibraryCard> card = libraryCardRepository.findById(barcode);
 

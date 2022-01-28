@@ -32,9 +32,9 @@ public interface AccountService
 
     ResponseEntity<MessageResponse> updateMemberStatus(Member member, AccountStatus status);
 
-    ResponseEntity<MessageResponse> cancelMemberAccount(LibraryCard card, String cardNumber, String password);
+    ResponseEntity<MessageResponse> cancelMemberAccount(LibraryCard card, String password);
 
-    ResponseEntity<MessageResponse> cancelLibrarianAccount(LibraryCard card, String cardNumber);
+    ResponseEntity<MessageResponse> cancelLibrarianAccount(LibraryCard card);
 
-    Object barcodeReader(LibraryCard card, String number, AccountType type, AccountStatus status);
+    Object barcodeReader(LibraryCard card, AccountType type, AccountStatus status);
 }

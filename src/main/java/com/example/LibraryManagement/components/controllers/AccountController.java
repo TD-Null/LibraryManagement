@@ -12,6 +12,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.Date;
 
 /*
@@ -45,8 +47,26 @@ public class AccountController
     public ResponseEntity<Object> viewAccountDetails(@RequestParam(value = "barcode") Long barcode,
                                                      @RequestParam(value = "card") String number)
     {
-        LibraryCard card = validationService.cardValidation(barcode);
-        return accountService.getAccountDetails(card, number);
+        log.trace("Request viewAccountDetails() called.");
+        log.info("User has inputted their credentials:" +
+                "\nLibrary card barcode: " + barcode +
+                "\nLibrary card number: " + number);
+        LibraryCard card = validationService.cardValidation(barcode, number);
+        log.info("Library card with barcode " + barcode + " has been validated.");
+
+        Instant start = Instant.now();
+
+        try
+        {
+            return accountService.getAccountDetails(card, number);
+        }
+
+        finally
+        {
+            Instant finish = Instant.now();
+            long time = Duration.between(start, finish).toMillis();
+            log.trace("{}: {} ms ",  time);
+        }
     }
 
     /*
@@ -71,10 +91,13 @@ public class AccountController
     @PostMapping("/signup")
     public ResponseEntity<LibraryCard> signup(@Valid @RequestBody SignupRequest signUpRequest)
     {
+        log.trace("Method signup() called.");
+        log.info("User is signing up for an account in the system.");
         return accountService.registerMember(signUpRequest.getName(), signUpRequest.getPassword(),
                 signUpRequest.getEmail(), signUpRequest.getStreetAddress(),
                 signUpRequest.getCity(), signUpRequest.getZipcode(),
-                signUpRequest.getCountry(), signUpRequest.getPhoneNumber(), new Date());
+                signUpRequest.getCountry(), signUpRequest.getPhoneNumber(),
+                new Date());
     }
 
     /*
@@ -87,7 +110,8 @@ public class AccountController
     @PutMapping("/update")
     public ResponseEntity<MessageResponse> editAccountDetails(@Valid @RequestBody UpdateAccountRequest request)
     {
-        LibraryCard card = validationService.cardValidation(request.getBarcode());
+        LibraryCard card = validationService.cardValidation(
+                request.getBarcode(), request.getNumber());
         return accountService.updateAccountDetails(card, request.getNumber(),
                 request.getName(), request.getStreetAddress(), request.getCity(),
                 request.getZipcode(), request.getCountry(), request.getEmail(),
@@ -104,7 +128,10 @@ public class AccountController
     @PutMapping("/update/password")
     public ResponseEntity<MessageResponse> changePassword(@Valid @RequestBody ChangePasswordRequest request)
     {
-        LibraryCard card = validationService.cardValidation(request.getBarcode());
-        return accountService.changePassword(card, request.getOriginalPassword(), request.getNewPassword());
+        LibraryCard card = validationService.cardValidation(
+                request.getBarcode(), request.getNumber());
+        return accountService.changePassword(card,
+                request.getOriginalPassword(),
+                request.getNewPassword());
     }
 }
