@@ -59,17 +59,26 @@ public class AccountController
             LibraryCard card = validationService.cardValidation(barcode, number);
             cardValidationSuccess = true;
 
-            ResponseEntity<Object> accountDetails = accountService.getAccountDetails(card, number);
+            ResponseEntity<Object> response = accountService.getAccountDetails(card, number);
             requestSuccess = true;
-            return accountDetails;
+            return response;
         }
 
         finally
         {
             Instant finish = Instant.now();
             long time = Duration.between(start, finish).toMillis();
+            String message = "";
+
+            if(requestSuccess)
+                message = "User has obtained their account details.";
+
+            else
+                message = "User was unable to obtain their account details.";
+
             requestLog(requestType, httpServletRequest.getRequestURL().toString(),
-                    barcode, number, cardValidationSuccess, requestSuccess, time);
+                    message, barcode, number, cardValidationSuccess, requestSuccess,
+                    time);
         }
     }
 
@@ -90,17 +99,25 @@ public class AccountController
         try
         {
             LibraryCard card = validationService.cardNumberValidation(request.getLibraryCardNumber());
-            ResponseEntity<LibraryCard> libraryCard = accountService.authenticateUser(card, request.getPassword());
+            ResponseEntity<LibraryCard> response = accountService.authenticateUser(card, request.getPassword());
             requestSuccess = true;
-            return libraryCard;
+            return response;
         }
 
         finally
         {
             Instant finish = Instant.now();
             long time = Duration.between(start, finish).toMillis();
+            String message = "";
+
+            if(requestSuccess)
+                message = "User has login to their account.";
+
+            else
+                message = "User failed to login to their account (Either wrong library card number or password.";
+
             loginLog(requestType, httpServletRequest.getRequestURL().toString(),
-                    request.getLibraryCardNumber(), request.getPassword(),
+                    message, request.getLibraryCardNumber(), request.getPassword(),
                     requestSuccess, time);
         }
 
@@ -112,15 +129,41 @@ public class AccountController
      * Returns a 200 response code with the details of the user's library card.
      */
     @PostMapping("/signup")
-    public ResponseEntity<LibraryCard> signup(@Valid @RequestBody SignupRequest request)
+    public ResponseEntity<LibraryCard> signup(HttpServletRequest httpServletRequest,
+                                              @Valid @RequestBody SignupRequest request)
     {
-        log.trace("Method signup() called.");
-        log.info("User is signing up for an account in the system.");
-        return accountService.registerMember(request.getName(), request.getPassword(),
-                request.getEmail(), request.getStreetAddress(),
-                request.getCity(), request.getZipcode(),
-                request.getCountry(), request.getPhoneNumber(),
-                new Date());
+        String requestType = "POST";
+        boolean requestSuccess = false;
+        Instant start = Instant.now();
+
+        try
+        {
+            ResponseEntity<LibraryCard> response = accountService
+                    .registerMember(request.getName(), request.getPassword(),
+                    request.getEmail(), request.getStreetAddress(),
+                    request.getCity(), request.getZipcode(),
+                    request.getCountry(), request.getPhoneNumber(),
+                    new Date());
+            requestSuccess = true;
+            return response;
+        }
+
+        finally
+        {
+            Instant finish = Instant.now();
+            long time = Duration.between(start, finish).toMillis();
+            String message = "";
+
+            if(requestSuccess)
+                message = "User has created their account.";
+
+            else
+                message = "User failed to create their account.";
+
+            signupLog(requestType, httpServletRequest.getRequestURL().toString(),
+                    message, request.getName(), request.getPassword(),
+                    requestSuccess, time);
+        }
     }
 
     /*
@@ -131,14 +174,44 @@ public class AccountController
      * details has been updated.
      */
     @PutMapping("/update")
-    public ResponseEntity<MessageResponse> editAccountDetails(@Valid @RequestBody UpdateAccountRequest request)
+    public ResponseEntity<MessageResponse> editAccountDetails(HttpServletRequest httpServletRequest,
+                                                              @Valid @RequestBody UpdateAccountRequest request)
     {
-        LibraryCard card = validationService.cardValidation(
-                request.getBarcode(), request.getNumber());
-        return accountService.updateAccountDetails(card, request.getNumber(),
-                request.getName(), request.getStreetAddress(), request.getCity(),
-                request.getZipcode(), request.getCountry(), request.getEmail(),
-                request.getPhoneNumber());
+        String requestType = "PUT";
+        boolean cardValidationSuccess = false;
+        boolean requestSuccess = false;
+        Instant start = Instant.now();
+
+        try
+        {
+            LibraryCard card = validationService.cardValidation(
+                    request.getBarcode(), request.getNumber());
+            cardValidationSuccess = true;
+
+            ResponseEntity<MessageResponse> response = accountService.updateAccountDetails(card, request.getNumber(),
+                    request.getName(), request.getStreetAddress(), request.getCity(),
+                    request.getZipcode(), request.getCountry(), request.getEmail(),
+                    request.getPhoneNumber());
+            requestSuccess = true;
+            return response;
+        }
+
+        finally
+        {
+            Instant finish = Instant.now();
+            long time = Duration.between(start, finish).toMillis();
+            String message = "";
+
+            if(requestSuccess)
+                message = "User has successfully edited their account details.";
+
+            else
+                message = "User has failed to edit their account details.";
+
+            requestLog(requestType, httpServletRequest.getRequestURL().toString(), message,
+                    request.getBarcode(), request.getNumber(), cardValidationSuccess,
+                    requestSuccess, time);
+        }
     }
 
     /*
@@ -149,17 +222,48 @@ public class AccountController
      * password has been updated.
      */
     @PutMapping("/update/password")
-    public ResponseEntity<MessageResponse> changePassword(@Valid @RequestBody ChangePasswordRequest request)
+    public ResponseEntity<MessageResponse> changePassword(HttpServletRequest httpServletRequest,
+                                                          @Valid @RequestBody ChangePasswordRequest request)
     {
-        LibraryCard card = validationService.cardValidation(
-                request.getBarcode(), request.getNumber());
-        return accountService.changePassword(card,
-                request.getOriginalPassword(),
-                request.getNewPassword());
+        String requestType = "PUT";
+        boolean cardValidationSuccess = false;
+        boolean requestSuccess = false;
+        Instant start = Instant.now();
+
+        try
+        {
+            LibraryCard card = validationService.cardValidation(
+                    request.getBarcode(), request.getNumber());
+            cardValidationSuccess = true;
+
+            ResponseEntity<MessageResponse> response = accountService.changePassword(card,
+                    request.getOriginalPassword(),
+                    request.getNewPassword());
+            requestSuccess = true;
+            return response;
+        }
+
+        finally
+        {
+            Instant finish = Instant.now();
+            long time = Duration.between(start, finish).toMillis();
+            String message = "";
+
+            if(requestSuccess)
+                message = "User has successfully changed their password.";
+
+            else
+                message = "User has failed to change their password.";
+
+            requestLog(requestType, httpServletRequest.getRequestURL().toString(), message,
+                    request.getBarcode(), request.getNumber(), cardValidationSuccess,
+                    requestSuccess, time);
+        }
     }
 
-    private void loginLog(String requestType, String requestURL, String number,
-                          String password, boolean loginValidation, long time)
+    private void loginLog(String requestType, String requestURL, String message,
+                          String number, String password, boolean loginValidation,
+                          long time)
     {
         String userLog = "(Login user credentials:" +
                 " Number = " + number +
@@ -175,20 +279,39 @@ public class AccountController
         else
         {
             userLog += " [Invalid])";
-            successLog = "(Failure! Completed in " + time + " ms)";
+            successLog = "(Failed! Completed in " + time + " ms)";
         }
 
-        log.info(requestType + " " + requestURL + " " + userLog + " " + successLog);
+        log.info(requestType + " " + requestURL + " " + message + " " + userLog + " " + successLog);
     }
 
-    private void signupLog()
+    private void signupLog(String requestType, String requestURL, String message,
+                           String name, String password, boolean loginValidation,
+                           long time)
     {
+        String userLog = "(Login user credentials:" +
+                " Name = " + name +
+                ", Password = " + password;
+        String successLog;
 
+        if(loginValidation)
+        {
+            userLog += " [Valid])";
+            successLog = "(Success! Completed in " + time + " ms)";
+        }
+
+        else
+        {
+            userLog += " [Invalid])";
+            successLog = "(Failed! Completed in " + time + " ms)";
+        }
+
+        log.info(requestType + " " + requestURL + " " + message + " " + userLog + " " + successLog);
     }
 
-    private void requestLog(String requestType, String requestURL, long barcode,
-                            String number, boolean cardValidation, boolean requestSuccess,
-                            long time)
+    private void requestLog(String requestType, String requestURL, String message,
+                            long barcode, String number, boolean cardValidation,
+                            boolean requestSuccess, long time)
     {
         String userLog = "(User:" +
                 " Barcode = " + barcode +
@@ -207,6 +330,6 @@ public class AccountController
         else
             successLog = "(Failure! Completed in " + time + " ms)";
 
-        log.info(requestType + " " + requestURL + " " + userLog + " " + successLog);
+        log.info(requestType + " " + requestURL + " " + message + " " + userLog + " " + successLog);
     }
 }
