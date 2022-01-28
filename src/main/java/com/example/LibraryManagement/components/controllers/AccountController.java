@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.time.Duration;
 import java.time.Instant;
@@ -44,28 +45,31 @@ public class AccountController
      * from either a MEMBER or LIBRARIAN account.
      */
     @GetMapping("/details")
-    public ResponseEntity<Object> viewAccountDetails(@RequestParam(value = "barcode") Long barcode,
+    public ResponseEntity<Object> viewAccountDetails(HttpServletRequest httpServletRequest,
+                                                     @RequestParam(value = "barcode") Long barcode,
                                                      @RequestParam(value = "card") String number)
     {
-        log.trace("Request viewAccountDetails() called.");
-        log.info("User has inputted their credentials:" +
-                "\nLibrary card barcode: " + barcode +
-                "\nLibrary card number: " + number);
-        LibraryCard card = validationService.cardValidation(barcode, number);
-        log.info("Library card with barcode " + barcode + " has been validated.");
-
+        String requestType = "GET";
+        boolean cardValidationSuccess = false;
+        boolean requestSuccess = false;
         Instant start = Instant.now();
 
         try
         {
-            return accountService.getAccountDetails(card, number);
+            LibraryCard card = validationService.cardValidation(barcode, number);
+            cardValidationSuccess = true;
+
+            ResponseEntity<Object> accountDetails = accountService.getAccountDetails(card, number);
+            requestSuccess = true;
+            return accountDetails;
         }
 
         finally
         {
             Instant finish = Instant.now();
             long time = Duration.between(start, finish).toMillis();
-            log.trace("{}: {} ms ",  time);
+            requestLog(requestType, httpServletRequest.getRequestURL().toString(),
+                    barcode, number, cardValidationSuccess, requestSuccess, time);
         }
     }
 
@@ -76,11 +80,30 @@ public class AccountController
      * Returns a 200 response code with the details of the user's library card.
      */
     @PostMapping("/login")
-    public ResponseEntity<LibraryCard> login(@Valid @RequestBody LoginRequest loginRequest)
+    public ResponseEntity<LibraryCard> login(HttpServletRequest httpServletRequest,
+                                             @Valid @RequestBody LoginRequest request)
     {
-        LibraryCard card = validationService.cardNumberValidation(loginRequest.getLibraryCardNumber());
-        return accountService.authenticateUser(card,
-                loginRequest.getPassword());
+        String requestType = "POST";
+        boolean requestSuccess = false;
+        Instant start = Instant.now();
+
+        try
+        {
+            LibraryCard card = validationService.cardNumberValidation(request.getLibraryCardNumber());
+            ResponseEntity<LibraryCard> libraryCard = accountService.authenticateUser(card, request.getPassword());
+            requestSuccess = true;
+            return libraryCard;
+        }
+
+        finally
+        {
+            Instant finish = Instant.now();
+            long time = Duration.between(start, finish).toMillis();
+            loginLog(requestType, httpServletRequest.getRequestURL().toString(),
+                    request.getLibraryCardNumber(), request.getPassword(),
+                    requestSuccess, time);
+        }
+
     }
 
     /*
@@ -89,14 +112,14 @@ public class AccountController
      * Returns a 200 response code with the details of the user's library card.
      */
     @PostMapping("/signup")
-    public ResponseEntity<LibraryCard> signup(@Valid @RequestBody SignupRequest signUpRequest)
+    public ResponseEntity<LibraryCard> signup(@Valid @RequestBody SignupRequest request)
     {
         log.trace("Method signup() called.");
         log.info("User is signing up for an account in the system.");
-        return accountService.registerMember(signUpRequest.getName(), signUpRequest.getPassword(),
-                signUpRequest.getEmail(), signUpRequest.getStreetAddress(),
-                signUpRequest.getCity(), signUpRequest.getZipcode(),
-                signUpRequest.getCountry(), signUpRequest.getPhoneNumber(),
+        return accountService.registerMember(request.getName(), request.getPassword(),
+                request.getEmail(), request.getStreetAddress(),
+                request.getCity(), request.getZipcode(),
+                request.getCountry(), request.getPhoneNumber(),
                 new Date());
     }
 
@@ -133,5 +156,57 @@ public class AccountController
         return accountService.changePassword(card,
                 request.getOriginalPassword(),
                 request.getNewPassword());
+    }
+
+    private void loginLog(String requestType, String requestURL, String number,
+                          String password, boolean loginValidation, long time)
+    {
+        String userLog = "(Login user credentials:" +
+                " Number = " + number +
+                ", Password = " + password;
+        String successLog;
+
+        if(loginValidation)
+        {
+            userLog += " [Valid])";
+            successLog = "(Success! Completed in " + time + " ms)";
+        }
+
+        else
+        {
+            userLog += " [Invalid])";
+            successLog = "(Failure! Completed in " + time + " ms)";
+        }
+
+        log.info(requestType + " " + requestURL + " " + userLog + " " + successLog);
+    }
+
+    private void signupLog()
+    {
+
+    }
+
+    private void requestLog(String requestType, String requestURL, long barcode,
+                            String number, boolean cardValidation, boolean requestSuccess,
+                            long time)
+    {
+        String userLog = "(User:" +
+                " Barcode = " + barcode +
+                ", Number = " + number;
+        String successLog;
+
+        if(cardValidation)
+            userLog += " [Valid])";
+
+        else
+            userLog += " [Invalid])";
+
+        if(requestSuccess)
+            successLog = "(Success! Completed in " + time + " ms)";
+
+        else
+            successLog = "(Failure! Completed in " + time + " ms)";
+
+        log.info(requestType + " " + requestURL + " " + userLog + " " + successLog);
     }
 }
