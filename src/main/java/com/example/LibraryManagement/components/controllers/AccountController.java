@@ -6,12 +6,12 @@ import com.example.LibraryManagement.models.accounts.LibraryCard;
 import com.example.LibraryManagement.models.io.requests.*;
 import com.example.LibraryManagement.models.io.responses.MessageResponse;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import javax.validation.Validator;
 import java.util.Date;
 
 /*
@@ -25,6 +25,7 @@ import java.util.Date;
  */
 @CrossOrigin(origins = "*", maxAge = 3600)
 @AllArgsConstructor
+@Slf4j
 @RestController
 @RequestMapping("library_website/account")
 public class AccountController

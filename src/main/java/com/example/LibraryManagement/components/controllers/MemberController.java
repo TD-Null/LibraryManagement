@@ -25,6 +25,7 @@ import com.example.LibraryManagement.models.io.requests.member_requests.CheckTra
 import com.example.LibraryManagement.models.io.responses.MessageResponse;
 import com.example.LibraryManagement.models.io.responses.exceptions.ApiRequestException;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -47,6 +48,7 @@ import java.util.List;
  */
 @CrossOrigin(origins = "*", maxAge = 3600)
 @AllArgsConstructor
+@Slf4j
 @RestController
 @RequestMapping("library_website/account/member")
 public class MemberController
@@ -62,6 +64,7 @@ public class MemberController
     public ResponseEntity<List<BookItem>> viewBooksLoans(@RequestParam(value = "id") Long barcode,
                                                          @RequestParam(value = "card") String number)
     {
+        log.info("User logging in with ");
         LibraryCard card = validationService.cardValidation(barcode);
         Member member = (Member) accountService.barcodeReader(card, number,
                 AccountType.MEMBER, AccountStatus.ACTIVE);

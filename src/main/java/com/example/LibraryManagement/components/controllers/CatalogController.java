@@ -6,6 +6,7 @@ import com.example.LibraryManagement.models.books.properties.Author;
 import com.example.LibraryManagement.models.books.properties.BookItem;
 import com.example.LibraryManagement.models.books.properties.Subject;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
@@ -26,6 +27,7 @@ import java.util.List;
  */
 @CrossOrigin(origins = "*", maxAge = 3600)
 @AllArgsConstructor
+@Slf4j
 @RestController
 @RequestMapping("library_website/catalog")
 public class CatalogController
