@@ -16,6 +16,7 @@ import javax.validation.Valid;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Date;
+import java.util.List;
 
 /*
  * Controller component containing the API requests relating to accounts:
@@ -52,6 +53,7 @@ public class AccountController
         String requestType = "GET";
         boolean cardValidationSuccess = false;
         boolean requestSuccess = false;
+        ResponseEntity<Object> response;
         Instant start = Instant.now();
 
         try
@@ -59,7 +61,7 @@ public class AccountController
             LibraryCard card = validationService.cardValidation(barcode, number);
             cardValidationSuccess = true;
 
-            ResponseEntity<Object> response = accountService.getAccountDetails(card, number);
+            response = accountService.getAccountDetails(card, number);
             requestSuccess = true;
             return response;
         }
@@ -94,12 +96,13 @@ public class AccountController
     {
         String requestType = "POST";
         boolean requestSuccess = false;
+        ResponseEntity<LibraryCard> response;
         Instant start = Instant.now();
 
         try
         {
             LibraryCard card = validationService.cardNumberValidation(request.getLibraryCardNumber());
-            ResponseEntity<LibraryCard> response = accountService.authenticateUser(card, request.getPassword());
+            response = accountService.authenticateUser(card, request.getPassword());
             requestSuccess = true;
             return response;
         }
@@ -134,16 +137,15 @@ public class AccountController
     {
         String requestType = "POST";
         boolean requestSuccess = false;
+        ResponseEntity<LibraryCard> response;
         Instant start = Instant.now();
 
         try
         {
-            ResponseEntity<LibraryCard> response = accountService
-                    .registerMember(request.getName(), request.getPassword(),
-                    request.getEmail(), request.getStreetAddress(),
-                    request.getCity(), request.getZipcode(),
-                    request.getCountry(), request.getPhoneNumber(),
-                    new Date());
+            response = accountService.registerMember(request.getName(),
+                    request.getPassword(), request.getEmail(), request.getStreetAddress(),
+                    request.getCity(), request.getZipcode(), request.getCountry(),
+                    request.getPhoneNumber(), new Date());
             requestSuccess = true;
             return response;
         }
@@ -180,6 +182,7 @@ public class AccountController
         String requestType = "PUT";
         boolean cardValidationSuccess = false;
         boolean requestSuccess = false;
+        ResponseEntity<MessageResponse> response;
         Instant start = Instant.now();
 
         try
@@ -188,7 +191,7 @@ public class AccountController
                     request.getBarcode(), request.getNumber());
             cardValidationSuccess = true;
 
-            ResponseEntity<MessageResponse> response = accountService.updateAccountDetails(card, request.getNumber(),
+            response = accountService.updateAccountDetails(card, request.getNumber(),
                     request.getName(), request.getStreetAddress(), request.getCity(),
                     request.getZipcode(), request.getCountry(), request.getEmail(),
                     request.getPhoneNumber());
@@ -228,6 +231,7 @@ public class AccountController
         String requestType = "PUT";
         boolean cardValidationSuccess = false;
         boolean requestSuccess = false;
+        ResponseEntity<MessageResponse> response;
         Instant start = Instant.now();
 
         try
@@ -236,7 +240,7 @@ public class AccountController
                     request.getBarcode(), request.getNumber());
             cardValidationSuccess = true;
 
-            ResponseEntity<MessageResponse> response = accountService.changePassword(card,
+            response = accountService.changePassword(card,
                     request.getOriginalPassword(),
                     request.getNewPassword());
             requestSuccess = true;

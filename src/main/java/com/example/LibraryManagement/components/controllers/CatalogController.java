@@ -12,6 +12,11 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
+import java.sql.ResultSet;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -41,7 +46,36 @@ public class CatalogController
      * Will return no books and a 404 response if there are no books found within the system.
      */
     @GetMapping
-    public ResponseEntity<List<BookItem>> viewAllBooks() { return viewCatalogService.listAllBooks(); }
+    public ResponseEntity<List<BookItem>> viewAllBooks(HttpServletRequest httpServletRequest)
+    {
+        String requestType = "GET";
+        boolean requestSuccess = false;
+        ResponseEntity<List<BookItem>> response;
+        Instant start = Instant.now();
+
+        try
+        {
+            response = viewCatalogService.listAllBooks();
+            requestSuccess = true;
+            return response;
+        }
+
+        finally
+        {
+            Instant finish = Instant.now();
+            long time = Duration.between(start, finish).toMillis();
+            String message = "";
+
+            if(requestSuccess)
+                message = "All books have been listed.";
+
+            else
+                message = "No books are available.";
+
+            catalogLog(requestType, httpServletRequest.getRequestURL().toString(),
+                    message, time);
+        }
+    }
 
     /*
      * All libraries viewing GET request.
@@ -49,7 +83,36 @@ public class CatalogController
      * Will return no libraries and a 404 response if there are no libraries found within the system.
      */
     @GetMapping("/library")
-    public ResponseEntity<List<Library>> viewAllLibraries() { return viewCatalogService.listAllLibraries(); }
+    public ResponseEntity<List<Library>> viewAllLibraries(HttpServletRequest httpServletRequest)
+    {
+        String requestType = "GET";
+        boolean requestSuccess = false;
+        ResponseEntity<List<Library>> response;
+        Instant start = Instant.now();
+
+        try
+        {
+            response = viewCatalogService.listAllLibraries();
+            requestSuccess = true;
+            return response;
+        }
+
+        finally
+        {
+            Instant finish = Instant.now();
+            long time = Duration.between(start, finish).toMillis();
+            String message = "";
+
+            if(requestSuccess)
+                message = "All libraries have been listed.";
+
+            else
+                message = "No libraries are available.";
+
+            catalogLog(requestType, httpServletRequest.getRequestURL().toString(),
+                    message, time);
+        }
+    }
 
     /*
      * All subjects viewing GET request.
@@ -57,7 +120,36 @@ public class CatalogController
      * Will return no subjects and a 404 response if there are no subjects found within the system.
      */
     @GetMapping("/subjects")
-    public ResponseEntity<List<Subject>> viewAllSubjects() { return viewCatalogService.listAllSubjects(); }
+    public ResponseEntity<List<Subject>> viewAllSubjects(HttpServletRequest httpServletRequest)
+    {
+        String requestType = "GET";
+        boolean requestSuccess = false;
+        ResponseEntity<List<Subject>> response;
+        Instant start = Instant.now();
+
+        try
+        {
+            response = viewCatalogService.listAllSubjects();
+            requestSuccess = true;
+            return response;
+        }
+
+        finally
+        {
+            Instant finish = Instant.now();
+            long time = Duration.between(start, finish).toMillis();
+            String message = "";
+
+            if(requestSuccess)
+                message = "All subjects have been listed.";
+
+            else
+                message = "No subjects are available.";
+
+            catalogLog(requestType, httpServletRequest.getRequestURL().toString(),
+                    message, time);
+        }
+    }
 
     /*
      * All subjects viewing GET request.
@@ -65,7 +157,36 @@ public class CatalogController
      * Will return no authors and a 404 response if there are no authors found within the system.
      */
     @GetMapping("/author")
-    public ResponseEntity<List<Author>> viewAllAuthors() { return viewCatalogService.listAllAuthors(); }
+    public ResponseEntity<List<Author>> viewAllAuthors(HttpServletRequest httpServletRequest)
+    {
+        String requestType = "GET";
+        boolean requestSuccess = false;
+        ResponseEntity<List<Author>> response;
+        Instant start = Instant.now();
+
+        try
+        {
+            response = viewCatalogService.listAllAuthors();
+            requestSuccess = true;
+            return response;
+        }
+
+        finally
+        {
+            Instant finish = Instant.now();
+            long time = Duration.between(start, finish).toMillis();
+            String message = "";
+
+            if(requestSuccess)
+                message = "All authors have been listed.";
+
+            else
+                message = "No authors are available.";
+
+            catalogLog(requestType, httpServletRequest.getRequestURL().toString(),
+                    message, time);
+        }
+    }
 
     /*
      * Book search GET request.
@@ -82,13 +203,64 @@ public class CatalogController
      * Will return no books and a 404 response if there are no books found within the given parameters.
      */
     @GetMapping("/search")
-    public ResponseEntity<List<BookItem>> searchBooks(@RequestParam(value = "library", required = false, defaultValue = "none") String library,
+    public ResponseEntity<List<BookItem>> searchBooks(HttpServletRequest httpServletRequest,
+                                                      @RequestParam(value = "library", required = false, defaultValue = "none") String library,
                                                       @RequestParam(value = "title", required = false, defaultValue = "none") String title,
                                                       @RequestParam(value = "author", required = false, defaultValue = "none") String author,
                                                       @RequestParam(value = "subjects", required = false, defaultValue = "none") List<String> subjects,
                                                       @RequestParam(value = "pub_date", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date publicationDate)
     {
-        return viewCatalogService.searchBooks(library, title, author, subjects, publicationDate);
+        String requestType = "GET";
+        boolean requestSuccess = false;
+        ResponseEntity<List<BookItem>> response = ResponseEntity.ok(new ArrayList<>());
+        Instant start = Instant.now();
+
+        try
+        {
+            response = viewCatalogService.searchBooks(
+                    library, title, author, subjects, publicationDate);
+            requestSuccess = true;
+            return response;
+        }
+
+        finally
+        {
+            Instant finish = Instant.now();
+            long time = Duration.between(start, finish).toMillis();
+            String message = "";
+
+            if(requestSuccess)
+                message = response.getBody().size() + " books were found under this search.";
+
+            else
+                message = "No books are available under this search.";
+
+            catalogSearchLog(requestType, httpServletRequest.getRequestURL().toString(),
+                    message, library, title, author, subjects.toString(), publicationDate.toString(),
+                    time);
+        }
     }
 
+    private void catalogLog(String requestType, String requestURL, String message, long time)
+    {
+        String successLog = "(Success! Completed in " + time + " ms)";
+
+        log.info(requestType + " " + requestURL + " " + message + " " + successLog);
+    }
+
+    private void catalogSearchLog(String requestType, String requestURL, String message,
+                                  String library, String title, String author, String subjects,
+                                  String pub_date, long time)
+    {
+        String successLog = "(Success! Completed in " + time + " ms)";
+        String search = "(Search: " +
+                "Library = " + library + ", " +
+                "Title = " + title + ", " +
+                "Author = " + author + ", " +
+                "Subjects = " + subjects + ", " +
+                "Pub_Date = " + pub_date +
+                ")";
+
+        log.info(requestType + " " + requestURL + " " + message + " " + search + " " + successLog);
+    }
 }
