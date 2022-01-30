@@ -70,6 +70,7 @@ public class MemberController
     {
         boolean cardValidationSuccess = false;
         boolean requestSuccess = false;
+        int num_bookLoans = 0;
         Instant start = Instant.now();
 
         try
@@ -81,11 +82,12 @@ public class MemberController
             cardValidationSuccess = true;
 
             List<BookItem> bookLoans = new ArrayList<>(member.getCheckedOutBooks());
-            requestSuccess = true;
 
             if (bookLoans.isEmpty())
                 throw new ApiRequestException("Member has no books borrowed currently.", HttpStatus.NOT_FOUND);
 
+            num_bookLoans = bookLoans.size();
+            requestSuccess = true;
             return ResponseEntity.ok(bookLoans);
         }
 
@@ -98,10 +100,10 @@ public class MemberController
             if(cardValidationSuccess)
             {
                 if (requestSuccess)
-                    message = "Member has viewed their book loans.";
+                    message = "Member has viewed their book loans. (# Borrowed Books:" + num_bookLoans + ")";
 
                 else
-                    message = "Member has no book loans current book loans.";
+                    message = "Member has no current book loans.";
             }
 
             else
@@ -114,56 +116,159 @@ public class MemberController
     }
 
     @GetMapping("/reserve/books")
-    public ResponseEntity<List<BookItem>> viewReservedBooks(@RequestParam(value = "id") Long barcode,
+    public ResponseEntity<List<BookItem>> viewReservedBooks(HttpServletRequest httpServletRequest,
+                                                            @RequestParam(value = "id") Long barcode,
                                                             @RequestParam(value = "card") String number)
     {
-        String requestType = "GET";
         boolean cardValidationSuccess = false;
         boolean requestSuccess = false;
+        int num_bookReservations = 0;
         Instant start = Instant.now();
 
-        LibraryCard card = validationService.cardValidation(
-                barcode, number);
-        Member member = (Member) accountService.barcodeReader(
-                card, AccountType.MEMBER, AccountStatus.ACTIVE);
-        List<BookItem> bookReservations = new ArrayList<>(member.getReservedBooks());
+        try
+        {
+            LibraryCard card = validationService.cardValidation(
+                    barcode, number);
+            Member member = (Member) accountService.barcodeReader(
+                    card, AccountType.MEMBER, AccountStatus.ACTIVE);
+            cardValidationSuccess = true;
 
-        if(bookReservations.isEmpty())
-            throw new ApiRequestException("Member has no books reserved currently.", HttpStatus.NOT_FOUND);
+            List<BookItem> bookReservations = new ArrayList<>(member.getReservedBooks());
 
-        return ResponseEntity.ok(bookReservations);
+            if (bookReservations.isEmpty())
+                throw new ApiRequestException("Member has no books reserved currently.", HttpStatus.NOT_FOUND);
+
+            num_bookReservations = bookReservations.size();
+            requestSuccess = true;
+            return ResponseEntity.ok(bookReservations);
+        }
+
+        finally
+        {
+            Instant finish = Instant.now();
+            long time = Duration.between(start, finish).toMillis();
+            String message;
+
+            if(cardValidationSuccess)
+            {
+                if (requestSuccess)
+                    message = "Member has viewed their book loans. (# Reserved Books:" + num_bookReservations + ")";
+
+                else
+                    message = "Member has no current book reservations.";
+            }
+
+            else
+                message = "Member was unable to obtain current book reservations.";
+
+            memberViewRequestLog(httpServletRequest.getRequestURL().toString(),
+                    message, barcode, number, cardValidationSuccess, requestSuccess,
+                    time);
+        }
     }
 
     @GetMapping("/notifications")
-    public ResponseEntity<List<AccountNotification>> viewNotifications(@RequestParam(value = "id") Long barcode,
+    public ResponseEntity<List<AccountNotification>> viewNotifications(HttpServletRequest httpServletRequest,
+                                                                       @RequestParam(value = "id") Long barcode,
                                                                        @RequestParam(value = "card") String number)
     {
-        LibraryCard card = validationService.cardValidation(
-                barcode, number);
-        Member member = (Member) accountService.barcodeReader(
-                card, AccountType.MEMBER, AccountStatus.ACTIVE);
-        List<AccountNotification> notifications = new ArrayList<>(member.getNotifications());
+        boolean cardValidationSuccess = false;
+        boolean requestSuccess = false;
+        int num_notifications = 0;
+        Instant start = Instant.now();
 
-        if(notifications.isEmpty())
-            throw new ApiRequestException("Member has no notifications currently.", HttpStatus.NOT_FOUND);
+        try
+        {
+            LibraryCard card = validationService.cardValidation(
+                    barcode, number);
+            Member member = (Member) accountService.barcodeReader(
+                    card, AccountType.MEMBER, AccountStatus.ACTIVE);
+            cardValidationSuccess = true;
 
-        return ResponseEntity.ok(notifications);
+            List<AccountNotification> notifications = new ArrayList<>(member.getNotifications());
+
+            if (notifications.isEmpty())
+                throw new ApiRequestException("Member has no notifications currently.", HttpStatus.NOT_FOUND);
+
+            num_notifications = notifications.size();
+            requestSuccess = true;
+            return ResponseEntity.ok(notifications);
+        }
+
+        finally
+        {
+            Instant finish = Instant.now();
+            long time = Duration.between(start, finish).toMillis();
+            String message;
+
+            if(cardValidationSuccess)
+            {
+                if (requestSuccess)
+                    message = "Member has viewed their book loans. (# Notifications:" + num_notifications + ")";
+
+                else
+                    message = "Member has no current notifications.";
+            }
+
+            else
+                message = "Member was unable to obtain current notifications.";
+
+            memberViewRequestLog(httpServletRequest.getRequestURL().toString(),
+                    message, barcode, number, cardValidationSuccess, requestSuccess,
+                    time);
+        }
     }
 
     @GetMapping("/fines")
-    public ResponseEntity<List<Fine>> viewFines(@RequestParam(value = "id") Long barcode,
+    public ResponseEntity<List<Fine>> viewFines(HttpServletRequest httpServletRequest,
+                                                @RequestParam(value = "id") Long barcode,
                                                 @RequestParam(value = "card") String number)
     {
-        LibraryCard card = validationService.cardValidation(
-                barcode, number);
-        Member member = (Member) accountService.barcodeReader(
-                card, AccountType.MEMBER, AccountStatus.ACTIVE);
-        List<Fine> fines = new ArrayList<>(member.getFines());
+        boolean cardValidationSuccess = false;
+        boolean requestSuccess = false;
+        int num_fines = 0;
+        Instant start = Instant.now();
 
-        if(fines.isEmpty())
-            throw new ApiRequestException("Member has no fines currently.", HttpStatus.NOT_FOUND);
+        try
+        {
+            LibraryCard card = validationService.cardValidation(
+                    barcode, number);
+            Member member = (Member) accountService.barcodeReader(
+                    card, AccountType.MEMBER, AccountStatus.ACTIVE);
+            cardValidationSuccess = true;
 
-        return ResponseEntity.ok(fines);
+            List<Fine> fines = new ArrayList<>(member.getFines());
+
+            if (fines.isEmpty())
+                throw new ApiRequestException("Member has no fines currently.", HttpStatus.NOT_FOUND);
+
+            num_fines = fines.size();
+            requestSuccess = true;
+            return ResponseEntity.ok(fines);
+        }
+
+        finally
+        {
+            Instant finish = Instant.now();
+            long time = Duration.between(start, finish).toMillis();
+            String message;
+
+            if(cardValidationSuccess)
+            {
+                if (requestSuccess)
+                    message = "Member has viewed their current fines. (# Fines:" + num_fines + ")";
+
+                else
+                    message = "Member has no current fines.";
+            }
+
+            else
+                message = "Member was unable to obtain current fines";
+
+            memberViewRequestLog(httpServletRequest.getRequestURL().toString(),
+                    message, barcode, number, cardValidationSuccess, requestSuccess,
+                    time);
+        }
     }
 
     @GetMapping("/transactions")
@@ -347,8 +452,8 @@ public class MemberController
     {
         String requestType = "GET";
         String userLog = "(Member:" +
-                " Barcode = " + barcode +
-                ", Number = " + number;
+                " Card Barcode = " + barcode +
+                ", Card Number = " + number;
         String successLog = "(Success! Completed in " + time + " ms)";
 
         if(cardValidation)

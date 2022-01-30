@@ -316,8 +316,8 @@ public class AccountController
                                    boolean requestSuccess, long time)
     {
         String userLog = "(User:" +
-                " Barcode = " + barcode +
-                ", Number = " + number;
+                " Card Barcode = " + barcode +
+                ", Card Number = " + number;
         String successLog;
 
         if(cardValidation)
