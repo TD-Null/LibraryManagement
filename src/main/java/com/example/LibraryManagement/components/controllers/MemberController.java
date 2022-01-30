@@ -263,7 +263,7 @@ public class MemberController
             }
 
             else
-                message = "Member was unable to obtain current fines";
+                message = "Member was unable to obtain current fines.";
 
             memberViewRequestLog(httpServletRequest.getRequestURL().toString(),
                     message, barcode, number, cardValidationSuccess, requestSuccess,
@@ -292,7 +292,8 @@ public class MemberController
             List<FineTransaction> transactions = new ArrayList<>();
             List<Fine> fines = new ArrayList<>(member.getFines());
 
-            for (Fine f : fines) {
+            for (Fine f : fines)
+            {
                 FineTransaction t = f.getFineTransaction();
 
                 if (t != null) {
@@ -324,7 +325,7 @@ public class MemberController
             }
 
             else
-                message = "Member was unable to obtain current transactions";
+                message = "Member was unable to obtain current transactions.";
 
             memberViewRequestLog(httpServletRequest.getRequestURL().toString(),
                     message, barcode, number, cardValidationSuccess, requestSuccess,
@@ -333,34 +334,106 @@ public class MemberController
     }
 
     @GetMapping("/checkout/history")
-    public ResponseEntity<List<BookLending>> viewCheckoutHistory(@RequestParam(value = "barcode") Long barcode,
+    public ResponseEntity<List<BookLending>> viewCheckoutHistory(HttpServletRequest httpServletRequest,
+                                                                 @RequestParam(value = "barcode") Long barcode,
                                                                  @RequestParam(value = "card") String number)
     {
-        LibraryCard card = validationService.cardValidation(barcode, number);
-        Member member = (Member) accountService.barcodeReader(
-                card, AccountType.MEMBER, AccountStatus.ACTIVE);
-        List<BookLending> checkoutRecords = new ArrayList<>(member.getBookLoans());
+        boolean cardValidationSuccess = false;
+        boolean requestSuccess = false;
+        int num_checkouts = 0;
+        Instant start = Instant.now();
 
-        if(checkoutRecords.isEmpty())
-            throw new ApiRequestException("Member has no history of books checked out.", HttpStatus.NOT_FOUND);
+        try
+        {
+            LibraryCard card = validationService.cardValidation(barcode, number);
+            Member member = (Member) accountService.barcodeReader(
+                    card, AccountType.MEMBER, AccountStatus.ACTIVE);
+            cardValidationSuccess = true;
 
-        return ResponseEntity.ok(checkoutRecords);
+            List<BookLending> checkoutRecords = new ArrayList<>(member.getBookLoans());
+
+            if (checkoutRecords.isEmpty())
+                throw new ApiRequestException("Member has no history of books checked out.", HttpStatus.NOT_FOUND);
+
+            num_checkouts = checkoutRecords.size();
+            requestSuccess = true;
+            return ResponseEntity.ok(checkoutRecords);
+        }
+
+        finally
+        {
+            Instant finish = Instant.now();
+            long time = Duration.between(start, finish).toMillis();
+            String message;
+
+            if(cardValidationSuccess)
+            {
+                if (requestSuccess)
+                    message = "Member has viewed their book checkout history. (# Checkouts:" + num_checkouts + ")";
+
+                else
+                    message = "Member has no current history of book checkouts.";
+            }
+
+            else
+                message = "Member was unable to obtain current history of book checkouts.";
+
+            memberViewRequestLog(httpServletRequest.getRequestURL().toString(),
+                    message, barcode, number, cardValidationSuccess, requestSuccess,
+                    time);
+        }
     }
 
     @GetMapping("/reserve/history")
-    public ResponseEntity<List<BookReservation>> viewReservationHistory(@RequestParam(value = "barcode") Long barcode,
+    public ResponseEntity<List<BookReservation>> viewReservationHistory(HttpServletRequest httpServletRequest,
+                                                                        @RequestParam(value = "barcode") Long barcode,
                                                                         @RequestParam(value = "card") String number)
     {
-        LibraryCard card = validationService.cardValidation(
-                barcode, number);
-        Member member = (Member) accountService.barcodeReader(
-                card, AccountType.MEMBER, AccountStatus.ACTIVE);
-        List<BookReservation> reservationRecords = new ArrayList<>(member.getBookReservations());
+        boolean cardValidationSuccess = false;
+        boolean requestSuccess = false;
+        int num_reservations = 0;
+        Instant start = Instant.now();
 
-        if(reservationRecords.isEmpty())
-            throw new ApiRequestException("Member has no history of book reservations.", HttpStatus.NOT_FOUND);
+        try
+        {
+            LibraryCard card = validationService.cardValidation(
+                    barcode, number);
+            Member member = (Member) accountService.barcodeReader(
+                    card, AccountType.MEMBER, AccountStatus.ACTIVE);
+            cardValidationSuccess = true;
 
-        return ResponseEntity.ok(reservationRecords);
+            List<BookReservation> reservationRecords = new ArrayList<>(member.getBookReservations());
+
+            if (reservationRecords.isEmpty())
+                throw new ApiRequestException("Member has no history of book reservations.", HttpStatus.NOT_FOUND);
+
+            num_reservations = reservationRecords.size();
+            requestSuccess = true;
+            return ResponseEntity.ok(reservationRecords);
+        }
+
+        finally
+        {
+            Instant finish = Instant.now();
+            long time = Duration.between(start, finish).toMillis();
+            String message;
+
+            if(cardValidationSuccess)
+            {
+                if (requestSuccess)
+                    message = "Member has viewed their book reservations history. (# Reservations:" + num_reservations + ")";
+
+                else
+                    message = "Member has no current history of book reservations.";
+            }
+
+            else
+                message = "Member was unable to obtain current history of book reservations.";
+
+            memberViewRequestLog(httpServletRequest.getRequestURL().toString(),
+                    message, barcode, number, cardValidationSuccess, requestSuccess,
+                    time);
+        }
     }
 
     @PutMapping("/checkout")
