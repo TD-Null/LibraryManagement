@@ -31,7 +31,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -61,20 +64,54 @@ public class MemberController
     private final ValidationService validationService;
 
     @GetMapping("/checkout/books")
-    public ResponseEntity<List<BookItem>> viewBooksLoans(@RequestParam(value = "id") Long barcode,
+    public ResponseEntity<List<BookItem>> viewBooksLoans(HttpServletRequest httpServletRequest,
+                                                         @RequestParam(value = "id") Long barcode,
                                                          @RequestParam(value = "card") String number)
     {
-        log.info("User logging in with ");
-        LibraryCard card = validationService.cardValidation(
-                barcode, number);
-        Member member = (Member) accountService.barcodeReader(
-                card, AccountType.MEMBER, AccountStatus.ACTIVE);
-        List<BookItem> bookLoans = new ArrayList<>(member.getCheckedOutBooks());
+        String requestType = "GET";
+        boolean cardValidationSuccess = false;
+        boolean requestSuccess = false;
+        Instant start = Instant.now();
 
-        if(bookLoans.isEmpty())
-            throw new ApiRequestException("Member has no books borrowed currently.", HttpStatus.NOT_FOUND);
+        try
+        {
+            LibraryCard card = validationService.cardValidation(
+                    barcode, number);
+            Member member = (Member) accountService.barcodeReader(
+                    card, AccountType.MEMBER, AccountStatus.ACTIVE);
+            cardValidationSuccess = true;
 
-        return ResponseEntity.ok(bookLoans);
+            List<BookItem> bookLoans = new ArrayList<>(member.getCheckedOutBooks());
+            requestSuccess = true;
+
+            if (bookLoans.isEmpty())
+                throw new ApiRequestException("Member has no books borrowed currently.", HttpStatus.NOT_FOUND);
+
+            return ResponseEntity.ok(bookLoans);
+        }
+
+        finally
+        {
+            Instant finish = Instant.now();
+            long time = Duration.between(start, finish).toMillis();
+            String message = "";
+
+            if(cardValidationSuccess)
+            {
+                if (requestSuccess)
+                    message = "Member has viewed their book loans.";
+
+                else
+                    message = "Member has no book loans current book loans.";
+            }
+
+            else
+                message = "Member was unable to obtain current book loans.";
+
+            memberViewRequestLog(requestType, httpServletRequest.getRequestURL().toString(),
+                    message, barcode, number, cardValidationSuccess, requestSuccess,
+                    time);
+        }
     }
 
     @GetMapping("/reserve/books")
@@ -299,5 +336,29 @@ public class MemberController
         LibraryCard libraryCard = validationService.cardValidation(
                 request.getBarcode(), request.getNumber());
         return accountService.cancelMemberAccount(libraryCard, request.getPassword());
+    }
+
+    private void memberViewRequestLog(String requestType, String requestURL, String message,
+                                  long barcode, String number, boolean cardValidation,
+                                  boolean requestSuccess, long time)
+    {
+        String userLog = "(Member:" +
+                " Barcode = " + barcode +
+                ", Number = " + number;
+        String successLog = "(Success! Completed in " + time + " ms)";
+
+        if(cardValidation)
+            userLog += " [Valid])";
+
+        else
+            userLog += " [Invalid])";
+
+        if(requestSuccess)
+            successLog = "(Success! Completed in " + time + " ms)";
+
+        else
+            successLog = "(Failure! Completed in " + time + " ms)";
+
+        log.info(requestType + " " + requestURL + " " + message + " " + userLog + " " + successLog);
     }
 }

@@ -117,7 +117,7 @@ public class AccountController
                 message = "User has login to their account.";
 
             else
-                message = "User failed to login to their account (Either wrong library card number or password.";
+                message = "User failed to login to their account (Either wrong library card number or password).";
 
             loginLog(requestType, httpServletRequest.getRequestURL().toString(),
                     message, request.getLibraryCardNumber(), request.getPassword(),
@@ -163,7 +163,7 @@ public class AccountController
                 message = "User failed to create their account.";
 
             signupLog(requestType, httpServletRequest.getRequestURL().toString(),
-                    message, request.getName(), request.getPassword(),
+                    message, request.getName(), request.getPassword(), request.getEmail(),
                     requestSuccess, time);
         }
     }
@@ -290,12 +290,13 @@ public class AccountController
     }
 
     private void signupLog(String requestType, String requestURL, String message,
-                           String name, String password, boolean loginValidation,
+                           String name, String password, String email, boolean loginValidation,
                            long time)
     {
         String userLog = "(Login user credentials:" +
                 " Name = " + name +
-                ", Password = " + password;
+                ", Password = " + password +
+                ", Email = " + email;
         String successLog;
 
         if(loginValidation)

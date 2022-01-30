@@ -351,4 +351,28 @@ public class LibrarianController
         Author author = validationService.authorValidation(request.getAuthor());
         return updateCatalogService.removeAuthor(author);
     }
+
+    private void requestLog(String requestType, String requestURL, String message,
+                            long barcode, String number, boolean cardValidation,
+                            boolean requestSuccess, long time)
+    {
+        String userLog = "(User:" +
+                " Barcode = " + barcode +
+                ", Number = " + number;
+        String successLog;
+
+        if(cardValidation)
+            userLog += " [Valid])";
+
+        else
+            userLog += " [Invalid])";
+
+        if(requestSuccess)
+            successLog = "(Success! Completed in " + time + " ms)";
+
+        else
+            successLog = "(Failure! Completed in " + time + " ms)";
+
+        log.info(requestType + " " + requestURL + " " + message + " " + userLog + " " + successLog);
+    }
 }
