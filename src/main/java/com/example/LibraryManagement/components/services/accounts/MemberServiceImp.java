@@ -58,7 +58,7 @@ public class MemberServiceImp implements MemberService
         Date dueDate = new Date(currDate.getTime() + Limitations.MAX_LENDING_DAYS * (1000 * 60 * 60 * 24));
         AccountNotification notification = new AccountNotification(member,
                 currDate, member.getEmail(), member.getAddress(),
-                "User has been loaned the book " + book.getTitle() + ".");
+                "User has been loaned the book \"" + book.getTitle() + "\".");
         BookLending bookLoan = new BookLending(book, member, currDate, dueDate);
 
         if(book.isReferenceOnly())
@@ -143,7 +143,7 @@ public class MemberServiceImp implements MemberService
         Date returnDate = currDate;
         Date dueDate = book.getDueDate();
         AccountNotification notification = new AccountNotification(member, returnDate, member.getEmail(), member.getAddress(),
-            "User has returned the book " + book.getTitle() + " on time.");
+            "User has returned the book \"" + book.getTitle() + "\" on time.");
         MessageResponse response = new MessageResponse("Book has been returned.");
 
         member.returnBookItem(book, returnDate);
@@ -158,8 +158,8 @@ public class MemberServiceImp implements MemberService
             AccountNotification fineNotification = new AccountNotification(member,
                     returnDate, member.getEmail(), member.getAddress(),
                     "User has been issued a fine of $" + fine
-                            + " for returning the book " + book.getTitle()
-                            + " late.");
+                            + " for returning the book \"" + book.getTitle()
+                            + "\" late.");
 
             member.addFine(new Fine(fine, member));
             notificationRepository.save(fineNotification);
@@ -183,7 +183,7 @@ public class MemberServiceImp implements MemberService
 
             AccountNotification reservationNotification = new AccountNotification(reservedMember,
                     returnDate, reservedMember.getEmail(), reservedMember.getAddress(),
-                    "Reservation for book " + book.getTitle() + " is now available.");
+                    "Reservation for book \"" + book.getTitle() + "\" is now available.");
 
             notificationRepository.save(reservationNotification);
             reservedMember.sendNotification(reservationNotification);
@@ -202,7 +202,7 @@ public class MemberServiceImp implements MemberService
     public ResponseEntity<MessageResponse> reserveBook(Member member, BookItem book, Date currDate)
     {
         AccountNotification notification = new AccountNotification(member, currDate, member.getEmail(), member.getAddress(),
-                "User has made a reservation for the book " + book.getTitle() + ".");
+                "User has made a reservation for the book \"" + book.getTitle() + "\".");
         BookReservation bookReservation = new BookReservation(book, member, currDate, ReservationStatus.WAITING);
 
         if(book.isReferenceOnly())
@@ -263,7 +263,7 @@ public class MemberServiceImp implements MemberService
 
         AccountNotification notification = new AccountNotification(member,
                 currDate, member.getEmail(), member.getAddress(),
-                "User has cancelled their reservation for the book " + book.getTitle() + ".");
+                "User has cancelled their reservation for the book \"" + book.getTitle() + "\".");
 
         notificationRepository.save(notification);
         member.sendNotification(notification);
@@ -296,7 +296,7 @@ public class MemberServiceImp implements MemberService
         Date newDueDate = new Date(dueDate.getTime() + Limitations.MAX_LENDING_DAYS * (1000 * 60 * 60 * 24));
         AccountNotification notification = new AccountNotification(member,
                 returnDate, member.getEmail(), member.getAddress(),
-                "User has renewed the book " + book.getTitle() + ".");
+                "User has renewed the book \"" + book.getTitle() + "\".");
 
         if(dueDate.compareTo(returnDate) < 0)
         {
@@ -307,8 +307,8 @@ public class MemberServiceImp implements MemberService
             AccountNotification fineNotification = new AccountNotification(member,
                     returnDate, member.getEmail(), member.getAddress(),
                     "User has been issued a fine of " + fine
-                            + " for returning the book " + book.getTitle()
-                            + " late.");
+                            + " for returning the book \"" + book.getTitle()
+                            + "\" late.");
 
             member.addFine(new Fine(fine, member));
             notificationRepository.save(fineNotification);
@@ -326,7 +326,7 @@ public class MemberServiceImp implements MemberService
 
                 AccountNotification reservationNotification = new AccountNotification(reservedMember,
                         returnDate, reservedMember.getEmail(), reservedMember.getAddress(),
-                        "Reservation for book " + book.getTitle() + " is now available.");
+                        "Reservation for book \"" + book.getTitle() + "\" is now available.");
 
                 notificationRepository.save(notification);
                 reservedMember.sendNotification(reservationNotification);
@@ -347,9 +347,9 @@ public class MemberServiceImp implements MemberService
         {
             AccountNotification renewalFailureNotification = new AccountNotification(member,
                     returnDate, member.getEmail(), member.getAddress(),
-                    "User was unable to renew the book " + book.getTitle() +
-                            " as it is currently reserved for another member. " +
-                            "Book " + book.getTitle() + " has been returned.");
+                    "User was unable to renew the book \"" + book.getTitle() +
+                            "\" as it is currently reserved for another member. " +
+                            "Book \"" + book.getTitle() + "\" has been returned.");
 
             notificationRepository.save(renewalFailureNotification);
             member.sendNotification(renewalFailureNotification);
@@ -360,7 +360,7 @@ public class MemberServiceImp implements MemberService
 
             AccountNotification reservationNotification = new AccountNotification(reservedMember,
                     returnDate, reservedMember.getEmail(), reservedMember.getAddress(),
-                    "Reservation for book " + book.getTitle() + " is now available.");
+                    "Reservation for book \"" + book.getTitle() + "\" is now available.");
 
             notificationRepository.save(notification);
             reservedMember.sendNotification(reservationNotification);

@@ -283,7 +283,8 @@ public class AccountController
             successLog = "(Failed! Completed in " + time + " ms)";
         }
 
-        log.info(requestType + " " + requestURL + " " + message + " " + userLog + " " + successLog);
+        log.info(requestType + " " + requestURL + " " + message + " " +
+                userLog + " " + successLog);
     }
 
     private void signupLog(String requestURL, String message, String name, String password,
@@ -308,7 +309,8 @@ public class AccountController
             successLog = "(Failed! Completed in " + time + " ms)";
         }
 
-        log.info(requestType + " " + requestURL + " " + message + " " + userLog + " " + successLog);
+        log.info(requestType + " " + requestURL + " " + message + " " +
+                userLog + " " + successLog);
     }
 
     private void accountRequestLog(String requestType, String requestURL, String message,
@@ -332,6 +334,7 @@ public class AccountController
         else
             successLog = "(Failure! Completed in " + time + " ms)";
 
-        log.info(requestType + " " + requestURL + " " + message + " " + userLog + " " + successLog);
+        log.info(requestType + " " + requestURL + " " + message + " " +
+                userLog + " " + successLog);
     }
 }

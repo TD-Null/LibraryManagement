@@ -437,16 +437,50 @@ public class MemberController
     }
 
     @PutMapping("/checkout")
-    public ResponseEntity<BookItem> checkoutBook(@Valid @RequestBody CardValidationRequest request,
+    public ResponseEntity<BookItem> checkoutBook(HttpServletRequest httpServletRequest,
+                                                 @Valid @RequestBody CardValidationRequest request,
                                                  @RequestParam(value = "book") Long bookBarcode)
     {
-        LibraryCard card = validationService.cardValidation(
-                request.getBarcode(), request.getNumber());
-        Member member = (Member) accountService.barcodeReader(
-                card, AccountType.MEMBER, AccountStatus.ACTIVE);
+        boolean cardValidationSuccess = false;
+        boolean bookValidationSuccess = false;
+        boolean requestSuccess = false;
+        String bookTitle = "";
+        ResponseEntity<BookItem> response;
+        Instant start = Instant.now();
 
-        BookItem book = validationService.bookValidation(bookBarcode);
-        return memberService.checkoutBook(member, book, new Date());
+        try
+        {
+            LibraryCard card = validationService.cardValidation(
+                    request.getBarcode(), request.getNumber());
+            Member member = (Member) accountService.barcodeReader(
+                    card, AccountType.MEMBER, AccountStatus.ACTIVE);
+            cardValidationSuccess = true;
+
+            BookItem book = validationService.bookValidation(bookBarcode);
+            bookValidationSuccess = true;
+
+            response = memberService.checkoutBook(member, book, new Date());
+            requestSuccess = true;
+            return response;
+        }
+
+        finally
+        {
+            Instant finish = Instant.now();
+            long time = Duration.between(start, finish).toMillis();
+            String message;
+
+            if (requestSuccess)
+                message = "Member has borrowed book \"" + bookTitle + "\".";
+
+            else
+                message = "Member has no current history of book reservations.";
+
+            memberBookRequestLog(httpServletRequest.getRequestURL().toString(),
+                    message, request.getBarcode(), request.getNumber(), bookBarcode,
+                    cardValidationSuccess, bookValidationSuccess, requestSuccess,
+                    time);
+        }
     }
 
     @PutMapping("/return")
@@ -575,16 +609,20 @@ public class MemberController
         else
             successLog = "(Failure! Completed in " + time + " ms)";
 
-        log.info(requestType + " " + requestURL + " " + message + " " + userLog + " " + successLog);
+        log.info(requestType + " " + requestURL + " " + message + " " +
+                userLog + " " + successLog);
     }
 
-    private void memberActionRequestLog(String requestURL, String message, long barcode, String number,
-                                        boolean cardValidation, boolean requestSuccess, long time)
+    private void memberBookRequestLog(String requestURL, String message, long barcode, String number,
+                                      Long bookBarcode, boolean cardValidation, boolean bookValidation,
+                                      boolean requestSuccess, long time)
     {
         String requestType = "PUT";
         String userLog = "(Member:" +
                 " Card Barcode = " + barcode +
                 ", Card Number = " + number;
+        String bookLog = "(Book: " +
+                "Barcode = " + bookBarcode;
         String successLog = "(Success! Completed in " + time + " ms)";
 
         if(cardValidation)
@@ -593,13 +631,20 @@ public class MemberController
         else
             userLog += " [Invalid])";
 
+        if(bookValidation)
+            bookLog += " [Valid])";
+
+        else
+            bookLog += " [Invalid])";
+
         if(requestSuccess)
             successLog = "(Success! Completed in " + time + " ms)";
 
         else
             successLog = "(Failure! Completed in " + time + " ms)";
 
-        log.info(requestType + " " + requestURL + " " + message + " " + userLog + " " + successLog);
+        log.info(requestType + " " + requestURL + " " + message + " " +
+                userLog + " " + bookLog + " " + successLog);
     }
 
     private void memberCancelRequestLog(String requestURL, String message, long barcode, String number,
@@ -623,6 +668,7 @@ public class MemberController
         else
             successLog = "(Failure! Completed in " + time + " ms)";
 
-        log.info(requestType + " " + requestURL + " " + message + " " + userLog + " " + successLog);
+        log.info(requestType + " " + requestURL + " " + message + " " +
+                userLog + " " + successLog);
     }
 }

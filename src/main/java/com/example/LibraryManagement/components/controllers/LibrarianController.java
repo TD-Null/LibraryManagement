@@ -373,6 +373,7 @@ public class LibrarianController
         else
             successLog = "(Failure! Completed in " + time + " ms)";
 
-        log.info(requestType + " " + requestURL + " " + message + " " + userLog + " " + successLog);
+        log.info(requestType + " " + requestURL + " " + message + " " +
+                userLog + " " + successLog);
     }
 }

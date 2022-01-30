@@ -249,7 +249,8 @@ public class CatalogController
         String requestType = "GET";
         String successLog = "(Success! Completed in " + time + " ms)";
 
-        log.info(requestType + " " + requestURL + " " + message + " " + successLog);
+        log.info(requestType + " " + requestURL + " " + message + " " +
+                successLog);
     }
 
     private void catalogSearchLog(String requestURL, String message, String library,
@@ -266,6 +267,7 @@ public class CatalogController
                 "Pub_Date = " + pub_date +
                 ")";
 
-        log.info(requestType + " " + requestURL + " " + message + " " + search + " " + successLog);
+        log.info(requestType + " " + requestURL + " " + message + " " +
+                search + " " + successLog);
     }
 }
