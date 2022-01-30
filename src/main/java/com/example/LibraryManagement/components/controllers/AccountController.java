@@ -115,7 +115,7 @@ public class AccountController
                 message = "User has login to their account.";
 
             else
-                message = "User failed to login to their account (Either wrong library card number or password).";
+                message = "User failed to login to their account. (Either wrong library card number or password)";
 
             loginLog(httpServletRequest.getRequestURL().toString(), message,
                     request.getLibraryCardNumber(), request.getPassword(),
@@ -154,10 +154,10 @@ public class AccountController
             String message;
 
             if(requestSuccess)
-                message = "User has created their account.";
+                message = "User has created their account as a member.";
 
             else
-                message = "User failed to create their account.";
+                message = "User failed to create their account as a member.";
 
             signupLog(httpServletRequest.getRequestURL().toString(), message,
                     request.getName(), request.getPassword(), request.getEmail(),
