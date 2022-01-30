@@ -49,11 +49,13 @@ public class CatalogController
     {
         boolean requestSuccess = false;
         ResponseEntity<List<BookItem>> response;
+        int num_books = 0;
         Instant start = Instant.now();
 
         try
         {
             response = viewCatalogService.listAllBooks();
+            num_books = response.getBody().size();
             requestSuccess = true;
             return response;
         }
@@ -65,7 +67,7 @@ public class CatalogController
             String message;
 
             if(requestSuccess)
-                message = "All books have been listed.";
+                message = "All books have been listed. (# Books = " + num_books + ")";
 
             else
                 message = "No books are available.";
@@ -85,11 +87,13 @@ public class CatalogController
     {
         boolean requestSuccess = false;
         ResponseEntity<List<Library>> response;
+        int num_libraries = 0;
         Instant start = Instant.now();
 
         try
         {
             response = viewCatalogService.listAllLibraries();
+            num_libraries = response.getBody().size();
             requestSuccess = true;
             return response;
         }
@@ -101,7 +105,7 @@ public class CatalogController
             String message;
 
             if(requestSuccess)
-                message = "All libraries have been listed.";
+                message = "All libraries have been listed. (# Libraries = " + num_libraries + ")";
 
             else
                 message = "No libraries are available.";
@@ -121,11 +125,13 @@ public class CatalogController
     {
         boolean requestSuccess = false;
         ResponseEntity<List<Subject>> response;
+        int num_subjects = 0;
         Instant start = Instant.now();
 
         try
         {
             response = viewCatalogService.listAllSubjects();
+            num_subjects = response.getBody().size();
             requestSuccess = true;
             return response;
         }
@@ -137,7 +143,7 @@ public class CatalogController
             String message;
 
             if(requestSuccess)
-                message = "All subjects have been listed.";
+                message = "All subjects have been listed. (# Subjects = " + num_subjects + ")";
 
             else
                 message = "No subjects are available.";
@@ -157,11 +163,13 @@ public class CatalogController
     {
         boolean requestSuccess = false;
         ResponseEntity<List<Author>> response;
+        int num_authors = 0;
         Instant start = Instant.now();
 
         try
         {
             response = viewCatalogService.listAllAuthors();
+            num_authors = response.getBody().size();
             requestSuccess = true;
             return response;
         }
@@ -173,7 +181,7 @@ public class CatalogController
             String message;
 
             if(requestSuccess)
-                message = "All authors have been listed.";
+                message = "All authors have been listed. (# Authors = " + num_authors + ")";
 
             else
                 message = "No authors are available.";
