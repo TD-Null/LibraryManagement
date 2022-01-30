@@ -472,7 +472,7 @@ public class MemberController
             String message;
 
             if (requestSuccess)
-                message = "Member has borrowed book \"" + bookTitle + "\".";
+                message = "Member has borrowed the book \"" + bookTitle + "\".";
 
             else
                 message = "Member was unable to borrow a book from the system.";
@@ -582,11 +582,38 @@ public class MemberController
     }
 
     @DeleteMapping("/cancel")
-    public ResponseEntity<MessageResponse> cancelMembership(@Valid @RequestBody CancelMembershipRequest request)
+    public ResponseEntity<MessageResponse> cancelMembership(HttpServletRequest httpServletRequest,
+                                                            @Valid @RequestBody CancelMembershipRequest request)
     {
-        LibraryCard libraryCard = validationService.cardValidation(
-                request.getBarcode(), request.getNumber());
-        return accountService.cancelMemberAccount(libraryCard, request.getPassword());
+        boolean requestSuccess = false;
+        ResponseEntity<MessageResponse> response;
+        Instant start = Instant.now();
+
+        try
+        {
+            LibraryCard libraryCard = validationService.cardValidation(
+                    request.getBarcode(), request.getNumber());
+            response = accountService.cancelMemberAccount(libraryCard, request.getPassword());
+            requestSuccess = true;
+            return response;
+        }
+
+        finally
+        {
+            Instant finish = Instant.now();
+            long time = Duration.between(start, finish).toMillis();
+            String message;
+
+            if (requestSuccess)
+                message = "Member has cancelled their membership.";
+
+            else
+                message = "Member was unable to cancel their membership.";
+
+            memberCancelRequestLog(httpServletRequest.getRequestURL().toString(), message,
+                    request.getBarcode(), request.getNumber(), request.getPassword(),
+                    requestSuccess, time);
+        }
     }
 
     private void memberViewRequestLog(String requestURL, String message, long barcode, String number,
@@ -624,7 +651,7 @@ public class MemberController
                 ", Card Number = " + number;
         String bookLog = "(Book: " +
                 "Barcode = " + bookBarcode;
-        String successLog = "(Success! Completed in " + time + " ms)";
+        String successLog;
 
         if(cardValidation)
             userLog += " [Valid])";
@@ -649,25 +676,25 @@ public class MemberController
     }
 
     private void memberCancelRequestLog(String requestURL, String message, long barcode, String number,
-                                        boolean cardValidation, boolean requestSuccess, long time)
+                                        String password, boolean requestSuccess, long time)
     {
         String requestType = "DELETE";
         String userLog = "(Member:" +
                 " Card Barcode = " + barcode +
-                ", Card Number = " + number;
-        String successLog = "(Success! Completed in " + time + " ms)";
+                ", Card Number = " + number +
+                ", Password = " + password;
+        String successLog;
 
-        if(cardValidation)
+        if(requestSuccess) {
             userLog += " [Valid])";
-
-        else
-            userLog += " [Invalid])";
-
-        if(requestSuccess)
             successLog = "(Success! Completed in " + time + " ms)";
+        }
 
         else
+        {
             successLog = "(Failure! Completed in " + time + " ms)";
+            userLog += " [Invalid])";
+        }
 
         log.info(requestType + " " + requestURL + " " + message + " " +
                 userLog + " " + successLog);
