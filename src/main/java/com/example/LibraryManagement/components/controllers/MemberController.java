@@ -577,4 +577,52 @@ public class MemberController
 
         log.info(requestType + " " + requestURL + " " + message + " " + userLog + " " + successLog);
     }
+
+    private void memberActionRequestLog(String requestURL, String message, long barcode, String number,
+                                        boolean cardValidation, boolean requestSuccess, long time)
+    {
+        String requestType = "PUT";
+        String userLog = "(Member:" +
+                " Card Barcode = " + barcode +
+                ", Card Number = " + number;
+        String successLog = "(Success! Completed in " + time + " ms)";
+
+        if(cardValidation)
+            userLog += " [Valid])";
+
+        else
+            userLog += " [Invalid])";
+
+        if(requestSuccess)
+            successLog = "(Success! Completed in " + time + " ms)";
+
+        else
+            successLog = "(Failure! Completed in " + time + " ms)";
+
+        log.info(requestType + " " + requestURL + " " + message + " " + userLog + " " + successLog);
+    }
+
+    private void memberCancelRequestLog(String requestURL, String message, long barcode, String number,
+                                        boolean cardValidation, boolean requestSuccess, long time)
+    {
+        String requestType = "DELETE";
+        String userLog = "(Member:" +
+                " Card Barcode = " + barcode +
+                ", Card Number = " + number;
+        String successLog = "(Success! Completed in " + time + " ms)";
+
+        if(cardValidation)
+            userLog += " [Valid])";
+
+        else
+            userLog += " [Invalid])";
+
+        if(requestSuccess)
+            successLog = "(Success! Completed in " + time + " ms)";
+
+        else
+            successLog = "(Failure! Completed in " + time + " ms)";
+
+        log.info(requestType + " " + requestURL + " " + message + " " + userLog + " " + successLog);
+    }
 }
