@@ -272,30 +272,64 @@ public class MemberController
     }
 
     @GetMapping("/transactions")
-    public ResponseEntity<List<FineTransaction>> viewTransactions(@RequestParam(value = "id") Long barcode,
+    public ResponseEntity<List<FineTransaction>> viewTransactions(HttpServletRequest httpServletRequest,
+                                                                  @RequestParam(value = "id") Long barcode,
                                                                   @RequestParam(value = "card") String number)
     {
-        LibraryCard card = validationService.cardValidation(
-                barcode, number);
-        Member member = (Member) accountService.barcodeReader(
-                card, AccountType.MEMBER, AccountStatus.ACTIVE);
-        List<FineTransaction> transactions = new ArrayList<>();
-        List<Fine> fines = new ArrayList<>(member.getFines());
+        boolean cardValidationSuccess = false;
+        boolean requestSuccess = false;
+        int num_transactions = 0;
+        Instant start = Instant.now();
 
-        for(Fine f: fines)
+        try
         {
-            FineTransaction t = f.getFineTransaction();
+            LibraryCard card = validationService.cardValidation(
+                    barcode, number);
+            Member member = (Member) accountService.barcodeReader(
+                    card, AccountType.MEMBER, AccountStatus.ACTIVE);
+            cardValidationSuccess = true;
 
-            if(t != null)
-            {
-                transactions.add(t);
+            List<FineTransaction> transactions = new ArrayList<>();
+            List<Fine> fines = new ArrayList<>(member.getFines());
+
+            for (Fine f : fines) {
+                FineTransaction t = f.getFineTransaction();
+
+                if (t != null) {
+                    transactions.add(t);
+                }
             }
+
+            if (transactions.isEmpty())
+                throw new ApiRequestException("Member has not made any transactions currently.", HttpStatus.NOT_FOUND);
+
+            num_transactions = transactions.size();
+            requestSuccess = true;
+            return ResponseEntity.ok(transactions);
         }
 
-        if(transactions.isEmpty())
-            throw new ApiRequestException("Member has not made any transactions currently.", HttpStatus.NOT_FOUND);
+        finally
+        {
+            Instant finish = Instant.now();
+            long time = Duration.between(start, finish).toMillis();
+            String message;
 
-        return ResponseEntity.ok(transactions);
+            if(cardValidationSuccess)
+            {
+                if (requestSuccess)
+                    message = "Member has viewed their current transactions. (# Transactions:" + num_transactions + ")";
+
+                else
+                    message = "Member has no current transactions.";
+            }
+
+            else
+                message = "Member was unable to obtain current transactions";
+
+            memberViewRequestLog(httpServletRequest.getRequestURL().toString(),
+                    message, barcode, number, cardValidationSuccess, requestSuccess,
+                    time);
+        }
     }
 
     @GetMapping("/checkout/history")
