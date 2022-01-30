@@ -458,6 +458,7 @@ public class MemberController
 
             BookItem book = validationService.bookValidation(bookBarcode);
             bookValidationSuccess = true;
+            bookTitle = book.getTitle();
 
             response = memberService.checkoutBook(member, book, new Date());
             requestSuccess = true;
@@ -474,7 +475,7 @@ public class MemberController
                 message = "Member has borrowed book \"" + bookTitle + "\".";
 
             else
-                message = "Member has no current history of book reservations.";
+                message = "Member was unable to borrow a book from the system.";
 
             memberBookRequestLog(httpServletRequest.getRequestURL().toString(),
                     message, request.getBarcode(), request.getNumber(), bookBarcode,
