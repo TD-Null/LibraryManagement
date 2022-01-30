@@ -13,7 +13,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import java.sql.ResultSet;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -48,7 +47,6 @@ public class CatalogController
     @GetMapping
     public ResponseEntity<List<BookItem>> viewAllBooks(HttpServletRequest httpServletRequest)
     {
-        String requestType = "GET";
         boolean requestSuccess = false;
         ResponseEntity<List<BookItem>> response;
         Instant start = Instant.now();
@@ -64,7 +62,7 @@ public class CatalogController
         {
             Instant finish = Instant.now();
             long time = Duration.between(start, finish).toMillis();
-            String message = "";
+            String message;
 
             if(requestSuccess)
                 message = "All books have been listed.";
@@ -72,8 +70,8 @@ public class CatalogController
             else
                 message = "No books are available.";
 
-            catalogLog(requestType, httpServletRequest.getRequestURL().toString(),
-                    message, time);
+            catalogLog(httpServletRequest.getRequestURL().toString(), message,
+                    time);
         }
     }
 
@@ -85,7 +83,6 @@ public class CatalogController
     @GetMapping("/library")
     public ResponseEntity<List<Library>> viewAllLibraries(HttpServletRequest httpServletRequest)
     {
-        String requestType = "GET";
         boolean requestSuccess = false;
         ResponseEntity<List<Library>> response;
         Instant start = Instant.now();
@@ -101,7 +98,7 @@ public class CatalogController
         {
             Instant finish = Instant.now();
             long time = Duration.between(start, finish).toMillis();
-            String message = "";
+            String message;
 
             if(requestSuccess)
                 message = "All libraries have been listed.";
@@ -109,8 +106,8 @@ public class CatalogController
             else
                 message = "No libraries are available.";
 
-            catalogLog(requestType, httpServletRequest.getRequestURL().toString(),
-                    message, time);
+            catalogLog(httpServletRequest.getRequestURL().toString(), message,
+                    time);
         }
     }
 
@@ -122,7 +119,6 @@ public class CatalogController
     @GetMapping("/subjects")
     public ResponseEntity<List<Subject>> viewAllSubjects(HttpServletRequest httpServletRequest)
     {
-        String requestType = "GET";
         boolean requestSuccess = false;
         ResponseEntity<List<Subject>> response;
         Instant start = Instant.now();
@@ -138,7 +134,7 @@ public class CatalogController
         {
             Instant finish = Instant.now();
             long time = Duration.between(start, finish).toMillis();
-            String message = "";
+            String message;
 
             if(requestSuccess)
                 message = "All subjects have been listed.";
@@ -146,8 +142,8 @@ public class CatalogController
             else
                 message = "No subjects are available.";
 
-            catalogLog(requestType, httpServletRequest.getRequestURL().toString(),
-                    message, time);
+            catalogLog(httpServletRequest.getRequestURL().toString(), message,
+                    time);
         }
     }
 
@@ -159,7 +155,6 @@ public class CatalogController
     @GetMapping("/author")
     public ResponseEntity<List<Author>> viewAllAuthors(HttpServletRequest httpServletRequest)
     {
-        String requestType = "GET";
         boolean requestSuccess = false;
         ResponseEntity<List<Author>> response;
         Instant start = Instant.now();
@@ -175,7 +170,7 @@ public class CatalogController
         {
             Instant finish = Instant.now();
             long time = Duration.between(start, finish).toMillis();
-            String message = "";
+            String message;
 
             if(requestSuccess)
                 message = "All authors have been listed.";
@@ -183,8 +178,8 @@ public class CatalogController
             else
                 message = "No authors are available.";
 
-            catalogLog(requestType, httpServletRequest.getRequestURL().toString(),
-                    message, time);
+            catalogLog(httpServletRequest.getRequestURL().toString(), message,
+                    time);
         }
     }
 
@@ -210,15 +205,15 @@ public class CatalogController
                                                       @RequestParam(value = "subjects", required = false, defaultValue = "none") List<String> subjects,
                                                       @RequestParam(value = "pub_date", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date publicationDate)
     {
-        String requestType = "GET";
         boolean requestSuccess = false;
-        ResponseEntity<List<BookItem>> response = ResponseEntity.ok(new ArrayList<>());
+        int searchResults = 0;
         Instant start = Instant.now();
 
         try
         {
-            response = viewCatalogService.searchBooks(
-                    library, title, author, subjects, publicationDate);
+            ResponseEntity<List<BookItem>> response = viewCatalogService.searchBooks(
+                     library, title, author, subjects, publicationDate);
+            searchResults = response.getBody().size();
             requestSuccess = true;
             return response;
         }
@@ -227,31 +222,33 @@ public class CatalogController
         {
             Instant finish = Instant.now();
             long time = Duration.between(start, finish).toMillis();
-            String message = "";
+            String message;
 
             if(requestSuccess)
-                message = response.getBody().size() + " books were found under this search.";
+                message = searchResults + " books were found under this search.";
 
             else
                 message = "No books are available under this search.";
 
-            catalogSearchLog(requestType, httpServletRequest.getRequestURL().toString(),
-                    message, library, title, author, subjects.toString(), publicationDate.toString(),
+            catalogSearchLog(httpServletRequest.getRequestURL().toString(), message,
+                    library, title, author, subjects.toString(), publicationDate.toString(),
                     time);
         }
     }
 
-    private void catalogLog(String requestType, String requestURL, String message, long time)
+    private void catalogLog(String requestURL, String message, long time)
     {
+        String requestType = "GET";
         String successLog = "(Success! Completed in " + time + " ms)";
 
         log.info(requestType + " " + requestURL + " " + message + " " + successLog);
     }
 
-    private void catalogSearchLog(String requestType, String requestURL, String message,
-                                  String library, String title, String author, String subjects,
+    private void catalogSearchLog(String requestURL, String message, String library,
+                                  String title, String author, String subjects,
                                   String pub_date, long time)
     {
+        String requestType = "GET";
         String successLog = "(Success! Completed in " + time + " ms)";
         String search = "(Search: " +
                 "Library = " + library + ", " +

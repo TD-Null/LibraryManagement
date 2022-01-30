@@ -16,7 +16,6 @@ import javax.validation.Valid;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Date;
-import java.util.List;
 
 /*
  * Controller component containing the API requests relating to accounts:
@@ -70,7 +69,7 @@ public class AccountController
         {
             Instant finish = Instant.now();
             long time = Duration.between(start, finish).toMillis();
-            String message = "";
+            String message;
 
             if(requestSuccess)
                 message = "User has obtained their account details.";
@@ -78,7 +77,7 @@ public class AccountController
             else
                 message = "User was unable to obtain their account details.";
 
-            requestLog(requestType, httpServletRequest.getRequestURL().toString(),
+            accountRequestLog(requestType, httpServletRequest.getRequestURL().toString(),
                     message, barcode, number, cardValidationSuccess, requestSuccess,
                     time);
         }
@@ -94,7 +93,6 @@ public class AccountController
     public ResponseEntity<LibraryCard> login(HttpServletRequest httpServletRequest,
                                              @Valid @RequestBody LoginRequest request)
     {
-        String requestType = "POST";
         boolean requestSuccess = false;
         ResponseEntity<LibraryCard> response;
         Instant start = Instant.now();
@@ -111,7 +109,7 @@ public class AccountController
         {
             Instant finish = Instant.now();
             long time = Duration.between(start, finish).toMillis();
-            String message = "";
+            String message;
 
             if(requestSuccess)
                 message = "User has login to their account.";
@@ -119,8 +117,8 @@ public class AccountController
             else
                 message = "User failed to login to their account (Either wrong library card number or password).";
 
-            loginLog(requestType, httpServletRequest.getRequestURL().toString(),
-                    message, request.getLibraryCardNumber(), request.getPassword(),
+            loginLog(httpServletRequest.getRequestURL().toString(), message,
+                    request.getLibraryCardNumber(), request.getPassword(),
                     requestSuccess, time);
         }
 
@@ -135,7 +133,6 @@ public class AccountController
     public ResponseEntity<LibraryCard> signup(HttpServletRequest httpServletRequest,
                                               @Valid @RequestBody SignupRequest request)
     {
-        String requestType = "POST";
         boolean requestSuccess = false;
         ResponseEntity<LibraryCard> response;
         Instant start = Instant.now();
@@ -154,7 +151,7 @@ public class AccountController
         {
             Instant finish = Instant.now();
             long time = Duration.between(start, finish).toMillis();
-            String message = "";
+            String message;
 
             if(requestSuccess)
                 message = "User has created their account.";
@@ -162,8 +159,8 @@ public class AccountController
             else
                 message = "User failed to create their account.";
 
-            signupLog(requestType, httpServletRequest.getRequestURL().toString(),
-                    message, request.getName(), request.getPassword(), request.getEmail(),
+            signupLog(httpServletRequest.getRequestURL().toString(), message,
+                    request.getName(), request.getPassword(), request.getEmail(),
                     requestSuccess, time);
         }
     }
@@ -203,7 +200,7 @@ public class AccountController
         {
             Instant finish = Instant.now();
             long time = Duration.between(start, finish).toMillis();
-            String message = "";
+            String message;
 
             if(requestSuccess)
                 message = "User has successfully edited their account details.";
@@ -211,7 +208,7 @@ public class AccountController
             else
                 message = "User has failed to edit their account details.";
 
-            requestLog(requestType, httpServletRequest.getRequestURL().toString(), message,
+            accountRequestLog(requestType, httpServletRequest.getRequestURL().toString(), message,
                     request.getBarcode(), request.getNumber(), cardValidationSuccess,
                     requestSuccess, time);
         }
@@ -251,7 +248,7 @@ public class AccountController
         {
             Instant finish = Instant.now();
             long time = Duration.between(start, finish).toMillis();
-            String message = "";
+            String message;
 
             if(requestSuccess)
                 message = "User has successfully changed their password.";
@@ -259,16 +256,16 @@ public class AccountController
             else
                 message = "User has failed to change their password.";
 
-            requestLog(requestType, httpServletRequest.getRequestURL().toString(), message,
+            accountRequestLog(requestType, httpServletRequest.getRequestURL().toString(), message,
                     request.getBarcode(), request.getNumber(), cardValidationSuccess,
                     requestSuccess, time);
         }
     }
 
-    private void loginLog(String requestType, String requestURL, String message,
-                          String number, String password, boolean loginValidation,
-                          long time)
+    private void loginLog(String requestURL, String message, String number, String password,
+                          boolean loginValidation, long time)
     {
+        String requestType = "POST";
         String userLog = "(Login user credentials:" +
                 " Number = " + number +
                 ", Password = " + password;
@@ -289,10 +286,10 @@ public class AccountController
         log.info(requestType + " " + requestURL + " " + message + " " + userLog + " " + successLog);
     }
 
-    private void signupLog(String requestType, String requestURL, String message,
-                           String name, String password, String email, boolean loginValidation,
-                           long time)
+    private void signupLog(String requestURL, String message, String name, String password,
+                           String email, boolean loginValidation, long time)
     {
+        String requestType = "POST";
         String userLog = "(Login user credentials:" +
                 " Name = " + name +
                 ", Password = " + password +
@@ -314,9 +311,9 @@ public class AccountController
         log.info(requestType + " " + requestURL + " " + message + " " + userLog + " " + successLog);
     }
 
-    private void requestLog(String requestType, String requestURL, String message,
-                            long barcode, String number, boolean cardValidation,
-                            boolean requestSuccess, long time)
+    private void accountRequestLog(String requestType, String requestURL, String message,
+                                   long barcode, String number, boolean cardValidation,
+                                   boolean requestSuccess, long time)
     {
         String userLog = "(User:" +
                 " Barcode = " + barcode +

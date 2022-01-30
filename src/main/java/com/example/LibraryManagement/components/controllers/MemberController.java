@@ -68,7 +68,6 @@ public class MemberController
                                                          @RequestParam(value = "id") Long barcode,
                                                          @RequestParam(value = "card") String number)
     {
-        String requestType = "GET";
         boolean cardValidationSuccess = false;
         boolean requestSuccess = false;
         Instant start = Instant.now();
@@ -94,7 +93,7 @@ public class MemberController
         {
             Instant finish = Instant.now();
             long time = Duration.between(start, finish).toMillis();
-            String message = "";
+            String message;
 
             if(cardValidationSuccess)
             {
@@ -108,7 +107,7 @@ public class MemberController
             else
                 message = "Member was unable to obtain current book loans.";
 
-            memberViewRequestLog(requestType, httpServletRequest.getRequestURL().toString(),
+            memberViewRequestLog(httpServletRequest.getRequestURL().toString(),
                     message, barcode, number, cardValidationSuccess, requestSuccess,
                     time);
         }
@@ -118,6 +117,11 @@ public class MemberController
     public ResponseEntity<List<BookItem>> viewReservedBooks(@RequestParam(value = "id") Long barcode,
                                                             @RequestParam(value = "card") String number)
     {
+        String requestType = "GET";
+        boolean cardValidationSuccess = false;
+        boolean requestSuccess = false;
+        Instant start = Instant.now();
+
         LibraryCard card = validationService.cardValidation(
                 barcode, number);
         Member member = (Member) accountService.barcodeReader(
@@ -338,10 +342,10 @@ public class MemberController
         return accountService.cancelMemberAccount(libraryCard, request.getPassword());
     }
 
-    private void memberViewRequestLog(String requestType, String requestURL, String message,
-                                  long barcode, String number, boolean cardValidation,
-                                  boolean requestSuccess, long time)
+    private void memberViewRequestLog(String requestURL, String message, long barcode, String number,
+                                      boolean cardValidation, boolean requestSuccess, long time)
     {
+        String requestType = "GET";
         String userLog = "(Member:" +
                 " Barcode = " + barcode +
                 ", Number = " + number;
