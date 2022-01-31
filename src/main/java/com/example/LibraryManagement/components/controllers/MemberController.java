@@ -974,7 +974,7 @@ public class MemberController
                                         String password, boolean requestSuccess, long time)
     {
         String requestType = "DELETE";
-        String userLog = "(Member:" +
+        String userLog = "(Cancelled Member:" +
                 " Card Barcode = " + barcode +
                 ", Card Number = " + number +
                 ", Password = " + password;

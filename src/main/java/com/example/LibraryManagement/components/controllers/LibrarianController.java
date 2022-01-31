@@ -198,7 +198,7 @@ public class LibrarianController
             else
                 message = "Librarian failed to register to the system.";
 
-            registerRequestLog(httpServletRequest.getRequestURL().toString(), message,
+            registerLibrarianRequestLog(httpServletRequest.getRequestURL().toString(), message,
                     request.getName(), request.getPassword(), request.getEmail(),
                     requestSuccess, time);
         }
@@ -253,7 +253,7 @@ public class LibrarianController
             else
                 message += " [Invalid])";
 
-            registerRequestLog(httpServletRequest.getRequestURL().toString(), message,
+            registerLibrarianRequestLog(httpServletRequest.getRequestURL().toString(), message,
                     request.getName(), request.getPassword(), request.getEmail(),
                     requestSuccess, time);
         }
@@ -263,14 +263,56 @@ public class LibrarianController
     public ResponseEntity<MessageResponse> removeLibrarian(HttpServletRequest httpServletRequest,
                                                            @Valid @RequestBody RemoveLibrarianRequest request)
     {
-        LibraryCard card = validationService.cardValidation(
-                request.getBarcode(), request.getNumber());
-        accountService.barcodeReader(
-                card, AccountType.LIBRARIAN, AccountStatus.ACTIVE);
+        boolean cardValidationSuccess = false;
+        boolean removedLibrarianValidationSuccess = false;
+        boolean requestSuccess = false;
+        ResponseEntity<MessageResponse> response;
+        Instant start = Instant.now();
 
-        LibraryCard libraryCard = validationService.cardBarcodeValidation(
-                request.getLibrarianCardBarcode());
-        return accountService.cancelLibrarianAccount(libraryCard);
+        try
+        {
+            LibraryCard card = validationService.cardValidation(
+                    request.getBarcode(), request.getNumber());
+            accountService.barcodeReader(
+                    card, AccountType.LIBRARIAN, AccountStatus.ACTIVE);
+            cardValidationSuccess = true;
+
+            LibraryCard removedLibrarianCard = validationService.cardValidation(
+                    request.getLibrarianCardBarcode(),
+                    request.getLibrarianCardNumber());
+            removedLibrarianValidationSuccess = true;
+
+            response = accountService.cancelLibrarianAccount(removedLibrarianCard);
+            requestSuccess = true;
+            return response;
+        }
+
+        finally
+        {
+            Instant finish = Instant.now();
+            long time = Duration.between(start, finish).toMillis();
+            String message;
+
+            if(requestSuccess)
+                message = "Librarian has removed a librarian from the system.";
+
+            else
+                message = "Librarian failed to remove a librarian from the system.";
+
+            message += " (Librarian:" +
+                    " Card Barcode = " + request.getBarcode() +
+                    ", Card Number = " + request.getNumber();
+
+            if(cardValidationSuccess)
+                message += " [Valid])";
+
+            else
+                message += " [Invalid])";
+
+            removeLibrarianRequestLog(httpServletRequest.getRequestURL().toString(), message,
+                    request.getLibrarianCardBarcode(), request.getLibrarianCardNumber(),
+                    removedLibrarianValidationSuccess, requestSuccess, time);
+        }
     }
 
     @PutMapping("/account/member/block")
@@ -645,8 +687,8 @@ public class LibrarianController
                 userLog + " " + successLog);
     }
 
-    private void registerRequestLog(String requestURL, String message, String name, String password,
-                                    String email, boolean requestSuccess, long time)
+    private void registerLibrarianRequestLog(String requestURL, String message, String name, String password,
+                                             String email, boolean requestSuccess, long time)
     {
         String requestType = "POST";
         String userLog = "(Added Librarian:" +
@@ -664,6 +706,35 @@ public class LibrarianController
         else
         {
             userLog += " [Invalid])";
+            successLog = "(Failed! Completed in " + time + " ms)";
+        }
+
+        log.info(requestType + " " + requestURL + " " + message + " " +
+                userLog + " " + successLog);
+    }
+
+    private void removeLibrarianRequestLog(String requestURL, String message, long barcode, String number,
+                                           boolean cardValidation, boolean requestSuccess, long time)
+    {
+        String requestType = "DELETE";
+        String userLog = "(Removed Librarian:" +
+                " Card Barcode = " + barcode +
+                ", Card Number = " + number;
+        String successLog;
+
+        if(cardValidation)
+            userLog += " [Valid])";
+
+        else
+            userLog += " [Invalid])";
+
+        if(requestSuccess)
+        {
+            successLog = "(Success! Completed in " + time + " ms)";
+        }
+
+        else
+        {
             successLog = "(Failed! Completed in " + time + " ms)";
         }
 
