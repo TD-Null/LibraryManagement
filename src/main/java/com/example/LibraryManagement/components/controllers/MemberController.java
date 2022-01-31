@@ -485,16 +485,51 @@ public class MemberController
     }
 
     @PutMapping("/return")
-    public ResponseEntity<MessageResponse> returnBook(@Valid @RequestBody CardValidationRequest request,
+    public ResponseEntity<MessageResponse> returnBook(HttpServletRequest httpServletRequest,
+                                                      @Valid @RequestBody CardValidationRequest request,
                                                       @RequestParam(value = "book") Long bookBarcode)
     {
-        LibraryCard card = validationService.cardValidation(
-                request.getBarcode(), request.getNumber());
-        Member member = (Member) accountService.barcodeReader(
-                card, AccountType.MEMBER, AccountStatus.ACTIVE);
+        boolean cardValidationSuccess = false;
+        boolean bookValidationSuccess = false;
+        boolean requestSuccess = false;
+        String bookTitle = "";
+        ResponseEntity<MessageResponse> response;
+        Instant start = Instant.now();
 
-        BookItem book = validationService.bookValidation(bookBarcode);
-        return memberService.returnBook(member, book, new Date());
+        try
+        {
+            LibraryCard card = validationService.cardValidation(
+                    request.getBarcode(), request.getNumber());
+            Member member = (Member) accountService.barcodeReader(
+                    card, AccountType.MEMBER, AccountStatus.ACTIVE);
+            cardValidationSuccess = true;
+
+            BookItem book = validationService.bookValidation(bookBarcode);
+            bookValidationSuccess = true;
+            bookTitle = book.getTitle();
+
+            response = memberService.returnBook(member, book, new Date());
+            requestSuccess = true;
+            return response;
+        }
+
+        finally
+        {
+            Instant finish = Instant.now();
+            long time = Duration.between(start, finish).toMillis();
+            String message;
+
+            if (requestSuccess)
+                message = "Member has returned the book \"" + bookTitle + "\".";
+
+            else
+                message = "Member was unable to return a book from the system.";
+
+            memberBookRequestLog(httpServletRequest.getRequestURL().toString(),
+                    message, request.getBarcode(), request.getNumber(), bookBarcode,
+                    cardValidationSuccess, bookValidationSuccess, requestSuccess,
+                    time);
+        }
     }
 
     @PutMapping("/reserve")
@@ -511,74 +546,243 @@ public class MemberController
     }
 
     @PutMapping("/reserve/cancel")
-    public ResponseEntity<MessageResponse> cancelReservation(@Valid @RequestBody CardValidationRequest request,
+    public ResponseEntity<MessageResponse> cancelReservation(HttpServletRequest httpServletRequest,
+                                                             @Valid @RequestBody CardValidationRequest request,
                                                              @RequestParam(value = "book") Long bookBarcode)
     {
-        LibraryCard card = validationService.cardValidation(
-                request.getBarcode(), request.getNumber());
-        Member member = (Member) accountService.barcodeReader(
-                card, AccountType.MEMBER, AccountStatus.ACTIVE);
+        boolean cardValidationSuccess = false;
+        boolean bookValidationSuccess = false;
+        boolean requestSuccess = false;
+        String bookTitle = "";
+        ResponseEntity<MessageResponse> response;
+        Instant start = Instant.now();
 
-        BookItem book = validationService.bookValidation(bookBarcode);
-        return memberService.cancelReservation(member, book, new Date());
+        try
+        {
+            LibraryCard card = validationService.cardValidation(
+                    request.getBarcode(), request.getNumber());
+            Member member = (Member) accountService.barcodeReader(
+                    card, AccountType.MEMBER, AccountStatus.ACTIVE);
+            cardValidationSuccess = true;
+
+            BookItem book = validationService.bookValidation(bookBarcode);
+            bookValidationSuccess = true;
+            bookTitle = book.getTitle();
+
+            response = memberService.cancelReservation(member, book, new Date());
+            requestSuccess = true;
+            return response;
+        }
+
+        finally
+        {
+            Instant finish = Instant.now();
+            long time = Duration.between(start, finish).toMillis();
+            String message;
+
+            if (requestSuccess)
+                message = "Member has cancelled their reservation of the book \"" + bookTitle + "\".";
+
+            else
+                message = "Member was unable to cancel their reservation of a book from the system.";
+
+            memberBookRequestLog(httpServletRequest.getRequestURL().toString(),
+                    message, request.getBarcode(), request.getNumber(), bookBarcode,
+                    cardValidationSuccess, bookValidationSuccess, requestSuccess,
+                    time);
+        }
     }
 
     @PutMapping("/renew")
-    public ResponseEntity<MessageResponse> renewBook(@Valid @RequestBody CardValidationRequest request,
+    public ResponseEntity<MessageResponse> renewBook(HttpServletRequest httpServletRequest,
+                                                     @Valid @RequestBody CardValidationRequest request,
                                                      @RequestParam(value = "book") Long bookBarcode)
     {
-        LibraryCard card = validationService.cardValidation(
-                request.getBarcode(), request.getNumber());
-        Member member = (Member) accountService.barcodeReader(
-                card, AccountType.MEMBER, AccountStatus.ACTIVE);
+        boolean cardValidationSuccess = false;
+        boolean bookValidationSuccess = false;
+        boolean requestSuccess = false;
+        String bookTitle = "";
+        ResponseEntity<MessageResponse> response;
+        Instant start = Instant.now();
 
-        BookItem book = validationService.bookValidation(bookBarcode);
-        return memberService.renewBook(member, book, new Date());
+        try
+        {
+            LibraryCard card = validationService.cardValidation(
+                    request.getBarcode(), request.getNumber());
+            Member member = (Member) accountService.barcodeReader(
+                    card, AccountType.MEMBER, AccountStatus.ACTIVE);
+            cardValidationSuccess = true;
+
+            BookItem book = validationService.bookValidation(bookBarcode);
+            bookValidationSuccess = true;
+            bookTitle = book.getTitle();
+
+            response = memberService.renewBook(member, book, new Date());
+            requestSuccess = true;
+            return response;
+        }
+
+        finally
+        {
+            Instant finish = Instant.now();
+            long time = Duration.between(start, finish).toMillis();
+            String message;
+
+            if (requestSuccess)
+                message = "Member has renewed their borrowed book \"" + bookTitle + "\".";
+
+            else
+                message = "Member was unable to renew one of their borrowed books from the system.";
+
+            memberBookRequestLog(httpServletRequest.getRequestURL().toString(),
+                    message, request.getBarcode(), request.getNumber(), bookBarcode,
+                    cardValidationSuccess, bookValidationSuccess, requestSuccess,
+                    time);
+        }
     }
 
     @PutMapping("/fines/transaction/card")
-    public ResponseEntity<MessageResponse> cardTransaction(@Valid @RequestBody CardTransactionRequest request,
+    public ResponseEntity<MessageResponse> cardTransaction(HttpServletRequest httpServletRequest,
+                                                           @Valid @RequestBody CardTransactionRequest request,
                                                            @RequestParam(value = "fine") Long fineID)
     {
-        LibraryCard card = validationService.cardValidation(
-                request.getBarcode(), request.getNumber());
-        Member member = (Member) accountService.barcodeReader(
-                card, AccountType.MEMBER, AccountStatus.ACTIVE);
+        boolean cardValidationSuccess = false;
+        boolean fineValidationSuccess = false;
+        boolean requestSuccess = false;
+        ResponseEntity<MessageResponse> response;
+        Instant start = Instant.now();
 
-        Fine fine = validationService.fineValidation(fineID);
-        return memberService.payFine(member, fine, TransactionType.CREDIT_CARD,
-                new CreditCardTransaction(request.getName()), request.getAmount(),
-                new Date());
+        try
+        {
+            LibraryCard card = validationService.cardValidation(
+                    request.getBarcode(), request.getNumber());
+            Member member = (Member) accountService.barcodeReader(
+                    card, AccountType.MEMBER, AccountStatus.ACTIVE);
+            cardValidationSuccess = true;
+
+            Fine fine = validationService.fineValidation(fineID);
+            fineValidationSuccess = true;
+
+            response =  memberService.payFine(member, fine, TransactionType.CREDIT_CARD,
+                    new CreditCardTransaction(request.getName()), request.getAmount(),
+                    new Date());
+            requestSuccess = true;
+            return response;
+        }
+
+        finally
+        {
+            Instant finish = Instant.now();
+            long time = Duration.between(start, finish).toMillis();
+            String message;
+
+            if (requestSuccess)
+                message = "Member has paid for their fine of + $" + request.getAmount() + ".";
+
+            else
+                message = "Member was unable to pay for their fine.";
+
+            memberTransactionRequestLog(httpServletRequest.getRequestURL().toString(), message,
+                    request.getBarcode(), request.getNumber(), fineID, TransactionType.CREDIT_CARD,
+                    request.getAmount(), cardValidationSuccess, fineValidationSuccess,
+                    requestSuccess, time);
+        }
     }
 
     @PutMapping("/fines/transaction/check")
-    public ResponseEntity<MessageResponse> checkTransaction(@Valid @RequestBody CheckTransactionRequest request,
+    public ResponseEntity<MessageResponse> checkTransaction(HttpServletRequest httpServletRequest,
+                                                            @Valid @RequestBody CheckTransactionRequest request,
                                                             @RequestParam(value = "fine") Long fineID)
     {
-        LibraryCard card = validationService.cardValidation(
-                request.getBarcode(), request.getNumber());
-        Member member = (Member) accountService.barcodeReader(
-                card, AccountType.MEMBER, AccountStatus.ACTIVE);
+        boolean cardValidationSuccess = false;
+        boolean fineValidationSuccess = false;
+        boolean requestSuccess = false;
+        ResponseEntity<MessageResponse> response;
+        Instant start = Instant.now();
 
-        Fine fine = validationService.fineValidation(fineID);
-        return memberService.payFine(member, fine, TransactionType.CHECK,
-                new CheckTransaction(request.getBankName(), request.getCheckNumber()), request.getAmount(),
-                new Date());
+        try
+        {
+            LibraryCard card = validationService.cardValidation(
+                    request.getBarcode(), request.getNumber());
+            Member member = (Member) accountService.barcodeReader(
+                    card, AccountType.MEMBER, AccountStatus.ACTIVE);
+            cardValidationSuccess = true;
+
+            Fine fine = validationService.fineValidation(fineID);
+            fineValidationSuccess = true;
+
+            response = memberService.payFine(member, fine, TransactionType.CHECK,
+                    new CheckTransaction(request.getBankName(), request.getCheckNumber()), request.getAmount(),
+                    new Date());
+            requestSuccess = true;
+            return response;
+        }
+
+        finally
+        {
+            Instant finish = Instant.now();
+            long time = Duration.between(start, finish).toMillis();
+            String message;
+
+            if (requestSuccess)
+                message = "Member has paid for their fine of + $" + request.getAmount() + ".";
+
+            else
+                message = "Member was unable to pay for their fine.";
+
+            memberTransactionRequestLog(httpServletRequest.getRequestURL().toString(), message,
+                    request.getBarcode(), request.getNumber(), fineID, TransactionType.CHECK,
+                    request.getAmount(), cardValidationSuccess, fineValidationSuccess,
+                    requestSuccess, time);
+        }
     }
 
     @PutMapping("/fines/transaction/cash")
-    public ResponseEntity<MessageResponse> cashTransaction(@Valid @RequestBody CashTransactionRequest request,
+    public ResponseEntity<MessageResponse> cashTransaction(HttpServletRequest httpServletRequest,
+                                                           @Valid @RequestBody CashTransactionRequest request,
                                                            @RequestParam(value = "fine") Long fineID)
     {
-        LibraryCard card = validationService.cardValidation(
-                request.getBarcode(), request.getNumber());
-        Member member = (Member) accountService.barcodeReader(
-                card, AccountType.MEMBER, AccountStatus.ACTIVE);
+        boolean cardValidationSuccess = false;
+        boolean fineValidationSuccess = false;
+        boolean requestSuccess = false;
+        ResponseEntity<MessageResponse> response;
+        Instant start = Instant.now();
 
-        Fine fine = validationService.fineValidation(fineID);
-        return memberService.payFine(member, fine, TransactionType.CASH,
-                new CashTransaction(request.getCashTendered()), request.getCashTendered(),
-                new Date());
+        try
+        {
+            LibraryCard card = validationService.cardValidation(
+                    request.getBarcode(), request.getNumber());
+            Member member = (Member) accountService.barcodeReader(
+                    card, AccountType.MEMBER, AccountStatus.ACTIVE);
+            cardValidationSuccess = true;
+
+            Fine fine = validationService.fineValidation(fineID);
+            fineValidationSuccess = true;
+
+            response = memberService.payFine(member, fine, TransactionType.CASH,
+                    new CashTransaction(request.getCashTendered()), request.getCashTendered(),
+                    new Date());
+            requestSuccess = true;
+            return response;
+        }
+
+        finally
+        {
+            Instant finish = Instant.now();
+            long time = Duration.between(start, finish).toMillis();
+            String message;
+
+            if (requestSuccess)
+                message = "Member has paid for their fine of + $" + request.getCashTendered() + ".";
+
+            else
+                message = "Member was unable to pay for their fine.";
+
+            memberTransactionRequestLog(httpServletRequest.getRequestURL().toString(), message,
+                    request.getBarcode(), request.getNumber(), fineID, TransactionType.CREDIT_CARD,
+                    request.getCashTendered(), cardValidationSuccess, fineValidationSuccess,
+                    requestSuccess, time);
+        }
     }
 
     @DeleteMapping("/cancel")
@@ -673,6 +877,61 @@ public class MemberController
 
         log.info(requestType + " " + requestURL + " " + message + " " +
                 userLog + " " + bookLog + " " + successLog);
+    }
+
+    private void memberTransactionRequestLog(String requestURL, String message, long barcode, String number,
+                                             Long fineID, TransactionType transactionType, double amount,
+                                             boolean cardValidation, boolean fineValidation,
+                                             boolean requestSuccess, long time)
+    {
+        String requestType = "PUT";
+        String userLog = "(Member:" +
+                " Card Barcode = " + barcode +
+                ", Card Number = " + number;
+
+        String fineLog = "(Fine: ID = " + fineID;
+
+        String transactionLog = "(Transaction:" +
+                " Amount = " + amount;
+
+        if(transactionType == TransactionType.CREDIT_CARD)
+            transactionLog += " Type = Credit Card";
+
+        else if(transactionType == TransactionType.CHECK)
+            transactionLog += " Type = Check";
+
+        else if(transactionType == TransactionType.CASH)
+            transactionLog += " Type = Cash";
+
+        String successLog;
+
+        if(cardValidation)
+            userLog += " [Valid])";
+
+        else
+            userLog += " [Invalid])";
+
+        if(fineValidation)
+            fineLog += " [Valid])";
+
+        else
+            fineLog += " [Invalid])";
+
+        if(requestSuccess)
+        {
+            transactionLog += " [Valid])";
+            successLog = "(Success! Completed in " + time + " ms)";
+        }
+
+        else
+        {
+            transactionLog += " [Invalid])";
+            successLog = "(Failure! Completed in " + time + " ms)";
+        }
+
+        log.info(requestType + " " + requestURL + " " + message + " " +
+                userLog + " " + fineLog + " " + transactionLog + " " +
+                successLog);
     }
 
     private void memberCancelRequestLog(String requestURL, String message, long barcode, String number,
