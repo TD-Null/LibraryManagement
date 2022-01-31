@@ -523,7 +523,8 @@ public class MemberController
                 message = "Member has returned the book \"" + bookTitle + "\".";
 
             else
-                message = "Member was unable to return a book from the system.";
+                message = "Member has either returned a borrowed book late " +
+                        "or was unable to return a book from the system.";
 
             memberBookRequestLog(httpServletRequest.getRequestURL().toString(),
                     message, request.getBarcode(), request.getNumber(), bookBarcode,
@@ -533,16 +534,50 @@ public class MemberController
     }
 
     @PutMapping("/reserve")
-    public ResponseEntity<MessageResponse> reserveBook(@Valid @RequestBody CardValidationRequest request,
+    public ResponseEntity<MessageResponse> reserveBook(HttpServletRequest httpServletRequest,
+                                                       @Valid @RequestBody CardValidationRequest request,
                                                        @RequestParam(value = "book") Long bookBarcode)
     {
-        LibraryCard card = validationService.cardValidation(
-                request.getBarcode(), request.getNumber());
-        Member member = (Member) accountService.barcodeReader(
-                card, AccountType.MEMBER, AccountStatus.ACTIVE);
+        boolean cardValidationSuccess = false;
+        boolean bookValidationSuccess = false;
+        boolean requestSuccess = false;
+        String bookTitle = "";
+        ResponseEntity<MessageResponse> response;
+        Instant start = Instant.now();
 
-        BookItem book = validationService.bookValidation(bookBarcode);
-        return memberService.reserveBook(member, book, new Date());
+        try
+        {
+            LibraryCard card = validationService.cardValidation(
+                    request.getBarcode(), request.getNumber());
+            Member member = (Member) accountService.barcodeReader(
+                    card, AccountType.MEMBER, AccountStatus.ACTIVE);
+            cardValidationSuccess = true;
+
+            BookItem book = validationService.bookValidation(bookBarcode);
+            bookValidationSuccess = true;
+
+            response = memberService.reserveBook(member, book, new Date());
+            requestSuccess = true;
+            return response;
+        }
+
+        finally
+        {
+            Instant finish = Instant.now();
+            long time = Duration.between(start, finish).toMillis();
+            String message;
+
+            if (requestSuccess)
+                message = "Member has reserved the book \"" + bookTitle + "\".";
+
+            else
+                message = "Member was unable to reserve a book from the system.";
+
+            memberBookRequestLog(httpServletRequest.getRequestURL().toString(),
+                    message, request.getBarcode(), request.getNumber(), bookBarcode,
+                    cardValidationSuccess, bookValidationSuccess, requestSuccess,
+                    time);
+        }
     }
 
     @PutMapping("/reserve/cancel")
@@ -584,7 +619,7 @@ public class MemberController
                 message = "Member has cancelled their reservation of the book \"" + bookTitle + "\".";
 
             else
-                message = "Member was unable to cancel their reservation of a book from the system.";
+                message = "Member was unable to cancel a reservation.";
 
             memberBookRequestLog(httpServletRequest.getRequestURL().toString(),
                     message, request.getBarcode(), request.getNumber(), bookBarcode,
@@ -632,7 +667,8 @@ public class MemberController
                 message = "Member has renewed their borrowed book \"" + bookTitle + "\".";
 
             else
-                message = "Member was unable to renew one of their borrowed books from the system.";
+                message = "Member was unable to renew one of their borrowed books from the system. " +
+                        "(Either returned late or book is not associated with the member)";
 
             memberBookRequestLog(httpServletRequest.getRequestURL().toString(),
                     message, request.getBarcode(), request.getNumber(), bookBarcode,
@@ -779,7 +815,7 @@ public class MemberController
                 message = "Member was unable to pay for their fine.";
 
             memberTransactionRequestLog(httpServletRequest.getRequestURL().toString(), message,
-                    request.getBarcode(), request.getNumber(), fineID, TransactionType.CREDIT_CARD,
+                    request.getBarcode(), request.getNumber(), fineID, TransactionType.CASH,
                     request.getCashTendered(), cardValidationSuccess, fineValidationSuccess,
                     requestSuccess, time);
         }
