@@ -34,7 +34,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -66,31 +69,106 @@ public class LibrarianController
     private final ValidationService validationService;
 
     @GetMapping("/account/member")
-    public ResponseEntity<List<Member>> viewAllMembers(@RequestParam(value = "barcode") Long barcode,
+    public ResponseEntity<List<Member>> viewAllMembers(HttpServletRequest httpServletRequest,
+                                                       @RequestParam(value = "barcode") Long barcode,
                                                        @RequestParam(value = "card") String number)
     {
-        LibraryCard card = validationService.cardValidation(
-                barcode, number);
-        accountService.barcodeReader(
-                card, AccountType.LIBRARIAN, AccountStatus.ACTIVE);
+        boolean cardValidationSuccess = false;
+        boolean requestSuccess = false;
+        int num_members = 0;
+        ResponseEntity<List<Member>> response;
+        Instant start = Instant.now();
 
-        return librarianService.listAllMembers();
+        try
+        {
+            LibraryCard card = validationService.cardValidation(
+                    barcode, number);
+            accountService.barcodeReader(
+                    card, AccountType.LIBRARIAN, AccountStatus.ACTIVE);
+            cardValidationSuccess = true;
+
+            response = librarianService.listAllMembers();
+            num_members = response.getBody().size();
+            requestSuccess = true;
+            return response;
+        }
+
+        finally
+        {
+            Instant finish = Instant.now();
+            long time = Duration.between(start, finish).toMillis();
+            String message;
+
+            if(cardValidationSuccess)
+            {
+                if (requestSuccess)
+                    message = "Librarian has viewed all " + num_members + " members within the system.";
+
+                else
+                    message = "Librarian has no members available to view.";
+            }
+
+            else
+                message = "Librarian was unable to obtain all member accounts.";
+
+            librarianViewRequestLog(httpServletRequest.getRequestURL().toString(),
+                    message, barcode, number, cardValidationSuccess, requestSuccess,
+                    time);
+        }
     }
 
     @GetMapping("/account/librarian")
-    public ResponseEntity<List<Librarian>> viewAllLibrarians(@RequestParam(value = "barcode") Long barcode,
+    public ResponseEntity<List<Librarian>> viewAllLibrarians(HttpServletRequest httpServletRequest,
+                                                             @RequestParam(value = "barcode") Long barcode,
                                                              @RequestParam(value = "card") String number)
     {
-        LibraryCard card = validationService.cardValidation(
-                barcode, number);
-        accountService.barcodeReader(
-                card, AccountType.LIBRARIAN, AccountStatus.ACTIVE);
+        boolean cardValidationSuccess = false;
+        boolean requestSuccess = false;
+        int num_librarians = 0;
+        ResponseEntity<List<Librarian>> response;
+        Instant start = Instant.now();
 
-        return librarianService.listAllLibrarians();
+        try
+        {
+            LibraryCard card = validationService.cardValidation(
+                    barcode, number);
+            accountService.barcodeReader(
+                    card, AccountType.LIBRARIAN, AccountStatus.ACTIVE);
+            cardValidationSuccess = true;
+
+            response = librarianService.listAllLibrarians();
+            num_librarians = response.getBody().size();
+            requestSuccess = true;
+            return response;
+        }
+
+        finally
+        {
+            Instant finish = Instant.now();
+            long time = Duration.between(start, finish).toMillis();
+            String message;
+
+            if(cardValidationSuccess)
+            {
+                if (requestSuccess)
+                    message = "Librarian has viewed all " + num_librarians + " librarians within the system.";
+
+                else
+                    message = "Librarian has no librarians available to view.";
+            }
+
+            else
+                message = "Librarian was unable to obtain all librarian accounts.";
+
+            librarianViewRequestLog(httpServletRequest.getRequestURL().toString(),
+                    message, barcode, number, cardValidationSuccess, requestSuccess,
+                    time);
+        }
     }
 
     @PostMapping("/account/librarian/register")
-    public ResponseEntity<LibraryCard> registerLibrarian(@Valid @RequestBody RegisterLibrarianRequest request)
+    public ResponseEntity<LibraryCard> registerLibrarian(HttpServletRequest httpServletRequest,
+                                                         @Valid @RequestBody RegisterLibrarianRequest request)
     {
         return accountService.registerLibrarian(
                 request.getName(), request.getPassword(),
@@ -101,7 +179,8 @@ public class LibrarianController
     }
 
     @PostMapping("/account/librarian/add")
-    public ResponseEntity<LibraryCard> addLibrarian(@Valid @RequestBody AddLibrarianRequest request)
+    public ResponseEntity<LibraryCard> addLibrarian(HttpServletRequest httpServletRequest,
+                                                    @Valid @RequestBody AddLibrarianRequest request)
     {
         LibraryCard card = validationService.cardValidation(
                 request.getBarcode(), request.getNumber());
@@ -117,7 +196,8 @@ public class LibrarianController
     }
 
     @DeleteMapping("account/librarian/remove")
-    public ResponseEntity<MessageResponse> removeLibrarian(@Valid @RequestBody RemoveLibrarianRequest request)
+    public ResponseEntity<MessageResponse> removeLibrarian(HttpServletRequest httpServletRequest,
+                                                           @Valid @RequestBody RemoveLibrarianRequest request)
     {
         LibraryCard card = validationService.cardValidation(
                 request.getBarcode(), request.getNumber());
@@ -130,7 +210,8 @@ public class LibrarianController
     }
 
     @PutMapping("/account/member/block")
-    public ResponseEntity<MessageResponse> blockMember(@Valid @RequestBody CardValidationRequest request,
+    public ResponseEntity<MessageResponse> blockMember(HttpServletRequest httpServletRequest,
+                                                       @Valid @RequestBody CardValidationRequest request,
                                                        @RequestParam(name = "member") Long memberId)
     {
         LibraryCard card = validationService.cardValidation(
@@ -143,7 +224,8 @@ public class LibrarianController
     }
 
     @PutMapping("/account/member/unblock")
-    public ResponseEntity<MessageResponse> unblockMember(@Valid @RequestBody CardValidationRequest request,
+    public ResponseEntity<MessageResponse> unblockMember(HttpServletRequest httpServletRequest,
+                                                         @Valid @RequestBody CardValidationRequest request,
                                                          @RequestParam(value = "member") Long memberId)
     {
         LibraryCard card = validationService.cardValidation(
@@ -156,43 +238,155 @@ public class LibrarianController
     }
 
     @GetMapping("/records/book_loans")
-    public ResponseEntity<List<BookLending>> viewAllBookLoans(@RequestParam(value = "barcode") Long barcode,
+    public ResponseEntity<List<BookLending>> viewAllBookLoans(HttpServletRequest httpServletRequest,
+                                                              @RequestParam(value = "barcode") Long barcode,
                                                               @RequestParam(value = "card") String number)
     {
-        LibraryCard card = validationService.cardValidation(
-                barcode, number);
-        accountService.barcodeReader(
-                card, AccountType.LIBRARIAN, AccountStatus.ACTIVE);
+        boolean cardValidationSuccess = false;
+        boolean requestSuccess = false;
+        int num_bookLoans = 0;
+        ResponseEntity<List<BookLending>> response;
+        Instant start = Instant.now();
 
-        return librarianService.listAllBookLoans();
+        try
+        {
+            LibraryCard card = validationService.cardValidation(
+                    barcode, number);
+            accountService.barcodeReader(
+                    card, AccountType.LIBRARIAN, AccountStatus.ACTIVE);
+            cardValidationSuccess = true;
+
+            response = librarianService.listAllBookLoans();
+            num_bookLoans = response.getBody().size();
+            requestSuccess = true;
+            return response;
+        }
+
+        finally
+        {
+            Instant finish = Instant.now();
+            long time = Duration.between(start, finish).toMillis();
+            String message;
+
+            if(cardValidationSuccess)
+            {
+                if (requestSuccess)
+                    message = "Librarian has viewed all " + num_bookLoans + " book loans within the system.";
+
+                else
+                    message = "Librarian has no book loans available to view.";
+            }
+
+            else
+                message = "Librarian was unable to obtain all book loans.";
+
+            librarianViewRequestLog(httpServletRequest.getRequestURL().toString(),
+                    message, barcode, number, cardValidationSuccess, requestSuccess,
+                    time);
+        }
     }
 
     @GetMapping("/records/book_reservations")
-    public ResponseEntity<List<BookReservation>> viewAllBookReservations(@RequestParam(value = "barcode") Long barcode,
+    public ResponseEntity<List<BookReservation>> viewAllBookReservations(HttpServletRequest httpServletRequest,
+                                                                         @RequestParam(value = "barcode") Long barcode,
                                                                          @RequestParam(value = "card") String number)
     {
-        LibraryCard card = validationService.cardValidation(
-                barcode, number);
-        accountService.barcodeReader(
-                card, AccountType.LIBRARIAN, AccountStatus.ACTIVE);
+        boolean cardValidationSuccess = false;
+        boolean requestSuccess = false;
+        int num_bookReservations = 0;
+        ResponseEntity<List<BookReservation>> response;
+        Instant start = Instant.now();
 
-        return librarianService.listAllBookReservations();
+        try
+        {
+            LibraryCard card = validationService.cardValidation(
+                    barcode, number);
+            accountService.barcodeReader(
+                    card, AccountType.LIBRARIAN, AccountStatus.ACTIVE);
+            cardValidationSuccess = true;
+
+            response = librarianService.listAllBookReservations();
+            num_bookReservations = response.getBody().size();
+            requestSuccess = true;
+            return response;
+        }
+
+        finally
+        {
+            Instant finish = Instant.now();
+            long time = Duration.between(start, finish).toMillis();
+            String message;
+
+            if(cardValidationSuccess)
+            {
+                if (requestSuccess)
+                    message = "Librarian has viewed all " + num_bookReservations + " book reservations within the system.";
+
+                else
+                    message = "Librarian has no book reservations available to view.";
+            }
+
+            else
+                message = "Librarian was unable to obtain all book reservations.";
+
+            librarianViewRequestLog(httpServletRequest.getRequestURL().toString(),
+                    message, barcode, number, cardValidationSuccess, requestSuccess,
+                    time);
+        }
     }
 
     @GetMapping("/record/fines")
-    public ResponseEntity<List<Fine>> viewAllFines(@RequestParam(value = "barcode") Long barcode,
+    public ResponseEntity<List<Fine>> viewAllFines(HttpServletRequest httpServletRequest,
+                                                   @RequestParam(value = "barcode") Long barcode,
                                                    @RequestParam(value = "card") String number)
     {
-        LibraryCard card = validationService.cardValidation(
-                barcode, number);
-        accountService.barcodeReader(
-                card, AccountType.LIBRARIAN, AccountStatus.ACTIVE);
+        boolean cardValidationSuccess = false;
+        boolean requestSuccess = false;
+        int num_fines = 0;
+        ResponseEntity<List<Fine>> response;
+        Instant start = Instant.now();
 
-        return librarianService.listAllFines();
+        try
+        {
+            LibraryCard card = validationService.cardValidation(
+                    barcode, number);
+            accountService.barcodeReader(
+                    card, AccountType.LIBRARIAN, AccountStatus.ACTIVE);
+            cardValidationSuccess = true;
+
+            response = librarianService.listAllFines();
+            num_fines = response.getBody().size();
+            requestSuccess = true;
+            return response;
+        }
+
+        finally
+        {
+            Instant finish = Instant.now();
+            long time = Duration.between(start, finish).toMillis();
+            String message;
+
+            if(cardValidationSuccess)
+            {
+                if (requestSuccess)
+                    message = "Librarian has viewed all " + num_fines + " fines within the system.";
+
+                else
+                    message = "Librarian has no fines available to view.";
+            }
+
+            else
+                message = "Librarian was unable to obtain all book fines.";
+
+            librarianViewRequestLog(httpServletRequest.getRequestURL().toString(),
+                    message, barcode, number, cardValidationSuccess, requestSuccess,
+                    time);
+        }
     }
 
     @PostMapping("/catalog/library/add")
-    public ResponseEntity<MessageResponse> addLibrary(@Valid @RequestBody AddLibraryRequest request)
+    public ResponseEntity<MessageResponse> addLibrary(HttpServletRequest httpServletRequest,
+                                                      @Valid @RequestBody AddLibraryRequest request)
     {
         LibraryCard card = validationService.cardValidation(
                 request.getBarcode(), request.getNumber());
@@ -205,7 +399,8 @@ public class LibrarianController
     }
 
     @PostMapping("/catalog/book/add")
-    public ResponseEntity<MessageResponse> addBookItem(@Valid @RequestBody AddBookItemRequest request)
+    public ResponseEntity<MessageResponse> addBookItem(HttpServletRequest httpServletRequest,
+                                                       @Valid @RequestBody AddBookItemRequest request)
     {
         LibraryCard card = validationService.cardValidation(
                 request.getBarcode(), request.getNumber());
@@ -230,7 +425,8 @@ public class LibrarianController
     }
 
     @PostMapping("catalog/subject/add")
-    public ResponseEntity<MessageResponse> addSubject(@Valid @RequestBody SubjectRequest request)
+    public ResponseEntity<MessageResponse> addSubject(HttpServletRequest httpServletRequest,
+                                                      @Valid @RequestBody SubjectRequest request)
     {
         LibraryCard card = validationService.cardValidation(
                 request.getBarcode(), request.getNumber());
@@ -242,7 +438,8 @@ public class LibrarianController
     }
 
     @PostMapping("catalog/author/add")
-    public ResponseEntity<MessageResponse> addAuthor(@Valid @RequestBody AddAuthorRequest request)
+    public ResponseEntity<MessageResponse> addAuthor(HttpServletRequest httpServletRequest,
+                                                     @Valid @RequestBody AddAuthorRequest request)
     {
         LibraryCard card = validationService.cardValidation(
                 request.getBarcode(), request.getNumber());
@@ -254,7 +451,8 @@ public class LibrarianController
     }
 
     @PutMapping("/catalog/book/update")
-    public ResponseEntity<MessageResponse> updateBookItem(@Valid @RequestBody UpdateBookItemRequest request)
+    public ResponseEntity<MessageResponse> updateBookItem(HttpServletRequest httpServletRequest,
+                                                          @Valid @RequestBody UpdateBookItemRequest request)
     {
         LibraryCard card = validationService.cardValidation(
                 request.getBarcode(), request.getNumber());
@@ -279,7 +477,8 @@ public class LibrarianController
     }
 
     @PutMapping("/catalog/book/move")
-    public ResponseEntity<MessageResponse> moveBookItem(@Valid @RequestBody MoveBookItemRequest request)
+    public ResponseEntity<MessageResponse> moveBookItem(HttpServletRequest httpServletRequest,
+                                                        @Valid @RequestBody MoveBookItemRequest request)
     {
         LibraryCard card = validationService.cardValidation(
                 request.getBarcode(), request.getNumber());
@@ -293,7 +492,8 @@ public class LibrarianController
     }
 
     @PutMapping("/catalog/author/update")
-    public ResponseEntity<MessageResponse> updateAuthor(@Valid @RequestBody UpdateAuthorRequest request)
+    public ResponseEntity<MessageResponse> updateAuthor(HttpServletRequest httpServletRequest,
+                                                        @Valid @RequestBody UpdateAuthorRequest request)
     {
         LibraryCard card = validationService.cardValidation(
                 request.getBarcode(), request.getNumber());
@@ -305,7 +505,8 @@ public class LibrarianController
     }
 
     @DeleteMapping("catalog/library/remove")
-    public ResponseEntity<MessageResponse> removeLibrary(@Valid @RequestBody RemoveLibraryRequest request)
+    public ResponseEntity<MessageResponse> removeLibrary(HttpServletRequest httpServletRequest,
+                                                         @Valid @RequestBody RemoveLibraryRequest request)
     {
         LibraryCard card = validationService.cardValidation(
                 request.getBarcode(), request.getNumber());
@@ -317,7 +518,8 @@ public class LibrarianController
     }
 
     @DeleteMapping("/catalog/book/remove")
-    public ResponseEntity<MessageResponse> removeBookItem(@Valid @RequestBody RemoveBookItemRequest request)
+    public ResponseEntity<MessageResponse> removeBookItem(HttpServletRequest httpServletRequest,
+                                                          @Valid @RequestBody RemoveBookItemRequest request)
     {
         LibraryCard card = validationService.cardValidation(
                 request.getBarcode(), request.getNumber());
@@ -329,7 +531,8 @@ public class LibrarianController
     }
 
     @DeleteMapping("/catalog/subject/remove")
-    public ResponseEntity<MessageResponse> removeSubject(@Valid @RequestBody SubjectRequest request)
+    public ResponseEntity<MessageResponse> removeSubject(HttpServletRequest httpServletRequest,
+                                                         @Valid @RequestBody SubjectRequest request)
     {
         LibraryCard card = validationService.cardValidation(
                 request.getBarcode(), request.getNumber());
@@ -341,7 +544,8 @@ public class LibrarianController
     }
 
     @DeleteMapping("/catalog/author/remove")
-    public ResponseEntity<MessageResponse> removeAuthor(@Valid @RequestBody RemoveAuthorRequest request)
+    public ResponseEntity<MessageResponse> removeAuthor(HttpServletRequest httpServletRequest,
+                                                        @Valid @RequestBody RemoveAuthorRequest request)
     {
         LibraryCard card = validationService.cardValidation(
                 request.getBarcode(), request.getNumber());
@@ -352,14 +556,14 @@ public class LibrarianController
         return updateCatalogService.removeAuthor(author);
     }
 
-    private void requestLog(String requestType, String requestURL, String message,
-                            long barcode, String number, boolean cardValidation,
-                            boolean requestSuccess, long time)
+    private void librarianViewRequestLog(String requestURL, String message, long barcode, String number,
+                                      boolean cardValidation, boolean requestSuccess, long time)
     {
-        String userLog = "(User:" +
-                " Barcode = " + barcode +
-                ", Number = " + number;
-        String successLog;
+        String requestType = "GET";
+        String userLog = "(Librarian:" +
+                " Card Barcode = " + barcode +
+                ", Card Number = " + number;
+        String successLog = "(Success! Completed in " + time + " ms)";
 
         if(cardValidation)
             userLog += " [Valid])";
