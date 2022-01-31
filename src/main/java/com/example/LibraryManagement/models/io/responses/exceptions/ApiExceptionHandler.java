@@ -1,6 +1,8 @@
 package com.example.LibraryManagement.models.io.responses.exceptions;
 
 import com.example.LibraryManagement.models.io.responses.MessageResponse;
+import org.hibernate.JDBCException;
+import org.hibernate.exception.JDBCConnectionException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -27,6 +29,19 @@ public class ApiExceptionHandler
         HttpStatus status = e.getStatus();
         ApiException apiException = new ApiException(
                 new MessageResponse(e.getMessage()),
+                status,
+                ZonedDateTime.now(ZoneId.of("Z"))
+        );
+
+        return new ResponseEntity<>(apiException, status);
+    }
+
+    @ExceptionHandler(value = {JDBCConnectionException.class})
+    public ResponseEntity<Object> handleJDBCConnectionException(JDBCException e)
+    {
+        HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
+        ApiException apiException = new ApiException(
+                new MessageResponse("Unable to connect to server: " + e.getMessage()),
                 status,
                 ZonedDateTime.now(ZoneId.of("Z"))
         );
