@@ -840,10 +840,10 @@ public class LibrarianController
                 message = "Librarian failed to modify a book to the system.";
 
             if(catalogValidationSuccess)
-                catalogLog += " [Valid]) ";
+                catalogLog += " [Valid])";
 
             else
-                catalogLog += " [Invalid]) ";
+                catalogLog += " [Invalid])";
 
             catalogRequestLog(requestType, httpServletRequest.getRequestURL().toString(),
                     message, request.getBarcode(), request.getNumber(), catalogLog,
@@ -898,11 +898,10 @@ public class LibrarianController
                 message = "Librarian failed to move book within the system.";
 
             if(bookValidationSuccess)
-                catalogLog += " [Valid]) ";
+                catalogLog += " [Valid])";
 
             else
-                catalogLog += " [Invalid]) ";
-
+                catalogLog += " [Invalid])";
 
             catalogRequestLog(requestType, httpServletRequest.getRequestURL().toString(),
                     message, request.getBarcode(), request.getNumber(), catalogLog,
@@ -952,10 +951,10 @@ public class LibrarianController
                 message = "Librarian failed to modify an author to the system.";
 
             if(catalogValidationSuccess)
-                catalogLog += " [Valid]) ";
+                catalogLog += " [Valid])";
 
             else
-                catalogLog += " [Invalid]) ";
+                catalogLog += " [Invalid])";
 
             catalogRequestLog(requestType, httpServletRequest.getRequestURL().toString(),
                     message, request.getBarcode(), request.getNumber(), catalogLog,
@@ -1059,10 +1058,10 @@ public class LibrarianController
                 message = "Librarian failed to remove a book from the system.";
 
             if (catalogValidationSuccess)
-                catalogLog += " [Valid]) ";
+                catalogLog += " [Valid])";
 
             else
-                catalogLog += " [Invalid]) ";
+                catalogLog += " [Invalid])";
 
             catalogRequestLog(requestType, httpServletRequest.getRequestURL().toString(),
                     message, request.getBarcode(), request.getNumber(), catalogLog,
