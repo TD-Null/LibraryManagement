@@ -291,7 +291,7 @@ public class AccountController
                            String email, boolean loginValidation, long time)
     {
         String requestType = "POST";
-        String userLog = "(Login user credentials:" +
+        String userLog = "(Added Member:" +
                 " Name = " + name +
                 ", Password = " + password +
                 ", Email = " + email;

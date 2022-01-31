@@ -170,29 +170,93 @@ public class LibrarianController
     public ResponseEntity<LibraryCard> registerLibrarian(HttpServletRequest httpServletRequest,
                                                          @Valid @RequestBody RegisterLibrarianRequest request)
     {
-        return accountService.registerLibrarian(
-                request.getName(), request.getPassword(),
-                request.getEmail(), request.getStreetAddress(),
-                request.getCity(), request.getZipcode(),
-                request.getCountry(), request.getPhoneNumber(),
-                new Date());
+        boolean requestSuccess = false;
+        ResponseEntity<LibraryCard> response;
+        Instant start = Instant.now();
+
+        try
+        {
+            response = accountService.registerLibrarian(
+                    request.getName(), request.getPassword(),
+                    request.getEmail(), request.getStreetAddress(),
+                    request.getCity(), request.getZipcode(),
+                    request.getCountry(), request.getPhoneNumber(),
+                    new Date());
+            requestSuccess = true;
+            return response;
+        }
+
+        finally
+        {
+            Instant finish = Instant.now();
+            long time = Duration.between(start, finish).toMillis();
+            String message;
+
+            if(requestSuccess)
+                message = "Librarian has been registered to the system.";
+
+            else
+                message = "Librarian failed to register to the system.";
+
+            registerRequestLog(httpServletRequest.getRequestURL().toString(), message,
+                    request.getName(), request.getPassword(), request.getEmail(),
+                    requestSuccess, time);
+        }
     }
 
     @PostMapping("/account/librarian/add")
     public ResponseEntity<LibraryCard> addLibrarian(HttpServletRequest httpServletRequest,
                                                     @Valid @RequestBody AddLibrarianRequest request)
     {
-        LibraryCard card = validationService.cardValidation(
-                request.getBarcode(), request.getNumber());
-        accountService.barcodeReader(
-                card, AccountType.LIBRARIAN, AccountStatus.ACTIVE);
+        boolean cardValidationSuccess = false;
+        boolean requestSuccess = false;
+        ResponseEntity<LibraryCard> response;
+        Instant start = Instant.now();
 
-        return accountService.registerLibrarian(
-                request.getName(), request.getPassword(),
-                request.getEmail(), request.getStreetAddress(),
-                request.getCity(), request.getZipcode(),
-                request.getCountry(), request.getPhoneNumber(),
-                new Date());
+        try
+        {
+            LibraryCard card = validationService.cardValidation(
+                    request.getBarcode(), request.getNumber());
+            accountService.barcodeReader(
+                    card, AccountType.LIBRARIAN, AccountStatus.ACTIVE);
+            cardValidationSuccess = true;
+
+            response = accountService.registerLibrarian(
+                    request.getName(), request.getPassword(),
+                    request.getEmail(), request.getStreetAddress(),
+                    request.getCity(), request.getZipcode(),
+                    request.getCountry(), request.getPhoneNumber(),
+                    new Date());
+            requestSuccess = true;
+            return response;
+        }
+
+        finally
+        {
+            Instant finish = Instant.now();
+            long time = Duration.between(start, finish).toMillis();
+            String message;
+
+            if(requestSuccess)
+                message = "Librarian has registered another librarian to the system.";
+
+            else
+                message = "Librarian failed to register another librarian to the system.";
+
+            message += " (Librarian:" +
+                    " Card Barcode = " + request.getBarcode() +
+                    ", Card Number = " + request.getNumber();
+
+            if(cardValidationSuccess)
+                message += " [Valid])";
+
+            else
+                message += " [Invalid])";
+
+            registerRequestLog(httpServletRequest.getRequestURL().toString(), message,
+                    request.getName(), request.getPassword(), request.getEmail(),
+                    requestSuccess, time);
+        }
     }
 
     @DeleteMapping("account/librarian/remove")
@@ -557,7 +621,7 @@ public class LibrarianController
     }
 
     private void librarianViewRequestLog(String requestURL, String message, long barcode, String number,
-                                      boolean cardValidation, boolean requestSuccess, long time)
+                                         boolean cardValidation, boolean requestSuccess, long time)
     {
         String requestType = "GET";
         String userLog = "(Librarian:" +
@@ -576,6 +640,32 @@ public class LibrarianController
 
         else
             successLog = "(Failure! Completed in " + time + " ms)";
+
+        log.info(requestType + " " + requestURL + " " + message + " " +
+                userLog + " " + successLog);
+    }
+
+    private void registerRequestLog(String requestURL, String message, String name, String password,
+                                    String email, boolean requestSuccess, long time)
+    {
+        String requestType = "POST";
+        String userLog = "(Added Librarian:" +
+                " Name = " + name +
+                ", Password = " + password +
+                ", Email = " + email;
+        String successLog;
+
+        if(requestSuccess)
+        {
+            userLog += " [Valid])";
+            successLog = "(Success! Completed in " + time + " ms)";
+        }
+
+        else
+        {
+            userLog += " [Invalid])";
+            successLog = "(Failed! Completed in " + time + " ms)";
+        }
 
         log.info(requestType + " " + requestURL + " " + message + " " +
                 userLog + " " + successLog);
