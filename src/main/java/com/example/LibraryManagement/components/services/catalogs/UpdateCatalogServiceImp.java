@@ -48,7 +48,8 @@ public class UpdateCatalogServiceImp implements UpdateCatalogService
                                                       String zipcode, String country)
     {
         libraryRepository.save(new Library(name, new Address(streetAddress, city, zipcode, country)));
-        return ResponseEntity.ok(new MessageResponse("Library has been successfully added to the system."));
+        return new ResponseEntity<>(new MessageResponse("Library has been successfully added to the system."),
+                HttpStatus.CREATED);
     }
 
     @Transactional
@@ -75,19 +76,22 @@ public class UpdateCatalogServiceImp implements UpdateCatalogService
             bookItem.addSubject(s);
         }
 
-        return ResponseEntity.ok(new MessageResponse("Book has been successfully added to the system."));
+        return new ResponseEntity<>(new MessageResponse("Book has been successfully added to the system."),
+                HttpStatus.CREATED);
     }
 
     public ResponseEntity<MessageResponse> addSubject(String subject)
     {
         subjectRepository.save(new Subject(subject));
-        return ResponseEntity.ok(new MessageResponse("Subject has been successfully added to the system."));
+        return new ResponseEntity<>(new MessageResponse("Subject has been successfully added to the system."),
+                HttpStatus.CREATED);
     }
 
     public ResponseEntity<MessageResponse> addAuthor(String author, String description)
     {
         authorRepository.save(new Author(author, description));
-        return ResponseEntity.ok(new MessageResponse("Author has been successfully added to the system."));
+        return new ResponseEntity<>(new MessageResponse("Author has been successfully added to the system."),
+                HttpStatus.CREATED);
     }
 
     @Transactional

@@ -122,7 +122,7 @@ public class AccountServiceImp implements AccountService
         libraryCard.setMember(member);
 
         // Return the details of the user's library card after the account has been successfully created.
-        return ResponseEntity.ok(libraryCard);
+        return new ResponseEntity<>(libraryCard, HttpStatus.CREATED);
     }
 
     // Registers a new librarian using the user's inputted details to create an account.
@@ -154,7 +154,7 @@ public class AccountServiceImp implements AccountService
         libraryCard.setLibrarian(librarian);
 
         // Return the details of the user's library card after the account has been successfully created.
-        return ResponseEntity.ok(libraryCard);
+        return new ResponseEntity<>(libraryCard, HttpStatus.CREATED);
     }
 
     @Transactional
@@ -262,7 +262,8 @@ public class AccountServiceImp implements AccountService
 
         // Else, update the member's account status and return a response.
         member.setStatus(status);
-        return ResponseEntity.ok(new MessageResponse("Member's account status has been updated successfully."));
+        return new ResponseEntity<>(new MessageResponse("Member's account status has been updated successfully."),
+                HttpStatus.CREATED);
     }
 
     @Transactional
