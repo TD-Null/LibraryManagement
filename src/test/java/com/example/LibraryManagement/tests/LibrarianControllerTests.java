@@ -48,11 +48,19 @@ public class LibrarianControllerTests
     @Autowired
     private LibrarianController librarianController;
 
+    private String libraryControllerPath = "/library_website";
+
     @BeforeEach
     void setUp()
     {
         mockMvc = MockMvcBuilders.webAppContextSetup(context)
                 .build();
+    }
+
+    @AfterEach
+    void tearDown()
+    {
+
     }
 
     @Test
@@ -69,7 +77,8 @@ public class LibrarianControllerTests
                 "country",
                 "1234567890");
 
-        mockMvc.perform(post("/library_website/account/librarian/register")
+        mockMvc.perform(post(libraryControllerPath +
+                "/account/librarian/register")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(registerLibrarianRequest)))
                 .andExpect(status().is(409));
