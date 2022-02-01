@@ -178,10 +178,10 @@ public class MemberServiceImpTests
                 "1309DS",
                 AccountStatus.ACTIVE,
                 new Address(
-                        "user2@mail.com",
-                        "user2's street",
-                        "user2's city",
-                        "222222"),
+                "user2@mail.com",
+                "user2's street",
+                "user2's city",
+                "222222"),
                 "US",
                 "9543510389",
                 new Date());
