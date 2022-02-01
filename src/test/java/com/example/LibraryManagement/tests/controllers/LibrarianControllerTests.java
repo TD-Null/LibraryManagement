@@ -1,10 +1,11 @@
-package com.example.LibraryManagement.tests;
+package com.example.LibraryManagement.tests.controllers;
 
 import com.example.LibraryManagement.components.controllers.LibrarianController;
 import com.example.LibraryManagement.components.services.ValidationService;
 import com.example.LibraryManagement.components.services.accounts.AccountServiceImp;
 import com.example.LibraryManagement.components.services.accounts.LibrarianServiceImp;
 import com.example.LibraryManagement.components.services.catalogs.UpdateCatalogServiceImp;
+import com.example.LibraryManagement.models.accounts.LibraryCard;
 import com.example.LibraryManagement.models.accounts.types.Librarian;
 import com.example.LibraryManagement.models.io.requests.librarian_requests.post.RegisterLibrarianRequest;
 import com.example.LibraryManagement.models.io.responses.exceptions.ApiRequestException;
@@ -21,9 +22,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
@@ -32,6 +35,8 @@ import static org.springframework.security.test.web.servlet.setup.SecurityMockMv
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+@ActiveProfiles("test")
+@ExtendWith(SpringExtension.class)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @ContextConfiguration
 @SpringBootTest
@@ -40,10 +45,10 @@ public class LibrarianControllerTests
     @Autowired
     private WebApplicationContext context;
 
-    private MockMvc mockMvc;
-
     @Autowired
     private ObjectMapper mapper;
+
+    private MockMvc mockMvc;
 
     @Autowired
     private LibrarianController librarianController;
@@ -55,12 +60,6 @@ public class LibrarianControllerTests
     {
         mockMvc = MockMvcBuilders.webAppContextSetup(context)
                 .build();
-    }
-
-    @AfterEach
-    void tearDown()
-    {
-
     }
 
     @Test
@@ -77,11 +76,14 @@ public class LibrarianControllerTests
                 "country",
                 "1234567890");
 
-        mockMvc.perform(post(libraryControllerPath +
+        MvcResult mvcResult = mockMvc.perform(post(libraryControllerPath +
                 "/account/librarian/register")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(registerLibrarianRequest)))
-                .andExpect(status().is(409));
+                .andExpect(status().is(200))
+                .andReturn();
 
+        String result = mvcResult.getResponse().getContentAsString();
+        LibraryCard libraryCard = mapper.readValue(result, LibraryCard.class);
     }
 }

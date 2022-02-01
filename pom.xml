@@ -34,7 +34,12 @@
 		</dependency>
 		<!--	Dependencies for Swagger API end	-->
 
-		<!--	Dependencies for SQL databases start	-->
+		<!--	Dependencies for databases start	-->
+		<dependency>
+			<groupId>com.h2database</groupId>
+			<artifactId>h2</artifactId>
+			<scope>test</scope>
+		</dependency>
 		<dependency>
 			<groupId>mysql</groupId>
 			<artifactId>mysql-connector-java</artifactId>

@@ -1,4 +1,4 @@
-package com.example.LibraryManagement.tests;
+package com.example.LibraryManagement.tests.services;
 
 import com.example.LibraryManagement.components.repositories.accounts.AccountNotificationRepository;
 import com.example.LibraryManagement.components.repositories.books.BookLendingRepository;
@@ -29,6 +29,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.text.ParseException;
@@ -40,6 +41,7 @@ import java.util.Set;
  * Test cases used to test the logic and processes of
  * the member service.
  */
+@ActiveProfiles("test")
 @ExtendWith(SpringExtension.class)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @SpringBootTest

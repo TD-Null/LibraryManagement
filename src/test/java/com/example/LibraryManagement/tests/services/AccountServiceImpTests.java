@@ -1,4 +1,4 @@
-package com.example.LibraryManagement.tests;
+package com.example.LibraryManagement.tests.services;
 
 import com.example.LibraryManagement.components.repositories.accounts.LibrarianRepository;
 import com.example.LibraryManagement.components.repositories.accounts.LibraryCardRepository;
@@ -16,6 +16,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.Date;
@@ -24,6 +25,7 @@ import java.util.Date;
  * Test cases used to test the logic and processes of
  * the account service.
  */
+@ActiveProfiles("test")
 @ExtendWith(SpringExtension.class)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @SpringBootTest
