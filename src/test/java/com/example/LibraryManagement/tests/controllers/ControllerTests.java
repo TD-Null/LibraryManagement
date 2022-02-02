@@ -3,12 +3,21 @@ package com.example.LibraryManagement.tests.controllers;
 import com.example.LibraryManagement.models.accounts.LibraryCard;
 import com.example.LibraryManagement.models.accounts.types.Librarian;
 import com.example.LibraryManagement.models.accounts.types.Member;
+import com.example.LibraryManagement.models.books.properties.BookItem;
 import com.example.LibraryManagement.models.enums.accounts.AccountStatus;
+import com.example.LibraryManagement.models.enums.books.BookFormat;
 import com.example.LibraryManagement.models.io.requests.*;
+import com.example.LibraryManagement.models.io.requests.librarian_requests.SubjectRequest;
+import com.example.LibraryManagement.models.io.requests.librarian_requests.delete.RemoveAuthorRequest;
+import com.example.LibraryManagement.models.io.requests.librarian_requests.delete.RemoveBookItemRequest;
 import com.example.LibraryManagement.models.io.requests.librarian_requests.delete.RemoveLibrarianRequest;
-import com.example.LibraryManagement.models.io.requests.librarian_requests.post.AddLibrarianRequest;
-import com.example.LibraryManagement.models.io.requests.librarian_requests.post.RegisterLibrarianRequest;
+import com.example.LibraryManagement.models.io.requests.librarian_requests.delete.RemoveLibraryRequest;
+import com.example.LibraryManagement.models.io.requests.librarian_requests.post.*;
+import com.example.LibraryManagement.models.io.requests.librarian_requests.put.MoveBookItemRequest;
+import com.example.LibraryManagement.models.io.requests.librarian_requests.put.UpdateAuthorRequest;
+import com.example.LibraryManagement.models.io.requests.librarian_requests.put.UpdateBookItemRequest;
 import com.example.LibraryManagement.models.io.requests.member_requests.CancelMembershipRequest;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -22,6 +31,9 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
+
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -478,5 +490,213 @@ public class ControllerTests
     @Order(2)
     void updateAndViewCatalog() throws Exception
     {
+        MvcResult mvcResult;
+        String result;
+        List<BookItem> books;
+
+        AddLibraryRequest addLibraryRequest;
+        AddAuthorRequest addAuthorRequest;
+        SubjectRequest subjectRequest;
+        UpdateBookItemRequest updateBookRequest;
+        MoveBookItemRequest moveBookRequest;
+        UpdateAuthorRequest updateAuthorRequest;
+        RemoveLibraryRequest removeLibraryRequest;
+        RemoveAuthorRequest removeAuthorRequest;
+        RemoveBookItemRequest removeBookItemRequest;
+
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+
+        List<String> authors = Arrays.asList("David Stuart", "Robert South");
+        List<String> subjects = Arrays.asList("Action", "Comedy", "Romance", "Horror", "Drama");
+        AddBookItemRequest addBook1Request = new AddBookItemRequest(
+                librarianCard.getBarcode(),
+                librarianCard.getCardNumber(),
+                "East Library",
+                1,
+                "E",
+                "921-1-90-113401-2",
+                "Action Comedy Book",
+                "Publisher company",
+                "English",
+                100,
+                "David Stuart",
+                new HashSet<>(Arrays.asList("Action", "Comedy")),
+                BookFormat.HARDCOVER,
+                df.parse("2010-10-01"),
+                false,
+                10.0);
+        AddBookItemRequest addBook2Request = new AddBookItemRequest(
+            librarianCard.getBarcode(),
+            librarianCard.getCardNumber(),
+            "East Library",
+            1,
+            "E",
+            "812-5-57-150290-3",
+            "Action Romance Book",
+            "Publisher company",
+            "English",
+            250,
+            "Robert South",
+            new HashSet<>(Arrays.asList("Action", "Romance")),
+            BookFormat.HARDCOVER,
+            df.parse("2005-05-20"),
+            false,
+            5.0);
+        AddBookItemRequest addBook3Request = new AddBookItemRequest(
+                librarianCard.getBarcode(),
+                librarianCard.getCardNumber(),
+                "East Library",
+                1,
+                "E",
+                "902-66-2-033278-7",
+                "Suspense Book",
+                "Publisher company",
+                "English",
+                50,
+                "Susan North",
+                new HashSet<>(Arrays.asList("Suspense")),
+                BookFormat.HARDCOVER,
+                df.parse("2007-03-10"),
+                false,
+                15.0);
+        List<AddBookItemRequest> addBookRequests = Arrays.asList(
+                addBook1Request, addBook2Request, addBook3Request);
+
+        // Check that librarians can add libraries to the system.
+        addLibraryRequest = new AddLibraryRequest(
+                librarianCard.getBarcode(),
+                librarianCard.getCardNumber(),
+                "East Library",
+                "East Street",
+                "East City",
+                "332951",
+                "US");
+        mockMvc.perform(post(librarianControllerPath +
+                "/catalog/library/add")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(addLibraryRequest)))
+                .andExpect(status().is(201));
+        mockMvc.perform(post(librarianControllerPath +
+                "/catalog/library/add")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(addLibraryRequest)))
+                .andExpect(status().is(409));
+
+        addLibraryRequest = new AddLibraryRequest(
+                librarianCard.getBarcode(),
+                librarianCard.getCardNumber(),
+                "West Library",
+                "West Street",
+                "West City",
+                "320332",
+                "US");
+        mockMvc.perform(post(librarianControllerPath +
+                "/catalog/library/add")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(addLibraryRequest)))
+                .andExpect(status().is(201));
+        mockMvc.perform(post(librarianControllerPath +
+                "/catalog/library/add")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(addLibraryRequest)))
+                .andExpect(status().is(409));
+
+        for(String author: authors)
+        {
+            addAuthorRequest = new AddAuthorRequest(
+                    librarianCard.getBarcode(),
+                    librarianCard.getCardNumber(),
+                    author,
+                    "New author");
+            mockMvc.perform(post(librarianControllerPath +
+                    "/catalog/author/add")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(mapper.writeValueAsString(addAuthorRequest)))
+                    .andExpect(status().is(201));
+            mockMvc.perform(post(librarianControllerPath +
+                    "/catalog/author/add")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(mapper.writeValueAsString(addAuthorRequest)))
+                    .andExpect(status().is(409));
+        }
+
+        for(String subject: subjects)
+        {
+            subjectRequest = new SubjectRequest(
+                    librarianCard.getBarcode(),
+                    librarianCard.getCardNumber(),
+                    subject);
+            mockMvc.perform(post(librarianControllerPath +
+                    "/catalog/subject/add")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(mapper.writeValueAsString(subjectRequest)))
+                    .andExpect(status().is(201));
+            mockMvc.perform(post(librarianControllerPath +
+                    "/catalog/subject/add")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(mapper.writeValueAsString(subjectRequest)))
+                    .andExpect(status().is(409));
+        }
+
+        for(AddBookItemRequest addBookRequest: addBookRequests)
+        {
+            mockMvc.perform(post(librarianControllerPath +
+                    "/catalog/book/add")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(mapper.writeValueAsString(addBookRequest)))
+                    .andExpect(status().is(201));
+        }
+
+        // Check that catalog displays the right books, libraries, authors,
+        // and subjects during search.
+        mvcResult = mockMvc.perform(get(catalogControllerPath)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().is(200))
+                .andExpect(jsonPath("$.*", hasSize(3)))
+                .andExpect(jsonPath("$[*].title", containsInAnyOrder(
+                        addBook1Request.getTitle(),
+                        addBook2Request.getTitle(),
+                        addBook3Request.getTitle())))
+                .andReturn();
+        result = mvcResult.getResponse().getContentAsString();
+        books = mapper.readValue(result, new TypeReference<List<BookItem>>() {});
+
+        mockMvc.perform(get(catalogControllerPath +
+                "/library")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().is(200))
+                .andExpect(jsonPath("$.*", hasSize(2)))
+                .andExpect(jsonPath("$[*].name", containsInAnyOrder(
+                        "East Library", "West Library")));
+
+        mockMvc.perform(get(catalogControllerPath +
+                "/subjects")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().is(200))
+                .andExpect(jsonPath("$.*", hasSize(6)))
+                .andExpect(jsonPath("$[*].name", containsInAnyOrder(
+                        "Action", "Comedy", "Romance",
+                        "Horror", "Drama", "Suspense")));
+
+        mockMvc.perform(get(catalogControllerPath +
+                "/author")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().is(200))
+                .andExpect(jsonPath("$.*", hasSize(3)))
+                .andExpect(jsonPath("$[*].name", containsInAnyOrder(
+                        addBook1Request.getAuthor(),
+                        addBook2Request.getAuthor(),
+                        addBook3Request.getAuthor())));
+
+        mockMvc.perform(get(catalogControllerPath +
+                "/search")
+                .contentType(MediaType.APPLICATION_JSON)
+                .param("library", "East Library"))
+                .andExpect(status().is(200))
+                .andExpect(jsonPath("$.*", hasSize(3)))
+                .andExpect(jsonPath("$[*].title", containsInAnyOrder(
+                        addBook1Request.getTitle(),
+                        addBook2Request.getTitle(),
+                        addBook3Request.getTitle())));
     }
 }
