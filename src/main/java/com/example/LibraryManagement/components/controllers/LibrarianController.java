@@ -676,7 +676,7 @@ public class LibrarianController
         }
     }
 
-    @PostMapping("catalog/subject/add")
+    @PostMapping("/catalog/subject/add")
     public ResponseEntity<MessageResponse> addSubject(HttpServletRequest httpServletRequest,
                                                       @Valid @RequestBody SubjectRequest request)
     {
@@ -729,7 +729,7 @@ public class LibrarianController
         }
     }
 
-    @PostMapping("catalog/author/add")
+    @PostMapping("/catalog/author/add")
     public ResponseEntity<MessageResponse> addAuthor(HttpServletRequest httpServletRequest,
                                                      @Valid @RequestBody AddAuthorRequest request)
     {
@@ -964,7 +964,7 @@ public class LibrarianController
 
     }
 
-    @DeleteMapping("catalog/library/remove")
+    @DeleteMapping("/catalog/library/remove")
     public ResponseEntity<MessageResponse> removeLibrary(HttpServletRequest httpServletRequest,
                                                          @Valid @RequestBody RemoveLibraryRequest request)
     {

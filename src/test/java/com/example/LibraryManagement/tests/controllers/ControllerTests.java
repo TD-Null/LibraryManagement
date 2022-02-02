@@ -878,11 +878,45 @@ public class ControllerTests
                 .andExpect(jsonPath("$.*", hasSize(3)))
                 .andExpect(jsonPath("$[*].description", containsInAnyOrder(
                         "I am " + addBook3Request.getAuthor(),
-                        "New description", "New description")))
-                .andReturn();
+                        "New description", "New description")));
 
         // Check that librarians can remove books, libraries, authors,
-        // and subjects from the system.
+        // and subjects from the system. Libraries and authors cannot
+        // be removed if there are still books associated to them.
+        removeLibraryRequest = new RemoveLibraryRequest(
+                librarianCard.getBarcode(),
+                librarianCard.getCardNumber(),
+                "East Library");
+        mockMvc.perform(delete(librarianControllerPath +
+                "/catalog/library/remove")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(removeLibraryRequest)))
+                .andExpect(status().is(200));
+        removeLibraryRequest = new RemoveLibraryRequest(
+                librarianCard.getBarcode(),
+                librarianCard.getCardNumber(),
+                "West Library");
+        mockMvc.perform(delete(librarianControllerPath +
+                "/catalog/library/remove")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(removeLibraryRequest)))
+                .andExpect(status().is(409));
+        mockMvc.perform(get(catalogControllerPath +
+                "/library")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().is(200))
+                .andExpect(jsonPath("$.*", hasSize(1)))
+                .andExpect(jsonPath("$[*].name", containsInAnyOrder(
+                        "West Library")));
 
+        removeAuthorRequest = new RemoveAuthorRequest(
+                librarianCard.getBarcode(),
+                librarianCard.getCardNumber(),
+                addBook1Request.getAuthor());
+        mockMvc.perform(delete(librarianControllerPath +
+                "/catalog/author/remove")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(removeAuthorRequest)))
+                .andExpect(status().is(409));
     }
 }
