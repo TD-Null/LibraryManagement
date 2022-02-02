@@ -78,10 +78,10 @@ public class AccountServiceImp implements AccountService
          */
         if(card.isActive() && (
                 (type == AccountType.MEMBER && card.getMember() != null
-                        && card.getMember().getStatus() == AccountStatus.ACTIVE
+                        && card.getMember().getStatus() != AccountStatus.CANCELLED
                         && card.getMember().getPassword().equals(password)) ||
                 (type == AccountType.LIBRARIAN && card.getLibrarian() != null
-                        && card.getLibrarian().getStatus() == AccountStatus.ACTIVE
+                        && card.getLibrarian().getStatus() != AccountStatus.CANCELLED
                         && card.getLibrarian().getPassword().equals(password))))
         {
             return ResponseEntity.ok(card);
