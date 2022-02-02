@@ -231,7 +231,7 @@ public class CatalogController
             Instant finish = Instant.now();
             long time = Duration.between(start, finish).toMillis();
             String message;
-            String pubDatelog;
+            String pubDateLog;
 
             if(requestSuccess)
                 message = searchResults + " books were found under this search.";
@@ -240,13 +240,13 @@ public class CatalogController
                 message = "No books are available under this search.";
 
             if(publicationDate != null)
-                pubDatelog = publicationDate.toString();
+                pubDateLog = publicationDate.toString();
 
             else
-                pubDatelog = "none";
+                pubDateLog = "none";
 
             catalogSearchLog(httpServletRequest.getRequestURL().toString(), message,
-                    library, title, author, subjects.toString(), pubDatelog,
+                    library, title, author, subjects.toString(), pubDateLog,
                     time);
         }
     }
