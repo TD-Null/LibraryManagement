@@ -262,8 +262,7 @@ public class AccountServiceImp implements AccountService
 
         // Else, update the member's account status and return a response.
         member.setStatus(status);
-        return new ResponseEntity<>(new MessageResponse("Member's account status has been updated successfully."),
-                HttpStatus.CREATED);
+        return ResponseEntity.ok(new MessageResponse("Member's account status has been updated successfully."));
     }
 
     @Transactional

@@ -8,13 +8,11 @@ import com.example.LibraryManagement.models.accounts.LibraryCard;
 import com.example.LibraryManagement.models.accounts.types.Librarian;
 import com.example.LibraryManagement.models.accounts.types.Member;
 import com.example.LibraryManagement.models.enums.accounts.AccountStatus;
-import com.example.LibraryManagement.models.io.requests.ChangePasswordRequest;
-import com.example.LibraryManagement.models.io.requests.LoginRequest;
-import com.example.LibraryManagement.models.io.requests.SignupRequest;
-import com.example.LibraryManagement.models.io.requests.UpdateAccountRequest;
+import com.example.LibraryManagement.models.io.requests.*;
 import com.example.LibraryManagement.models.io.requests.librarian_requests.delete.RemoveLibrarianRequest;
 import com.example.LibraryManagement.models.io.requests.librarian_requests.post.AddLibrarianRequest;
 import com.example.LibraryManagement.models.io.requests.librarian_requests.post.RegisterLibrarianRequest;
+import com.example.LibraryManagement.models.io.requests.member_requests.CancelMembershipRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -131,11 +129,13 @@ public class ControllerTests
         LibraryCard cardResult;
         Member memberAccount;
         Librarian librarianAccount;
+        CardValidationRequest cardValidationRequest;
         LoginRequest loginRequest;
         UpdateAccountRequest updateAccountRequest;
         ChangePasswordRequest changePasswordRequest;
         AddLibrarianRequest addLibrarianRequest;
         RemoveLibrarianRequest removeLibrarianRequest;
+        CancelMembershipRequest cancelMembershipRequest;
 
         // Check that the accounts are already registered by logging into the created accounts.
         loginRequest = new LoginRequest(memberCard.getCardNumber(), registerMember.getPassword());
@@ -382,7 +382,9 @@ public class ControllerTests
                 .content(mapper.writeValueAsString(addLibrarianRequest)))
                 .andExpect(status().is(401));
 
-        // A librarian can also remove the account from the system.
+        // A librarian can also remove the account from the system. Librarian
+        // accounts cannot be removed once their account has been cancelled and
+        // cannot login with their credentials.
         removeLibrarianRequest = new RemoveLibrarianRequest(
                 librarianCard.getBarcode(),
                 librarianCard.getCardNumber(),
@@ -393,6 +395,11 @@ public class ControllerTests
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(removeLibrarianRequest)))
                 .andExpect(status().is(200));
+        mockMvc.perform(delete(librarianControllerPath +
+                "/account/librarian/remove")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(removeLibrarianRequest)))
+                .andExpect(status().is(400));
         mockMvc.perform(get(librarianControllerPath +
                 "/account/librarian")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -403,6 +410,64 @@ public class ControllerTests
                 .andExpect(jsonPath("$[*].status", containsInAnyOrder(
                         AccountStatus.ACTIVE.toString(),
                         AccountStatus.CANCELLED.toString())));
+        loginRequest = new LoginRequest(newLibrarianCard.getCardNumber(), addLibrarianRequest.getPassword());
+        mockMvc.perform(post(accountControllerPath +
+                "/login")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(loginRequest)))
+                .andExpect(status().is(401));
+
+        // Check that librarians can block and unblock members.
+        cardValidationRequest = new CardValidationRequest(
+                librarianCard.getBarcode(), librarianCard.getCardNumber());
+
+        mockMvc.perform(put(librarianControllerPath +
+                "/account/member/block")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(cardValidationRequest))
+                .param("member", memberAccount.getId().toString()))
+                .andExpect(status().is(200));
+        mockMvc.perform(put(librarianControllerPath +
+                "/account/member/block")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(cardValidationRequest))
+                .param("member", memberAccount.getId().toString()))
+                .andExpect(status().is(403));
+        mockMvc.perform(get(accountControllerPath +
+                "/details")
+                .contentType(MediaType.APPLICATION_JSON)
+                .param("barcode", memberCard.getBarcode().toString())
+                .param("card", memberCard.getCardNumber()))
+                .andExpect(status().is(200))
+                .andExpect(jsonPath("$.status", is(AccountStatus.BLACKLISTED.toString())));
+
+        mockMvc.perform(put(librarianControllerPath +
+                "/account/member/unblock")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(cardValidationRequest))
+                .param("member", memberAccount.getId().toString()))
+                .andExpect(status().is(200));
+        mockMvc.perform(put(librarianControllerPath +
+                "/account/member/unblock")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(cardValidationRequest))
+                .param("member", memberAccount.getId().toString()))
+                .andExpect(status().is(403));
+        mockMvc.perform(get(accountControllerPath +
+                "/details")
+                .contentType(MediaType.APPLICATION_JSON)
+                .param("barcode", memberCard.getBarcode().toString())
+                .param("card", memberCard.getCardNumber()))
+                .andExpect(status().is(200))
+                .andExpect(jsonPath("$.status", is(AccountStatus.ACTIVE.toString())));
+
+        // Check that members can cancel their accounts. Members must input valid
+        // credentials before cancelling their account.
+        //
+        // Members cannot cancel their accounts again and cannot login with their
+        // credentials after cancelling their membership.
+        cancelMembershipRequest = new CancelMembershipRequest(
+                memberCard.getBarcode(), memberCard.getCardNumber(), memberAccount.getPassword());
 
     }
 }
