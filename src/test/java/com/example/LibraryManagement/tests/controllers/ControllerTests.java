@@ -709,6 +709,15 @@ public class ControllerTests
         mockMvc.perform(get(catalogControllerPath +
                 "/search")
                 .contentType(MediaType.APPLICATION_JSON)
+                .param("author", addBook1Request.getAuthor()))
+                .andExpect(status().is(200))
+                .andExpect(jsonPath("$.*", hasSize(1)))
+                .andExpect(jsonPath("$[0].author.name",
+                        is(addBook1Request.getAuthor())));
+
+        mockMvc.perform(get(catalogControllerPath +
+                "/search")
+                .contentType(MediaType.APPLICATION_JSON)
                 .param("title", "Action"))
                 .andExpect(status().is(200))
                 .andExpect(jsonPath("$.*", hasSize(2)))
@@ -750,6 +759,8 @@ public class ControllerTests
                 .andExpect(jsonPath("$[*].title", containsInAnyOrder(
                         addBook3Request.getTitle())));
 
+        // Check that books are updated properly to the expected properties
+        // by librarians.
         for(BookItem book: books)
         {
             updateBookRequest = new UpdateBookItemRequest(
@@ -833,5 +844,45 @@ public class ControllerTests
             Assertions.assertEquals(3, book.getRackNumber());
             Assertions.assertEquals("F", book.getLocationIdentifier());
         }
+
+        // Check that author descriptions can be updated by librarians.
+        for(String author: authors)
+        {
+            updateAuthorRequest = new UpdateAuthorRequest(
+                    librarianCard.getBarcode(),
+                    librarianCard.getCardNumber(),
+                    author,
+                    "New description");
+            mockMvc.perform(put(librarianControllerPath +
+                    "/catalog/author/update")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(mapper.writeValueAsString(updateAuthorRequest)))
+                    .andExpect(status().is(200));
+        }
+
+        updateAuthorRequest = new UpdateAuthorRequest(
+                librarianCard.getBarcode(),
+                librarianCard.getCardNumber(),
+                addBook3Request.getAuthor(),
+                "I am " + addBook3Request.getAuthor());
+        mockMvc.perform(put(librarianControllerPath +
+                "/catalog/author/update")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(updateAuthorRequest)))
+                .andExpect(status().is(200));
+
+        mockMvc.perform(get(catalogControllerPath +
+                "/author")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().is(200))
+                .andExpect(jsonPath("$.*", hasSize(3)))
+                .andExpect(jsonPath("$[*].description", containsInAnyOrder(
+                        "I am " + addBook3Request.getAuthor(),
+                        "New description", "New description")))
+                .andReturn();
+
+        // Check that librarians can remove books, libraries, authors,
+        // and subjects from the system.
+
     }
 }
