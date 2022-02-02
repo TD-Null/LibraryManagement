@@ -3,6 +3,7 @@ package com.example.LibraryManagement.tests.controllers;
 import com.example.LibraryManagement.models.accounts.LibraryCard;
 import com.example.LibraryManagement.models.accounts.types.Librarian;
 import com.example.LibraryManagement.models.accounts.types.Member;
+import com.example.LibraryManagement.models.books.libraries.Rack;
 import com.example.LibraryManagement.models.books.properties.BookItem;
 import com.example.LibraryManagement.models.enums.accounts.AccountStatus;
 import com.example.LibraryManagement.models.enums.books.BookFormat;
@@ -748,5 +749,89 @@ public class ControllerTests
                 .andExpect(jsonPath("$.*", hasSize(1)))
                 .andExpect(jsonPath("$[*].title", containsInAnyOrder(
                         addBook3Request.getTitle())));
+
+        for(BookItem book: books)
+        {
+            updateBookRequest = new UpdateBookItemRequest(
+                    librarianCard.getBarcode(),
+                    librarianCard.getCardNumber(),
+                    book.getBarcode(),
+                    book.getISBN(),
+                    "Drama Book",
+                    "New Publisher Company",
+                    book.getLanguage(),
+                    book.getNumberOfPages(),
+                    book.getAuthor().getName(),
+                    new HashSet<>(Arrays.asList("Drama")),
+                    BookFormat.EBOOK,
+                    book.getPublicationDate(),
+                    book.isReferenceOnly(),
+                    book.getPrice());
+            moveBookRequest = new MoveBookItemRequest(
+                    librarianCard.getBarcode(),
+                    librarianCard.getCardNumber(),
+                    book.getBarcode(),
+                    "West Library",
+                    3,
+                    "F");
+            mockMvc.perform(put(librarianControllerPath +
+                    "/catalog/book/update")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(mapper.writeValueAsString(updateBookRequest)))
+                    .andExpect(status().is(200));
+            mockMvc.perform(put(librarianControllerPath +
+                    "/catalog/book/move")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(mapper.writeValueAsString(moveBookRequest)))
+                    .andExpect(status().is(200));
+        }
+
+        mockMvc.perform(get(catalogControllerPath +
+                "/search")
+                .contentType(MediaType.APPLICATION_JSON)
+                .param("subjects", "Drama"))
+                .andExpect(status().is(200))
+                .andExpect(jsonPath("$.*", hasSize(3)))
+                .andExpect(jsonPath("$[*].title", containsInAnyOrder(
+                        "Drama Book", "Drama Book", "Drama Book")))
+                .andExpect(jsonPath("$[*].format", containsInAnyOrder(
+                        BookFormat.EBOOK.toString(),
+                        BookFormat.EBOOK.toString(),
+                        BookFormat.EBOOK.toString())));
+        mockMvc.perform(get(catalogControllerPath +
+                "/search")
+                .contentType(MediaType.APPLICATION_JSON)
+                .param("subjects", "Action", "Comedy"))
+                .andExpect(status().is(404));
+
+        mockMvc.perform(get(catalogControllerPath +
+                "/search")
+                .contentType(MediaType.APPLICATION_JSON)
+                .param("library", "West Library"))
+                .andExpect(status().is(200))
+                .andExpect(jsonPath("$.*", hasSize(3)))
+                .andExpect(jsonPath("$[*].title", containsInAnyOrder(
+                        "Drama Book", "Drama Book", "Drama Book")));
+        mockMvc.perform(get(catalogControllerPath +
+                "/search")
+                .contentType(MediaType.APPLICATION_JSON)
+                .param("library", "East Library"))
+                .andExpect(status().is(404));
+
+        mvcResult = mockMvc.perform(get(catalogControllerPath)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().is(200))
+                .andExpect(jsonPath("$.*", hasSize(3)))
+                .andExpect(jsonPath("$[*].title", containsInAnyOrder(
+                        "Drama Book", "Drama Book", "Drama Book")))
+                .andReturn();
+        result = mvcResult.getResponse().getContentAsString();
+        books = mapper.readValue(result, new TypeReference<List<BookItem>>() {});
+
+        for(BookItem book: books)
+        {
+            Assertions.assertEquals(3, book.getRackNumber());
+            Assertions.assertEquals("F", book.getLocationIdentifier());
+        }
     }
 }

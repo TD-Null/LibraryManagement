@@ -785,7 +785,8 @@ public class LibrarianController
 
     @PutMapping("/catalog/book/update")
     public ResponseEntity<MessageResponse> updateBookItem(HttpServletRequest httpServletRequest,
-                                                          @Valid @RequestBody UpdateBookItemRequest request) {
+                                                          @Valid @RequestBody UpdateBookItemRequest request)
+    {
         String requestType = "PUT";
         boolean cardValidationSuccess = false;
         boolean catalogValidationSuccess = false;

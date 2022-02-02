@@ -12,7 +12,6 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.*;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotBlank;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
@@ -125,7 +124,7 @@ public class BookItem extends Book
         this.price = price;
     }
 
-    public Rack getRack(Rack r) { return new Rack(rackNumber, locationIdentifier); }
+    public Rack getRack() { return new Rack(rackNumber, locationIdentifier); }
 
     public void setRack(Rack r)
     {
