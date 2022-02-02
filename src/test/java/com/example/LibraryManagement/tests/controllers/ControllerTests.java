@@ -51,16 +51,6 @@ public class ControllerTests
     private ObjectMapper mapper;
     private MockMvc mockMvc;
 
-    // Controllers being used for testing.
-    @Autowired
-    private AccountController accountController;
-    @Autowired
-    private LibrarianController librarianController;
-    @Autowired
-    private MemberController memberController;
-    @Autowired
-    private CatalogController catalogController;
-
     // Paths for API requests in controllers.
     private String accountControllerPath = "/library_website/account";
     private String librarianControllerPath = "/library_website";
@@ -468,6 +458,34 @@ public class ControllerTests
         // credentials after cancelling their membership.
         cancelMembershipRequest = new CancelMembershipRequest(
                 memberCard.getBarcode(), memberCard.getCardNumber(), memberAccount.getPassword());
+        mockMvc.perform(delete(memberControllerPath +
+                "/cancel")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(cancelMembershipRequest)))
+                .andExpect(status().is(200));
+        mockMvc.perform(delete(memberControllerPath +
+                "/cancel")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(cancelMembershipRequest)))
+                .andExpect(status().is(400));
+        mockMvc.perform(get(librarianControllerPath +
+                "/account/member")
+                .contentType(MediaType.APPLICATION_JSON)
+                .param("barcode", librarianCard.getBarcode().toString())
+                .param("card", librarianCard.getCardNumber()))
+                .andExpect(status().is(200))
+                .andExpect(jsonPath("$[0].status", is(AccountStatus.CANCELLED.toString())));
+        loginRequest = new LoginRequest(memberCard.getCardNumber(), memberAccount.getPassword());
+        mockMvc.perform(post(accountControllerPath +
+                "/login")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(loginRequest)))
+                .andExpect(status().is(401));
+    }
 
+    @Test
+    @Order(2)
+    void updateAndViewCatalog() throws Exception
+    {
     }
 }
