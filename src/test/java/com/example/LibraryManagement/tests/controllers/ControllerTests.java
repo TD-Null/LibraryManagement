@@ -698,5 +698,55 @@ public class ControllerTests
                         addBook1Request.getTitle(),
                         addBook2Request.getTitle(),
                         addBook3Request.getTitle())));
+
+        mockMvc.perform(get(catalogControllerPath +
+                "/search")
+                .contentType(MediaType.APPLICATION_JSON)
+                .param("library", "West Library"))
+                .andExpect(status().is(404));
+
+        mockMvc.perform(get(catalogControllerPath +
+                "/search")
+                .contentType(MediaType.APPLICATION_JSON)
+                .param("title", "Action"))
+                .andExpect(status().is(200))
+                .andExpect(jsonPath("$.*", hasSize(2)))
+                .andExpect(jsonPath("$[*].title", containsInAnyOrder(
+                        addBook1Request.getTitle(),
+                        addBook2Request.getTitle())));
+
+        mockMvc.perform(get(catalogControllerPath +
+                "/search")
+                .contentType(MediaType.APPLICATION_JSON)
+                .param("subjects", "Action"))
+                .andExpect(status().is(200))
+                .andExpect(jsonPath("$.*", hasSize(2)))
+                .andExpect(jsonPath("$[*].title", containsInAnyOrder(
+                        addBook1Request.getTitle(),
+                        addBook2Request.getTitle())));
+
+        mockMvc.perform(get(catalogControllerPath +
+                "/search")
+                .contentType(MediaType.APPLICATION_JSON)
+                .param("subjects", "Suspense"))
+                .andExpect(status().is(200))
+                .andExpect(jsonPath("$.*", hasSize(1)))
+                .andExpect(jsonPath("$[*].title", containsInAnyOrder(
+                        addBook3Request.getTitle())));
+
+        mockMvc.perform(get(catalogControllerPath +
+                "/search")
+                .contentType(MediaType.APPLICATION_JSON)
+                .param("subjects", "Drama"))
+                .andExpect(status().is(404));
+
+        mockMvc.perform(get(catalogControllerPath +
+                "/search")
+                .contentType(MediaType.APPLICATION_JSON)
+                .param("pub_date", "2007-03-10"))
+                .andExpect(status().is(200))
+                .andExpect(jsonPath("$.*", hasSize(1)))
+                .andExpect(jsonPath("$[*].title", containsInAnyOrder(
+                        addBook3Request.getTitle())));
     }
 }
