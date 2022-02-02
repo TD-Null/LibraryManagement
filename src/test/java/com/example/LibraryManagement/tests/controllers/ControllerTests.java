@@ -1,9 +1,5 @@
 package com.example.LibraryManagement.tests.controllers;
 
-import com.example.LibraryManagement.components.controllers.AccountController;
-import com.example.LibraryManagement.components.controllers.CatalogController;
-import com.example.LibraryManagement.components.controllers.LibrarianController;
-import com.example.LibraryManagement.components.controllers.MemberController;
 import com.example.LibraryManagement.models.accounts.LibraryCard;
 import com.example.LibraryManagement.models.accounts.types.Librarian;
 import com.example.LibraryManagement.models.accounts.types.Member;
@@ -18,19 +14,14 @@ import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.test.web.servlet.ResultMatcher;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -52,10 +43,10 @@ public class ControllerTests
     private MockMvc mockMvc;
 
     // Paths for API requests in controllers.
-    private String accountControllerPath = "/library_website/account";
-    private String librarianControllerPath = "/library_website";
-    private String memberControllerPath = "/library_website/account/member";
-    private String catalogControllerPath = "/library_website/catalog";
+    private final String accountControllerPath = "/library_website/account";
+    private final String librarianControllerPath = "/library_website";
+    private final String memberControllerPath = "/library_website/account/member";
+    private final String catalogControllerPath = "/library_website/catalog";
 
     // Samples used for testing.
     private LibraryCard memberCard;
