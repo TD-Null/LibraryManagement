@@ -440,8 +440,39 @@ public class MemberControllerTests
 
         /*
          * Members can then return books that they have borrowed.
-         * THe book must have a loaned member in order to be returned
+         * The book must have a loaned member in order to be returned
          * and must be the right loaned member to return it.
          */
+        cardValidationRequest = new CardValidationRequest(
+                memberCard1.getBarcode(),
+                memberCard1.getCardNumber());
+        mockMvc.perform(put(memberControllerPath +
+                "/return")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(cardValidationRequest))
+                .param("book", books.get(0).getBarcode().toString()))
+                .andExpect(status().is(200));
+        mockMvc.perform(put(memberControllerPath +
+                "/return")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(cardValidationRequest))
+                .param("book", books.get(1).getBarcode().toString()))
+                .andExpect(status().is(400));
+
+        cardValidationRequest = new CardValidationRequest(
+                memberCard2.getBarcode(),
+                memberCard2.getCardNumber());
+        mockMvc.perform(put(memberControllerPath +
+                "/return")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(cardValidationRequest))
+                .param("book", books.get(1).getBarcode().toString()))
+                .andExpect(status().is(200));
+        mockMvc.perform(put(memberControllerPath +
+                "/return")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(cardValidationRequest))
+                .param("book", books.get(2).getBarcode().toString()))
+                .andExpect(status().is(400));
     }
 }
