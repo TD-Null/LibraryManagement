@@ -234,7 +234,8 @@ public class MemberControllerTests
         /*
          * Member accounts are able to borrow books within the system.
          * Members cannot borrow books that have been loaned to another member
-         * and cannot borrow books they have already borrowed.
+         * and cannot borrow books they have already borrowed. Members can
+         * then view the current books they have borrowed.
          */
         cardValidationRequest = new CardValidationRequest(
                 memberCard1.getBarcode(),
@@ -253,6 +254,12 @@ public class MemberControllerTests
                 .content(mapper.writeValueAsString(cardValidationRequest))
                 .param("book", books.get(0).getBarcode().toString()))
                 .andExpect(status().is(400));
+        mockMvc.perform(get(memberControllerPath +
+                "/checkout/books")
+                .contentType(MediaType.APPLICATION_JSON)
+                .param("id", books.get(0).getBarcode().toString()))
+                .andExpect(status().is(400));
+
 
         cardValidationRequest = new CardValidationRequest(
                 memberCard2.getBarcode(),
@@ -311,5 +318,42 @@ public class MemberControllerTests
                 .content(mapper.writeValueAsString(cardValidationRequest))
                 .param("book", books.get(2).getBarcode().toString()))
                 .andExpect(status().is(400));
+
+        cardValidationRequest = new CardValidationRequest(
+                memberCard1.getBarcode(),
+                memberCard1.getCardNumber());
+        mockMvc.perform(put(memberControllerPath +
+                "/reserve")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(cardValidationRequest))
+                .param("book", books.get(1).getBarcode().toString()))
+                .andExpect(status().is(409));
+        mockMvc.perform(put(memberControllerPath +
+                "/reserve")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(cardValidationRequest))
+                .param("book", books.get(2).getBarcode().toString()))
+                .andExpect(status().is(409));
+
+        /*
+         * Members can then borrow books that they have already
+         * reserved, or cancel their reservation when they no
+         * longer want the book reserved to them.
+         */
+        cardValidationRequest = new CardValidationRequest(
+                memberCard2.getBarcode(),
+                memberCard2.getCardNumber());
+        mockMvc.perform(put(memberControllerPath +
+                "/reserve")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(cardValidationRequest))
+                .param("book", books.get(0).getBarcode().toString()))
+                .andExpect(status().is(200));
+        mockMvc.perform(put(memberControllerPath +
+                "/reserve/cancel")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(cardValidationRequest))
+                .param("book", books.get(2).getBarcode().toString()))
+                .andExpect(status().is(200));
     }
 }
