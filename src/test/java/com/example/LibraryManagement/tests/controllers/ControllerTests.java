@@ -918,5 +918,92 @@ public class ControllerTests
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(removeAuthorRequest)))
                 .andExpect(status().is(409));
+
+        subjectRequest = new SubjectRequest(
+                librarianCard.getBarcode(),
+                librarianCard.getCardNumber(),
+                "Drama");
+        mockMvc.perform(delete(librarianControllerPath +
+                "/catalog/subject/remove")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(subjectRequest)))
+                .andExpect(status().is(200));
+        mockMvc.perform(get(catalogControllerPath +
+                "/subjects")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().is(200))
+                .andExpect(jsonPath("$.*", hasSize(5)))
+                .andExpect(jsonPath("$[*].name", containsInAnyOrder(
+                        "Action", "Comedy", "Romance",
+                        "Horror", "Suspense")));
+        mockMvc.perform(get(catalogControllerPath +
+                "/search")
+                .contentType(MediaType.APPLICATION_JSON)
+                .param("subjects", "Drama"))
+                .andExpect(status().is(404));
+
+        for(BookItem book: books)
+        {
+            removeBookItemRequest = new RemoveBookItemRequest(
+                    librarianCard.getBarcode(),
+                    librarianCard.getCardNumber(),
+                    book.getBarcode());
+            removeAuthorRequest = new RemoveAuthorRequest(
+                    librarianCard.getBarcode(),
+                    librarianCard.getCardNumber(),
+                    book.getAuthor().getName());
+
+            mockMvc.perform(delete(librarianControllerPath +
+                    "/catalog/book/remove")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(mapper.writeValueAsString(removeBookItemRequest)))
+                    .andExpect(status().is(200));
+            mockMvc.perform(delete(librarianControllerPath +
+                    "/catalog/book/remove")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(mapper.writeValueAsString(removeBookItemRequest)))
+                    .andExpect(status().is(404));
+
+            mockMvc.perform(delete(librarianControllerPath +
+                    "/catalog/author/remove")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(mapper.writeValueAsString(removeAuthorRequest)))
+                    .andExpect(status().is(200));
+            mockMvc.perform(delete(librarianControllerPath +
+                    "/catalog/author/remove")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(mapper.writeValueAsString(removeAuthorRequest)))
+                    .andExpect(status().is(404));
+        }
+
+        mockMvc.perform(get(catalogControllerPath)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().is(404));
+        mockMvc.perform(get(catalogControllerPath +
+                "/author")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().is(404));
+
+        removeLibraryRequest = new RemoveLibraryRequest(
+                librarianCard.getBarcode(),
+                librarianCard.getCardNumber(),
+                "West Library");
+        mockMvc.perform(delete(librarianControllerPath +
+                "/catalog/library/remove")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(removeLibraryRequest)))
+                .andExpect(status().is(200));
+        mockMvc.perform(delete(librarianControllerPath +
+                "/catalog/library/remove")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(removeLibraryRequest)))
+                .andExpect(status().is(404));
     }
+
+//    @Test
+//    @Order(3)
+//    void booksExchange() throws Exception
+//    {
+//
+//    }
 }
