@@ -71,6 +71,24 @@ public class MemberServiceImp implements MemberService
                     "on how many books can be issued to them.",
                     HttpStatus.CONFLICT);
 
+        else if(book.getStatus() == BookStatus.LOANED && book.getCurrLoanMember() != null)
+        {
+            Member loanedMember = book.getCurrLoanMember();
+
+            if(!loanedMember.equals(member))
+                throw new ApiRequestException("Sorry, but this book is " +
+                        "currently loaned to another member",
+                        HttpStatus.CONFLICT);
+
+            throw new ApiRequestException("This user is already borrowing this book.",
+                    HttpStatus.BAD_REQUEST);
+        }
+
+        else if(book.getStatus() == BookStatus.LOST)
+            throw new ApiRequestException("Sorry, but the book is lost and " +
+                    "cannot be found at the time.",
+                    HttpStatus.CONFLICT);
+
         else if(book.getCurrReservedMember() != null)
         {
             Member reservedMember = book.getCurrReservedMember();
@@ -93,24 +111,6 @@ public class MemberServiceImp implements MemberService
 
             return ResponseEntity.ok(book);
         }
-
-        else if(book.getStatus() == BookStatus.LOANED && book.getCurrLoanMember() != null)
-        {
-            Member loanedMember = book.getCurrLoanMember();
-
-            if(!loanedMember.equals(member))
-                throw new ApiRequestException("Sorry, but this book is " +
-                        "currently loaned to another member",
-                        HttpStatus.CONFLICT);
-
-            throw new ApiRequestException("This user is already borrowing this book.",
-                    HttpStatus.BAD_REQUEST);
-        }
-
-        else if(book.getStatus() == BookStatus.LOST)
-            throw new ApiRequestException("Sorry, but the book is lost and " +
-                    "cannot be found at the time.",
-                    HttpStatus.CONFLICT);
 
         bookLendingRepository.save(bookLoan);
         member.checkoutBookItem(book, bookLoan);
