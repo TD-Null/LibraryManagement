@@ -261,7 +261,9 @@ public class MemberControllerTests
                 .param("barcode", memberCard1.getBarcode().toString())
                 .param("card", memberCard1.getCardNumber()))
                 .andExpect(status().is(200))
-                .andExpect(jsonPath("$.*", hasSize(1)));
+                .andExpect(jsonPath("$.*", hasSize(1)))
+                .andExpect(jsonPath("$[0].title",
+                        is(books.get(0).getTitle())));
         mockMvc.perform(get(memberControllerPath +
                 "/checkout/history")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -335,6 +337,32 @@ public class MemberControllerTests
                 .param("book", books.get(2).getBarcode().toString()))
                 .andExpect(status().is(400));
 
+        mockMvc.perform(get(memberControllerPath +
+                "/reserve/books")
+                .contentType(MediaType.APPLICATION_JSON)
+                .param("barcode", memberCard2.getBarcode().toString())
+                .param("card", memberCard2.getCardNumber()))
+                .andExpect(status().is(200))
+                .andExpect(jsonPath("$.*", hasSize(3)))
+                .andExpect(jsonPath("$[*].title", containsInAnyOrder(
+                        books.get(0).getTitle(),
+                        books.get(1).getTitle(),
+                        books.get(2).getTitle())));
+        mockMvc.perform(get(memberControllerPath +
+                "/reserve/history")
+                .contentType(MediaType.APPLICATION_JSON)
+                .param("barcode", memberCard2.getBarcode().toString())
+                .param("card", memberCard2.getCardNumber()))
+                .andExpect(status().is(200))
+                .andExpect(jsonPath("$.*", hasSize(3)));
+        mockMvc.perform(get(memberControllerPath +
+                "/notifications")
+                .contentType(MediaType.APPLICATION_JSON)
+                .param("barcode", memberCard2.getBarcode().toString())
+                .param("card", memberCard2.getCardNumber()))
+                .andExpect(status().is(200))
+                .andExpect(jsonPath("$.*", hasSize(3)));
+
         cardValidationRequest = new CardValidationRequest(
                 memberCard1.getBarcode(),
                 memberCard1.getCardNumber());
@@ -350,6 +378,12 @@ public class MemberControllerTests
                 .content(mapper.writeValueAsString(cardValidationRequest))
                 .param("book", books.get(2).getBarcode().toString()))
                 .andExpect(status().is(409));
+        mockMvc.perform(get(memberControllerPath +
+                "/reserve/books")
+                .contentType(MediaType.APPLICATION_JSON)
+                .param("barcode", memberCard1.getBarcode().toString())
+                .param("card", memberCard1.getCardNumber()))
+                .andExpect(status().is(404));
 
         /*
          * Members can then borrow books that they have already
@@ -379,5 +413,35 @@ public class MemberControllerTests
                 .content(mapper.writeValueAsString(cardValidationRequest))
                 .param("book", books.get(2).getBarcode().toString()))
                 .andExpect(status().is(200));
+
+        mockMvc.perform(get(memberControllerPath +
+                "/reserve/books")
+                .contentType(MediaType.APPLICATION_JSON)
+                .param("barcode", memberCard2.getBarcode().toString())
+                .param("card", memberCard2.getCardNumber()))
+                .andExpect(status().is(200))
+                .andExpect(jsonPath("$.*", hasSize(1)));
+        mockMvc.perform(get(memberControllerPath +
+                "/notifications")
+                .contentType(MediaType.APPLICATION_JSON)
+                .param("barcode", memberCard2.getBarcode().toString())
+                .param("card", memberCard2.getCardNumber()))
+                .andExpect(status().is(200))
+                .andExpect(jsonPath("$.*", hasSize(5)));
+        mockMvc.perform(get(memberControllerPath +
+                "/checkout/books")
+                .contentType(MediaType.APPLICATION_JSON)
+                .param("barcode", memberCard2.getBarcode().toString())
+                .param("card", memberCard2.getCardNumber()))
+                .andExpect(status().is(200))
+                .andExpect(jsonPath("$.*", hasSize(1)))
+                .andExpect(jsonPath("$[0].title",
+                        is(books.get(1).getTitle())));
+
+        /*
+         * Members can then return books that they have borrowed.
+         * THe book must have a loaned member in order to be returned
+         * and must be the right loaned member to return it.
+         */
     }
 }
