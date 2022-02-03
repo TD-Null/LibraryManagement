@@ -11,7 +11,6 @@ import com.example.LibraryManagement.models.io.requests.librarian_requests.post.
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,9 +54,11 @@ public class MemberControllerTests
     private final String catalogControllerPath = "/library_website/catalog";
 
     // Samples used for testing.
-    private LibraryCard memberCard;
+    private LibraryCard memberCard1;
+    private LibraryCard memberCard2;
     private LibraryCard librarianCard;
-    private SignupRequest registerMember;
+    private SignupRequest registerMember1;
+    private SignupRequest registerMember2;
     private RegisterLibrarianRequest registerLibrarian;
 
     @BeforeEach
@@ -66,15 +67,25 @@ public class MemberControllerTests
         mockMvc = MockMvcBuilders.webAppContextSetup(context)
                 .build();
 
-        registerMember = new SignupRequest(
+        registerMember1 = new SignupRequest(
                 "Daniel Manning",
                 "0824DM",
-                "user@mail.com",
-                "user's street",
-                "user's city",
+                "user1@mail.com",
+                "user1's street",
+                "user1's city",
                 "111111",
                 "US",
                 "9541087310");
+
+        registerMember2 = new SignupRequest(
+                "Howard Stuart",
+                "1462HS",
+                "user2@mail.com",
+                "user2's street",
+                "user2's city",
+                "222222",
+                "US",
+                "9541147609");
 
         registerLibrarian = new RegisterLibrarianRequest(
                 "Manny South",
@@ -89,9 +100,22 @@ public class MemberControllerTests
         MvcResult memberResult = mockMvc.perform(post(accountControllerPath +
                 "/signup")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(mapper.writeValueAsString(registerMember)))
+                .content(mapper.writeValueAsString(registerMember1)))
                 .andExpect(status().is(201))
                 .andReturn();
+
+        String result = memberResult.getResponse().getContentAsString();
+        memberCard1 = mapper.readValue(result, LibraryCard.class);
+
+        memberResult = mockMvc.perform(post(accountControllerPath +
+                "/signup")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(registerMember2)))
+                .andExpect(status().is(201))
+                .andReturn();
+
+        result = memberResult.getResponse().getContentAsString();
+        memberCard2 = mapper.readValue(result, LibraryCard.class);
 
         MvcResult librarianResult = mockMvc.perform(post(librarianControllerPath +
                 "/account/librarian/register")
@@ -100,16 +124,12 @@ public class MemberControllerTests
                 .andExpect(status().is(201))
                 .andReturn();
 
-        String result = memberResult.getResponse().getContentAsString();
-        memberCard = mapper.readValue(result, LibraryCard.class);
-
         result = librarianResult.getResponse().getContentAsString();
         librarianCard = mapper.readValue(result, LibraryCard.class);
     }
 
     @Test
-    void booksExchange() throws Exception
-    {
+    void booksExchange() throws Exception {
         MvcResult mvcResult;
         String result;
         List<BookItem> books;
@@ -190,8 +210,7 @@ public class MemberControllerTests
                 .content(mapper.writeValueAsString(addLibraryRequest)))
                 .andExpect(status().is(409));
 
-        for(AddBookItemRequest addBookRequest: addBookRequests)
-        {
+        for (AddBookItemRequest addBookRequest : addBookRequests) {
             mockMvc.perform(post(librarianControllerPath +
                     "/catalog/book/add")
                     .contentType(MediaType.APPLICATION_JSON)
@@ -209,11 +228,17 @@ public class MemberControllerTests
                         addBook3Request.getTitle())))
                 .andReturn();
         result = mvcResult.getResponse().getContentAsString();
-        books = mapper.readValue(result, new TypeReference<List<BookItem>>() {});
+        books = mapper.readValue(result, new TypeReference<List<BookItem>>() {
+        });
 
+        /*
+         * Member accounts are able to borrow books within the system.
+         * Members cannot borrow books that have been loaned to another member
+         * and cannot borrow books they have already borrowed.
+         */
         cardValidationRequest = new CardValidationRequest(
-                memberCard.getBarcode(),
-                memberCard.getCardNumber());
+                memberCard1.getBarcode(),
+                memberCard1.getCardNumber());
         mockMvc.perform(put(memberControllerPath +
                 "/checkout")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -222,5 +247,69 @@ public class MemberControllerTests
                 .andExpect(status().is(200))
                 .andExpect(jsonPath("$.title",
                         is(books.get(0).getTitle())));
+        mockMvc.perform(put(memberControllerPath +
+                "/checkout")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(cardValidationRequest))
+                .param("book", books.get(0).getBarcode().toString()))
+                .andExpect(status().is(400));
+
+        cardValidationRequest = new CardValidationRequest(
+                memberCard2.getBarcode(),
+                memberCard2.getCardNumber());
+        mockMvc.perform(put(memberControllerPath +
+                "/checkout")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(cardValidationRequest))
+                .param("book", books.get(0).getBarcode().toString()))
+                .andExpect(status().is(409));
+
+        /*
+         * Members can also reserve books, especially when they are
+         * loaned to another member. Members cannot borrow books
+         * that have been reserved for another member, and members
+         * cannot reserve books that they have already reserved.
+         */
+        cardValidationRequest = new CardValidationRequest(
+                memberCard2.getBarcode(),
+                memberCard2.getCardNumber());
+        mockMvc.perform(put(memberControllerPath +
+                "/reserve")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(cardValidationRequest))
+                .param("book", books.get(0).getBarcode().toString()))
+                .andExpect(status().is(200));
+        mockMvc.perform(put(memberControllerPath +
+                "/reserve")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(cardValidationRequest))
+                .param("book", books.get(0).getBarcode().toString()))
+                .andExpect(status().is(400));
+
+        mockMvc.perform(put(memberControllerPath +
+                "/reserve")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(cardValidationRequest))
+                .param("book", books.get(1).getBarcode().toString()))
+                .andExpect(status().is(200));
+        mockMvc.perform(put(memberControllerPath +
+                "/reserve")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(cardValidationRequest))
+                .param("book", books.get(1).getBarcode().toString()))
+                .andExpect(status().is(400));
+
+        mockMvc.perform(put(memberControllerPath +
+                "/reserve")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(cardValidationRequest))
+                .param("book", books.get(2).getBarcode().toString()))
+                .andExpect(status().is(200));
+        mockMvc.perform(put(memberControllerPath +
+                "/reserve")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(cardValidationRequest))
+                .param("book", books.get(2).getBarcode().toString()))
+                .andExpect(status().is(400));
     }
 }
