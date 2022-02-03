@@ -45,7 +45,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @ContextConfiguration
 @SpringBootTest
-public class ControllerTests
+public class LibrarianControllerTests
 {
     // Properties used for mock testing the application.
     @Autowired
