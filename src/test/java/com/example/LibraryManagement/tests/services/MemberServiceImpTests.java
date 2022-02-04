@@ -3,10 +3,7 @@ package com.example.LibraryManagement.tests.services;
 import com.example.LibraryManagement.components.repositories.accounts.AccountNotificationRepository;
 import com.example.LibraryManagement.components.repositories.books.BookLendingRepository;
 import com.example.LibraryManagement.components.repositories.books.BookReservationRepository;
-import com.example.LibraryManagement.components.repositories.fines.CashTransactionRepository;
-import com.example.LibraryManagement.components.repositories.fines.CheckTransactionRepository;
-import com.example.LibraryManagement.components.repositories.fines.CreditCardTransactionRepository;
-import com.example.LibraryManagement.components.repositories.fines.FineTransactionRepository;
+import com.example.LibraryManagement.components.repositories.fines.*;
 import com.example.LibraryManagement.components.services.accounts.MemberServiceImp;
 import com.example.LibraryManagement.models.accounts.types.Member;
 import com.example.LibraryManagement.models.books.fines.Fine;
@@ -53,6 +50,8 @@ public class MemberServiceImpTests
     private BookReservationRepository bookReservationRepository;
     @Mock
     private AccountNotificationRepository notificationRepository;
+    @Mock
+    private FineRepository fineRepository;
     @Mock
     private FineTransactionRepository fineTransactionRepository;
     @Mock

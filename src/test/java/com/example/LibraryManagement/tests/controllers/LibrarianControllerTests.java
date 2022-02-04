@@ -3,7 +3,6 @@ package com.example.LibraryManagement.tests.controllers;
 import com.example.LibraryManagement.models.accounts.LibraryCard;
 import com.example.LibraryManagement.models.books.properties.BookItem;
 import com.example.LibraryManagement.models.enums.books.BookFormat;
-import com.example.LibraryManagement.models.io.requests.SignupRequest;
 import com.example.LibraryManagement.models.io.requests.librarian_requests.SubjectRequest;
 import com.example.LibraryManagement.models.io.requests.librarian_requests.delete.RemoveAuthorRequest;
 import com.example.LibraryManagement.models.io.requests.librarian_requests.delete.RemoveBookItemRequest;
@@ -62,9 +61,7 @@ public class LibrarianControllerTests
     private final String catalogControllerPath = "/library_website/catalog";
 
     // Samples used for testing.
-    private LibraryCard memberCard;
     private LibraryCard librarianCard;
-    private SignupRequest registerMember;
     private RegisterLibrarianRequest registerLibrarian;
 
     @BeforeEach
@@ -72,16 +69,6 @@ public class LibrarianControllerTests
     {
         mockMvc = MockMvcBuilders.webAppContextSetup(context)
                 .build();
-
-        registerMember = new SignupRequest(
-                "Daniel Manning",
-                "0824DM",
-                "user@mail.com",
-                "user's street",
-                "user's city",
-                "111111",
-                "US",
-                "9541087310");
 
         registerLibrarian = new RegisterLibrarianRequest(
                 "Manny South",
@@ -93,13 +80,6 @@ public class LibrarianControllerTests
                 "US",
                 "9543138282");
 
-        MvcResult memberResult = mockMvc.perform(post(accountControllerPath +
-                "/signup")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(mapper.writeValueAsString(registerMember)))
-                .andExpect(status().is(201))
-                .andReturn();
-
         MvcResult librarianResult = mockMvc.perform(post(librarianControllerPath +
                 "/account/librarian/register")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -107,10 +87,7 @@ public class LibrarianControllerTests
                 .andExpect(status().is(201))
                 .andReturn();
 
-        String result = memberResult.getResponse().getContentAsString();
-        memberCard = mapper.readValue(result, LibraryCard.class);
-
-        result = librarianResult.getResponse().getContentAsString();
+        String result = librarianResult.getResponse().getContentAsString();
         librarianCard = mapper.readValue(result, LibraryCard.class);
     }
 

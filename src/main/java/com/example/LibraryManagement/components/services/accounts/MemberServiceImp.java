@@ -44,6 +44,8 @@ public class MemberServiceImp implements MemberService
     @Autowired
     private final AccountNotificationRepository notificationRepository;
     @Autowired
+    private final FineRepository fineRepository;
+    @Autowired
     private final FineTransactionRepository fineTransactionRepository;
     @Autowired
     private final CreditCardTransactionRepository creditCardTransactionRepository;
@@ -152,16 +154,19 @@ public class MemberServiceImp implements MemberService
         {
             long diffInMillies = Math.abs(returnDate.getTime() - dueDate.getTime());
             long diff = TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS);
-            double fine = Limitations.FINE_PER_DAY * diff;
+            double amount = Limitations.FINE_PER_DAY * diff;
 
             response = new MessageResponse("Book has been returned late. User must pay a fine.");
             AccountNotification fineNotification = new AccountNotification(member,
                     returnDate, member.getEmail(), member.getAddress(),
-                    "User has been issued a fine of $" + fine
+                    "User has been issued a fine of $" + amount
                             + " for returning the book \"" + book.getTitle()
                             + "\" late.");
 
-            member.addFine(new Fine(fine, member));
+            Fine fine = new Fine(amount, member);
+            fineRepository.save(fine);
+
+            member.addFine(fine);
             notificationRepository.save(fineNotification);
             member.sendNotification(fineNotification);
         }
@@ -302,15 +307,18 @@ public class MemberServiceImp implements MemberService
         {
             long diffInMillies = Math.abs(returnDate.getTime() - dueDate.getTime());
             long diff = TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS);
-            double fine = Limitations.FINE_PER_DAY * diff;
+            double amount = Limitations.FINE_PER_DAY * diff;
 
             AccountNotification fineNotification = new AccountNotification(member,
                     returnDate, member.getEmail(), member.getAddress(),
-                    "User has been issued a fine of " + fine
+                    "User has been issued a fine of " + amount
                             + " for returning the book \"" + book.getTitle()
                             + "\" late.");
 
-            member.addFine(new Fine(fine, member));
+            Fine fine = new Fine(amount, member);
+            fineRepository.save(fine);
+
+            member.addFine(fine);
             notificationRepository.save(fineNotification);
             member.sendNotification(fineNotification);
             member.returnBookItem(book, currDate);

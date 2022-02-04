@@ -1,6 +1,5 @@
 package com.example.LibraryManagement.tests.controllers;
 
-import com.example.LibraryManagement.components.services.accounts.MemberServiceImp;
 import com.example.LibraryManagement.models.accounts.LibraryCard;
 import com.example.LibraryManagement.models.books.properties.BookItem;
 import com.example.LibraryManagement.models.enums.books.BookFormat;
@@ -12,6 +11,7 @@ import com.example.LibraryManagement.models.io.requests.librarian_requests.post.
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,10 +53,6 @@ public class MemberControllerTests
     private final String librarianControllerPath = "/library_website";
     private final String memberControllerPath = "/library_website/account/member";
     private final String catalogControllerPath = "/library_website/catalog";
-
-    // Services used for testing.
-    @Autowired
-    private MemberServiceImp memberService;
 
     // Samples used for testing.
     private LibraryCard memberCard1;
@@ -134,7 +130,9 @@ public class MemberControllerTests
     }
 
     @Test
-    void booksExchange() throws Exception {
+    @Order(1)
+    void booksExchange() throws Exception
+    {
         MvcResult mvcResult;
         String result;
         List<BookItem> books;
