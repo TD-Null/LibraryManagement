@@ -75,6 +75,7 @@ public class BookItem extends Book
     private boolean isReferenceOnly;
 
     @JsonIgnore
+    @Temporal(TemporalType.DATE)
     @Column(name = "BorrowedDate")
     private Date borrowed;
 
