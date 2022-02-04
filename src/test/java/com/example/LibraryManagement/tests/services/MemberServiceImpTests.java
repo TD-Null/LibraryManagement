@@ -10,7 +10,6 @@ import com.example.LibraryManagement.components.repositories.fines.FineTransacti
 import com.example.LibraryManagement.components.services.accounts.MemberServiceImp;
 import com.example.LibraryManagement.models.accounts.types.Member;
 import com.example.LibraryManagement.models.books.fines.Fine;
-import com.example.LibraryManagement.models.books.fines.FineTransaction;
 import com.example.LibraryManagement.models.books.fines.transactions.CashTransaction;
 import com.example.LibraryManagement.models.books.fines.transactions.CheckTransaction;
 import com.example.LibraryManagement.models.books.fines.transactions.CreditCardTransaction;
