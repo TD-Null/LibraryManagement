@@ -397,6 +397,10 @@ public class MemberServiceImp implements MemberService
             throw new ApiRequestException("Fine is not issued to this user.",
                     HttpStatus.BAD_REQUEST);
 
+        else if(fine.isPaid())
+            throw new ApiRequestException("Fine has already been paid by the user.",
+                    HttpStatus.BAD_REQUEST);
+
         else if(fine.getAmount() > amount)
             throw new ApiRequestException("Given amount is not enough to pay for the fine.",
                     HttpStatus.UNPROCESSABLE_ENTITY);
