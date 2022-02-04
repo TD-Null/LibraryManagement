@@ -1,5 +1,6 @@
 package com.example.LibraryManagement.tests.controllers;
 
+import com.example.LibraryManagement.components.services.accounts.MemberServiceImp;
 import com.example.LibraryManagement.models.accounts.LibraryCard;
 import com.example.LibraryManagement.models.books.properties.BookItem;
 import com.example.LibraryManagement.models.enums.books.BookFormat;
@@ -26,6 +27,7 @@ import org.springframework.web.context.WebApplicationContext;
 
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 
@@ -52,6 +54,10 @@ public class MemberControllerTests
     private final String librarianControllerPath = "/library_website";
     private final String memberControllerPath = "/library_website/account/member";
     private final String catalogControllerPath = "/library_website/catalog";
+
+    // Services used for testing.
+    @Autowired
+    private MemberServiceImp memberService;
 
     // Samples used for testing.
     private LibraryCard memberCard1;
@@ -458,6 +464,12 @@ public class MemberControllerTests
                 .content(mapper.writeValueAsString(cardValidationRequest))
                 .param("book", books.get(1).getBarcode().toString()))
                 .andExpect(status().is(400));
+        mockMvc.perform(get(memberControllerPath +
+                "/checkout/books")
+                .contentType(MediaType.APPLICATION_JSON)
+                .param("barcode", memberCard1.getBarcode().toString())
+                .param("card", memberCard1.getCardNumber()))
+                .andExpect(status().is(404));
 
         cardValidationRequest = new CardValidationRequest(
                 memberCard2.getBarcode(),
@@ -474,5 +486,113 @@ public class MemberControllerTests
                 .content(mapper.writeValueAsString(cardValidationRequest))
                 .param("book", books.get(2).getBarcode().toString()))
                 .andExpect(status().is(400));
+        mockMvc.perform(get(memberControllerPath +
+                "/checkout/books")
+                .contentType(MediaType.APPLICATION_JSON)
+                .param("barcode", memberCard2.getBarcode().toString())
+                .param("card", memberCard2.getCardNumber()))
+                .andExpect(status().is(404));
+
+        /*
+         * Members can also renew books that they have borrowed. The book
+         * must be loaned to a member in order for it be renewed and must
+         * be renewed by the right member that has borrowed the book.
+         */
+        cardValidationRequest = new CardValidationRequest(
+                memberCard2.getBarcode(),
+                memberCard2.getCardNumber());
+        mockMvc.perform(put(memberControllerPath +
+                "/renew")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(cardValidationRequest))
+                .param("book", books.get(0).getBarcode().toString()))
+                .andExpect(status().is(400));
+        mockMvc.perform(put(memberControllerPath +
+                "/checkout")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(cardValidationRequest))
+                .param("book", books.get(0).getBarcode().toString()))
+                .andExpect(status().is(200));
+        mockMvc.perform(put(memberControllerPath +
+                "/renew")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(cardValidationRequest))
+                .param("book", books.get(0).getBarcode().toString()))
+                .andExpect(status().is(200));
+
+        cardValidationRequest = new CardValidationRequest(
+                memberCard1.getBarcode(),
+                memberCard1.getCardNumber());
+        mockMvc.perform(put(memberControllerPath +
+                "/renew")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(cardValidationRequest))
+                .param("book", books.get(0).getBarcode().toString()))
+                .andExpect(status().is(400));
+
+        cardValidationRequest = new CardValidationRequest(
+                memberCard2.getBarcode(),
+                memberCard2.getCardNumber());
+        mockMvc.perform(put(memberControllerPath +
+                "/return")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(cardValidationRequest))
+                .param("book", books.get(0).getBarcode().toString()))
+                .andExpect(status().is(200));
+
+        /*
+         * Members can also view their fines issued and transaction made
+         * in their accounts. (There should be no fines or transactions
+         * as no books have been returned late at this time of testing)
+         */
+        mockMvc.perform(get(memberControllerPath +
+                "/fines")
+                .contentType(MediaType.APPLICATION_JSON)
+                .param("barcode", memberCard1.getBarcode().toString())
+                .param("card", memberCard1.getCardNumber()))
+                .andExpect(status().is(404));
+        mockMvc.perform(get(memberControllerPath +
+                "/transactions")
+                .contentType(MediaType.APPLICATION_JSON)
+                .param("barcode", memberCard1.getBarcode().toString())
+                .param("card", memberCard1.getCardNumber()))
+                .andExpect(status().is(404));
+        mockMvc.perform(get(memberControllerPath +
+                "/fines")
+                .contentType(MediaType.APPLICATION_JSON)
+                .param("barcode", memberCard2.getBarcode().toString())
+                .param("card", memberCard2.getCardNumber()))
+                .andExpect(status().is(404));
+        mockMvc.perform(get(memberControllerPath +
+                "/transactions")
+                .contentType(MediaType.APPLICATION_JSON)
+                .param("barcode", memberCard2.getBarcode().toString())
+                .param("card", memberCard2.getCardNumber()))
+                .andExpect(status().is(404));
+
+        /*
+         * Librarians can look at record of book loans, book reservations,
+         * and fines issued to users within the system.
+         */
+        mockMvc.perform(get(librarianControllerPath +
+                "/records/book_loans")
+                .contentType(MediaType.APPLICATION_JSON)
+                .param("barcode", librarianCard.getBarcode().toString())
+                .param("card", librarianCard.getCardNumber()))
+                .andExpect(status().is(200))
+                .andExpect(jsonPath("$.*", hasSize(3)));
+        mockMvc.perform(get(librarianControllerPath +
+                "/records/book_reservations")
+                .contentType(MediaType.APPLICATION_JSON)
+                .param("barcode", librarianCard.getBarcode().toString())
+                .param("card", librarianCard.getCardNumber()))
+                .andExpect(status().is(200))
+                .andExpect(jsonPath("$.*", hasSize(3)));
+        mockMvc.perform(get(librarianControllerPath +
+                "/records/fines")
+                .contentType(MediaType.APPLICATION_JSON)
+                .param("barcode", librarianCard.getBarcode().toString())
+                .param("card", librarianCard.getCardNumber()))
+                .andExpect(status().is(404));
     }
 }

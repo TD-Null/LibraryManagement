@@ -503,7 +503,7 @@ public class LibrarianController
         }
     }
 
-    @GetMapping("/record/fines")
+    @GetMapping("/records/fines")
     public ResponseEntity<List<Fine>> viewAllFines(HttpServletRequest httpServletRequest,
                                                    @RequestParam(value = "barcode") Long barcode,
                                                    @RequestParam(value = "card") String number)
