@@ -10,7 +10,7 @@ import javax.validation.constraints.NotBlank;
 // Type of transaction that uses a credit card to pay a fine.
 @Getter
 @Setter
-@EqualsAndHashCode
+@EqualsAndHashCode(exclude = "fineTransaction")
 @NoArgsConstructor
 @Entity
 @Table

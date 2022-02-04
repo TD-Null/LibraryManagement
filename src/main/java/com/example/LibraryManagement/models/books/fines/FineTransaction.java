@@ -20,7 +20,7 @@ import java.util.Date;
  */
 @Getter
 @Setter
-@EqualsAndHashCode
+@EqualsAndHashCode(exclude = "fine")
 @NoArgsConstructor
 @Entity
 @Table

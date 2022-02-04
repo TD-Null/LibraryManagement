@@ -1,4 +1,4 @@
-package com.example.LibraryManagement.tests;
+package com.example.LibraryManagement.tests.services;
 
 import com.example.LibraryManagement.components.repositories.accounts.LibrarianRepository;
 import com.example.LibraryManagement.components.repositories.accounts.LibraryCardRepository;
@@ -16,6 +16,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.Date;
@@ -24,6 +25,7 @@ import java.util.Date;
  * Test cases used to test the logic and processes of
  * the account service.
  */
+@ActiveProfiles("test")
 @ExtendWith(SpringExtension.class)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @SpringBootTest
@@ -107,8 +109,8 @@ public class AccountServiceImpTests
         Assertions.assertEquals(member, memberCard.getMember());
         Assertions.assertNull(memberCard.getLibrarian());
         Assertions.assertEquals(member,
-                accountService.barcodeReader(memberCard, memberCard.getCardNumber(),
-                        AccountType.MEMBER, AccountStatus.ACTIVE));
+                accountService.barcodeReader(
+                        memberCard, AccountType.MEMBER, AccountStatus.ACTIVE));
         Assertions.assertDoesNotThrow(() -> {
             accountService.authenticateUser(memberCard, member.getPassword());
         });
@@ -124,8 +126,8 @@ public class AccountServiceImpTests
         Assertions.assertEquals(librarian, librarianCard.getLibrarian());
         Assertions.assertNull(librarianCard.getMember());
         Assertions.assertEquals(librarian,
-                accountService.barcodeReader(librarianCard, librarianCard.getCardNumber(),
-                        AccountType.LIBRARIAN, AccountStatus.ACTIVE));
+                accountService.barcodeReader(
+                        librarianCard, AccountType.LIBRARIAN, AccountStatus.ACTIVE));
         Assertions.assertDoesNotThrow(() -> {
             accountService.authenticateUser(librarianCard, librarian.getPassword());
         });
@@ -229,8 +231,8 @@ public class AccountServiceImpTests
     {
         // Check that the account is of a librarian.
         Assertions.assertEquals(librarian,
-                accountService.barcodeReader(librarianCard, librarianCard.getCardNumber(),
-                        AccountType.LIBRARIAN, AccountStatus.ACTIVE));
+                accountService.barcodeReader(
+                        librarianCard, AccountType.LIBRARIAN, AccountStatus.ACTIVE));
 
         // Have the librarian block the member's account without throwing an exception.
         Assertions.assertDoesNotThrow(() -> {
@@ -247,8 +249,7 @@ public class AccountServiceImpTests
 
         // If the member tries to cancel their account while it is blocked, an exception should be thrown.
         memberExceptionMessage = Assertions.assertThrows(ApiRequestException.class, () -> {
-            accountService.cancelMemberAccount(memberCard,
-                    memberCard.getCardNumber(), member.getPassword());
+            accountService.cancelMemberAccount(memberCard, member.getPassword());
         }).getMessage();
         Assertions.assertEquals("Member's account is currently blocked. " +
                 "User cannot cancel their membership currently.", memberExceptionMessage);
@@ -270,8 +271,7 @@ public class AccountServiceImpTests
         // an exception is thrown
         memberCard.setType(AccountType.LIBRARIAN);
         memberExceptionMessage = Assertions.assertThrows(ApiRequestException.class, () -> {
-            accountService.cancelMemberAccount(memberCard,
-                    memberCard.getCardNumber(), member.getPassword());
+            accountService.cancelMemberAccount(memberCard, member.getPassword());
         }).getMessage();
         Assertions.assertEquals("User is not a member within the system.",
                 memberExceptionMessage);
@@ -281,8 +281,7 @@ public class AccountServiceImpTests
         // an exception is thrown.
         memberCard.setMember(null);
         memberExceptionMessage = Assertions.assertThrows(ApiRequestException.class, () -> {
-            accountService.cancelMemberAccount(memberCard,
-                    memberCard.getCardNumber(), member.getPassword());
+            accountService.cancelMemberAccount(memberCard, member.getPassword());
         }).getMessage();
         Assertions.assertEquals("No member is associated with this card.",
                 memberExceptionMessage);
@@ -292,8 +291,7 @@ public class AccountServiceImpTests
         // an exception is thrown.
         memberCard.setActive(false);
         memberExceptionMessage = Assertions.assertThrows(ApiRequestException.class, () -> {
-            accountService.cancelMemberAccount(memberCard,
-                    memberCard.getCardNumber(), member.getPassword());
+            accountService.cancelMemberAccount(memberCard, member.getPassword());
         }).getMessage();
         Assertions.assertEquals("Card is currently inactive, " +
                 "so membership cannot be cancelled.", memberExceptionMessage);
@@ -302,20 +300,7 @@ public class AccountServiceImpTests
         // If the member gives the wrong credentials to cancel their account,
         // an exception should be thrown.
         memberExceptionMessage = Assertions.assertThrows(ApiRequestException.class, () -> {
-            accountService.cancelMemberAccount(memberCard,
-                    "123456", member.getPassword());
-        }).getMessage();
-        Assertions.assertEquals("Given credentials are invalid." +
-                "Cannot proceed with cancelling member's account", memberExceptionMessage);
-        memberExceptionMessage = Assertions.assertThrows(ApiRequestException.class, () -> {
-            accountService.cancelMemberAccount(memberCard,
-                    memberCard.getCardNumber(), "password");
-        }).getMessage();
-        Assertions.assertEquals("Given credentials are invalid." +
-                "Cannot proceed with cancelling member's account", memberExceptionMessage);
-        memberExceptionMessage = Assertions.assertThrows(ApiRequestException.class, () -> {
-            accountService.cancelMemberAccount(memberCard,
-                    "123456", "password");
+            accountService.cancelMemberAccount(memberCard, "password");
         }).getMessage();
         Assertions.assertEquals("Given credentials are invalid." +
                 "Cannot proceed with cancelling member's account", memberExceptionMessage);
@@ -324,8 +309,7 @@ public class AccountServiceImpTests
         // an exception is thrown.
         member.setIssuedBooksTotal(5);
         memberExceptionMessage = Assertions.assertThrows(ApiRequestException.class, () -> {
-            accountService.cancelMemberAccount(memberCard,
-                    memberCard.getCardNumber(), member.getPassword());
+            accountService.cancelMemberAccount(memberCard, member.getPassword());
         }).getMessage();
         Assertions.assertEquals("User currently has books still issued to their account." +
                 "Please return any loaned books and cancel any book reservations made.", memberExceptionMessage);
@@ -335,8 +319,7 @@ public class AccountServiceImpTests
         // an exception is thrown.
         member.setTotalFines(5);
         memberExceptionMessage = Assertions.assertThrows(ApiRequestException.class, () -> {
-            accountService.cancelMemberAccount(memberCard,
-                    memberCard.getCardNumber(), member.getPassword());
+            accountService.cancelMemberAccount(memberCard, member.getPassword());
         }).getMessage();
         Assertions.assertEquals("User currently has fines still associated with their account." +
                 "Please pay for any fines still present in your account.", memberExceptionMessage);
@@ -345,8 +328,7 @@ public class AccountServiceImpTests
         // If a member has no issues with their account,
         // then they can cancel their account.
         Assertions.assertDoesNotThrow(() -> {
-            accountService.cancelMemberAccount(memberCard,
-                    memberCard.getCardNumber(), member.getPassword());
+            accountService.cancelMemberAccount(memberCard, member.getPassword());
         });
         Assertions.assertFalse(memberCard.isActive());
         Assertions.assertEquals(AccountStatus.CANCELLED, member.getStatus());
@@ -354,8 +336,7 @@ public class AccountServiceImpTests
         // If a member tries to cancel their account again,
         // an exception is thrown.
         memberExceptionMessage = Assertions.assertThrows(ApiRequestException.class, () -> {
-            accountService.cancelMemberAccount(memberCard,
-                    memberCard.getCardNumber(), member.getPassword());
+            accountService.cancelMemberAccount(memberCard, member.getPassword());
         }).getMessage();
         Assertions.assertEquals("Member has already cancelled this account.",
                 memberExceptionMessage);
@@ -382,18 +363,17 @@ public class AccountServiceImpTests
 
         // Check that the accounts are of librarians.
         Assertions.assertEquals(librarian,
-                accountService.barcodeReader(librarianCard, librarianCard.getCardNumber(),
-                        AccountType.LIBRARIAN, AccountStatus.ACTIVE));
+                accountService.barcodeReader(
+                        librarianCard, AccountType.LIBRARIAN, AccountStatus.ACTIVE));
         Assertions.assertEquals(newLibrarian,
-                accountService.barcodeReader(newLibrarianCard, newLibrarianCard.getCardNumber(),
-                        AccountType.LIBRARIAN, AccountStatus.ACTIVE));
+                accountService.barcodeReader(
+                        newLibrarianCard, AccountType.LIBRARIAN, AccountStatus.ACTIVE));
 
         // If the library card is not identified as belonging to a librarian,
         // an exception is thrown.
         newLibrarianCard.setType(AccountType.MEMBER);
         librarianExceptionMessage = Assertions.assertThrows(ApiRequestException.class, () -> {
-            accountService.cancelLibrarianAccount(newLibrarianCard,
-                    newLibrarianCard.getCardNumber());
+            accountService.cancelLibrarianAccount(newLibrarianCard);
         }).getMessage();
         Assertions.assertEquals("User is not a librarian within the system.",
                 librarianExceptionMessage);
@@ -403,8 +383,7 @@ public class AccountServiceImpTests
         // an exception is thrown.
         newLibrarianCard.setLibrarian(null);
         librarianExceptionMessage = Assertions.assertThrows(ApiRequestException.class, () -> {
-            accountService.cancelLibrarianAccount(newLibrarianCard,
-                    newLibrarianCard.getCardNumber());
+            accountService.cancelLibrarianAccount(newLibrarianCard);
         }).getMessage();
         Assertions.assertEquals("No librarian is associated with this card.",
                 librarianExceptionMessage);
@@ -414,8 +393,7 @@ public class AccountServiceImpTests
         // an exception is thrown.
         newLibrarian.setStatus(AccountStatus.CANCELLED);
         librarianExceptionMessage = Assertions.assertThrows(ApiRequestException.class, () ->
-                accountService.cancelLibrarianAccount(newLibrarianCard,
-                        newLibrarianCard.getCardNumber())).getMessage();
+                accountService.cancelLibrarianAccount(newLibrarianCard)).getMessage();
         Assertions.assertEquals("Librarian's account has already been cancelled.",
                 librarianExceptionMessage);
         newLibrarian.setStatus(AccountStatus.ACTIVE);
@@ -424,8 +402,7 @@ public class AccountServiceImpTests
         // an exception is thrown.
         newLibrarian.setStatus(AccountStatus.BLACKLISTED);
         librarianExceptionMessage = Assertions.assertThrows(ApiRequestException.class, () -> {
-            accountService.cancelLibrarianAccount(newLibrarianCard,
-                    newLibrarianCard.getCardNumber());
+            accountService.cancelLibrarianAccount(newLibrarianCard);
         }).getMessage();
         Assertions.assertEquals("Librarian's account is currently blocked. " +
                         "User cannot cancel their account currently.",
@@ -436,28 +413,17 @@ public class AccountServiceImpTests
         // an exception is thrown.
         newLibrarianCard.setActive(false);
         librarianExceptionMessage = Assertions.assertThrows(ApiRequestException.class, () -> {
-            accountService.cancelLibrarianAccount(newLibrarianCard,
-                    newLibrarianCard.getCardNumber());
+            accountService.cancelLibrarianAccount(newLibrarianCard);
         }).getMessage();
         Assertions.assertEquals("Card is currently inactive, " +
                         "so membership cannot be cancelled.",
                 librarianExceptionMessage);
         newLibrarianCard.setActive(true);
 
-        // If the credentials are invalid for cancelling a librarian account,
-        // an exception is thrown.
-        librarianExceptionMessage = Assertions.assertThrows(ApiRequestException.class, () -> {
-            accountService.cancelLibrarianAccount(newLibrarianCard,
-                    "123456");
-        }).getMessage();
-        Assertions.assertEquals("Given credentials are invalid." +
-                "Cannot proceed with cancelling librarian's account", librarianExceptionMessage);
-
         // If everything is validated for the librarian's account,
         // it can proceed with its cancellation.
         Assertions.assertDoesNotThrow(() -> {
-            accountService.cancelLibrarianAccount(newLibrarianCard,
-                    newLibrarianCard.getCardNumber());
+            accountService.cancelLibrarianAccount(newLibrarianCard);
         });
         Assertions.assertFalse(newLibrarianCard.isActive());
         Assertions.assertEquals(AccountStatus.CANCELLED, newLibrarian.getStatus());
@@ -465,8 +431,7 @@ public class AccountServiceImpTests
         // If a librarian's account is being cancelled again,
         // an exception is thrown.
         librarianExceptionMessage = Assertions.assertThrows(ApiRequestException.class, () ->
-                accountService.cancelLibrarianAccount(newLibrarianCard,
-                        newLibrarianCard.getCardNumber())).getMessage();
+                accountService.cancelLibrarianAccount(newLibrarianCard)).getMessage();
         Assertions.assertEquals("Librarian's account has already been cancelled.",
                 librarianExceptionMessage);
     }

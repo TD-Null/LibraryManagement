@@ -46,10 +46,7 @@ public class AccountServiceImp implements AccountService
     {
         AccountType type = card.getType();
 
-        if(!card.getCardNumber().equals(number))
-            throw new ApiRequestException("Invalid credentials.", HttpStatus.UNAUTHORIZED);
-
-        else if(type == AccountType.MEMBER && card.getMember() != null)
+        if(type == AccountType.MEMBER && card.getMember() != null)
         {
             return ResponseEntity.ok(card.getMember());
         }
@@ -81,10 +78,10 @@ public class AccountServiceImp implements AccountService
          */
         if(card.isActive() && (
                 (type == AccountType.MEMBER && card.getMember() != null
-                        && card.getMember().getStatus() == AccountStatus.ACTIVE
+                        && card.getMember().getStatus() != AccountStatus.CANCELLED
                         && card.getMember().getPassword().equals(password)) ||
                 (type == AccountType.LIBRARIAN && card.getLibrarian() != null
-                        && card.getLibrarian().getStatus() == AccountStatus.ACTIVE
+                        && card.getLibrarian().getStatus() != AccountStatus.CANCELLED
                         && card.getLibrarian().getPassword().equals(password))))
         {
             return ResponseEntity.ok(card);
@@ -125,7 +122,7 @@ public class AccountServiceImp implements AccountService
         libraryCard.setMember(member);
 
         // Return the details of the user's library card after the account has been successfully created.
-        return ResponseEntity.ok(libraryCard);
+        return new ResponseEntity<>(libraryCard, HttpStatus.CREATED);
     }
 
     // Registers a new librarian using the user's inputted details to create an account.
@@ -157,7 +154,7 @@ public class AccountServiceImp implements AccountService
         libraryCard.setLibrarian(librarian);
 
         // Return the details of the user's library card after the account has been successfully created.
-        return ResponseEntity.ok(libraryCard);
+        return new ResponseEntity<>(libraryCard, HttpStatus.CREATED);
     }
 
     @Transactional
@@ -269,8 +266,7 @@ public class AccountServiceImp implements AccountService
     }
 
     @Transactional
-    public ResponseEntity<MessageResponse> cancelMemberAccount(LibraryCard card,
-                                                               String cardNumber, String password)
+    public ResponseEntity<MessageResponse> cancelMemberAccount(LibraryCard card, String password)
     {
         if(card.getType() == AccountType.MEMBER)
         {
@@ -294,7 +290,7 @@ public class AccountServiceImp implements AccountService
                         "so membership cannot be cancelled.",
                         HttpStatus.FORBIDDEN);
 
-            else if(!card.getCardNumber().equals(cardNumber) || !member.getPassword().equals(password))
+            else if(!member.getPassword().equals(password))
                 throw new ApiRequestException("Given credentials are invalid." +
                         "Cannot proceed with cancelling member's account",
                         HttpStatus.UNAUTHORIZED);
@@ -319,7 +315,7 @@ public class AccountServiceImp implements AccountService
     }
 
     @Transactional
-    public ResponseEntity<MessageResponse> cancelLibrarianAccount(LibraryCard card, String cardNumber)
+    public ResponseEntity<MessageResponse> cancelLibrarianAccount(LibraryCard card)
     {
         if(card.getType() == AccountType.LIBRARIAN)
         {
@@ -343,11 +339,6 @@ public class AccountServiceImp implements AccountService
                         "so membership cannot be cancelled.",
                         HttpStatus.FORBIDDEN);
 
-            else if(!card.getCardNumber().equals(cardNumber))
-                throw new ApiRequestException("Given credentials are invalid." +
-                        "Cannot proceed with cancelling librarian's account",
-                        HttpStatus.UNAUTHORIZED);
-
             card.setActive(false);
             librarian.setStatus(AccountStatus.CANCELLED);
             return ResponseEntity.ok(new MessageResponse(
@@ -365,18 +356,15 @@ public class AccountServiceImp implements AccountService
      *
      * For example, only librarians can be able to add and modify books.
      */
-    public Object barcodeReader(LibraryCard card, String number, AccountType type, AccountStatus status)
+    public Object barcodeReader(LibraryCard card, AccountType type, AccountStatus status)
     {
-        if(!card.getCardNumber().equals(number))
-            throw new ApiRequestException("Invalid credentials.", HttpStatus.UNAUTHORIZED);
-
         /*
          * Check if the card is active and the account type matches to what is
          * expected. If so, check that the user's account is still active, either
          * of a MEMBER or LIBRARIAN. If both the library card and user's account is
          * still active, then the user may proceed.
          */
-        else if (card.isActive() && card.getType() == type)
+        if (card.isActive() && card.getType() == type)
         {
             if(type == AccountType.MEMBER && card.getMember() != null
                     && card.getMember().getStatus() == status)

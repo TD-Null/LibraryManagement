@@ -48,7 +48,8 @@ public class UpdateCatalogServiceImp implements UpdateCatalogService
                                                       String zipcode, String country)
     {
         libraryRepository.save(new Library(name, new Address(streetAddress, city, zipcode, country)));
-        return ResponseEntity.ok(new MessageResponse("Library has been successfully added to the system."));
+        return new ResponseEntity<>(new MessageResponse("Library has been successfully added to the system."),
+                HttpStatus.CREATED);
     }
 
     @Transactional
@@ -75,27 +76,31 @@ public class UpdateCatalogServiceImp implements UpdateCatalogService
             bookItem.addSubject(s);
         }
 
-        return ResponseEntity.ok(new MessageResponse("Book has been successfully added to the system."));
+        return new ResponseEntity<>(new MessageResponse("Book has been successfully added to the system."),
+                HttpStatus.CREATED);
     }
 
     public ResponseEntity<MessageResponse> addSubject(String subject)
     {
         subjectRepository.save(new Subject(subject));
-        return ResponseEntity.ok(new MessageResponse("Subject has been successfully added to the system."));
+        return new ResponseEntity<>(new MessageResponse("Subject has been successfully added to the system."),
+                HttpStatus.CREATED);
     }
 
     public ResponseEntity<MessageResponse> addAuthor(String author, String description)
     {
         authorRepository.save(new Author(author, description));
-        return ResponseEntity.ok(new MessageResponse("Author has been successfully added to the system."));
+        return new ResponseEntity<>(new MessageResponse("Author has been successfully added to the system."),
+                HttpStatus.CREATED);
     }
 
     @Transactional
     public ResponseEntity<MessageResponse> modifyBookItem(BookItem book, String ISBN, String title,
                                                           String publisher, String language, int numberOfPages,
-                                                          Author author, Set<Subject> newSubjects, BookFormat format,
+                                                          Author author, Set<Subject> subjects, BookFormat format,
                                                           Date publicationDate, boolean isReferenceOnly, double price)
     {
+        // Set the new properties for the book item.
         book.setISBN(ISBN);
         book.setTitle(title);
         book.setPublisher(publisher);
@@ -106,6 +111,8 @@ public class UpdateCatalogServiceImp implements UpdateCatalogService
         book.setReferenceOnly(isReferenceOnly);
         book.setPrice(price);
 
+        // If the new author is not the same as the current author of
+        // the book item, set the new Author to the book.
         Author prevAuthor = book.getAuthor();
 
         if(!prevAuthor.equals(author))
@@ -115,24 +122,21 @@ public class UpdateCatalogServiceImp implements UpdateCatalogService
             book.setAuthor(author);
         }
 
+        // Clear all subjects from the book and add in the
+        // the new subjects.
         Set<Subject> prevSubjects = book.getSubjects();
 
         for(Subject s: prevSubjects)
         {
-            if(!newSubjects.contains(s))
-            {
-                s.removeBookItem(book);
-                book.removeSubject(s);
-            }
+            s.removeBookItem(book);
         }
 
-        for(Subject s: newSubjects)
+        book.clearSubjects();
+
+        for(Subject s: subjects)
         {
-            if(!prevSubjects.contains(s))
-            {
-                s.addBookItem(book);
-                book.addSubject(s);
-            }
+            s.addBookItem(book);
+            book.addSubject(s);
         }
 
         return ResponseEntity.ok(new MessageResponse("Book has been successfully updated within the system."));

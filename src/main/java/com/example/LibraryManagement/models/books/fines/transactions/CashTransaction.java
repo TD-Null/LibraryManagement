@@ -12,7 +12,7 @@ import javax.validation.constraints.NotNull;
 // Type of transaction that uses cash to pay a fine.
 @Getter
 @Setter
-@EqualsAndHashCode
+@EqualsAndHashCode(exclude = "fineTransaction")
 @NoArgsConstructor
 @Entity
 @Table

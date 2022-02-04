@@ -10,8 +10,8 @@ import java.time.ZonedDateTime;
 /*
  * Contains the data of the REST API exception. This will include
  * the message from the ApiRequestException object's message, as
- * well as the HTTP status (usually an HTTP 400 Bad Request code)
- * and the current time when the exception was thrown.
+ * well as the HTTP status and the current time when the exception
+ * was thrown.
  */
 @Getter
 @AllArgsConstructor
