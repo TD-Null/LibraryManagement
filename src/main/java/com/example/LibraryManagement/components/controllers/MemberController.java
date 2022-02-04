@@ -64,7 +64,7 @@ public class MemberController
     private final ValidationService validationService;
 
     @GetMapping("/checkout/books")
-    public ResponseEntity<List<BookItem>> viewBooksLoans(HttpServletRequest httpServletRequest,
+    public ResponseEntity<List<BookItem>> viewBookLoans(HttpServletRequest httpServletRequest,
                                                          @RequestParam(value = "barcode") Long barcode,
                                                          @RequestParam(value = "card") String number)
     {
