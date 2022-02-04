@@ -61,17 +61,6 @@ public class ValidationService
         return card.get();
     }
 
-    public LibraryCard cardBarcodeValidation(Long barcode)
-    {
-        Optional<LibraryCard> card = libraryCardRepository.findById(barcode);
-
-        if(card.isEmpty())
-            throw new ApiRequestException("Unable to find library card within the system.",
-                    HttpStatus.UNAUTHORIZED);
-
-        return card.get();
-    }
-
     public LibraryCard cardNumberValidation(String cardNumber)
     {
         Optional<LibraryCard> card = libraryCardRepository.findLibraryCardByCardNumber(cardNumber);
