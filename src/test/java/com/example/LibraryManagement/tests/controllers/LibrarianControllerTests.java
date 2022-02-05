@@ -55,9 +55,7 @@ public class LibrarianControllerTests
     private MockMvc mockMvc;
 
     // Paths for API requests in controllers.
-    private final String accountControllerPath = "/library_website/account";
     private final String librarianControllerPath = "/library_website";
-    private final String memberControllerPath = "/library_website/account/member";
     private final String catalogControllerPath = "/library_website/catalog";
 
     // Samples used for testing.
