@@ -233,7 +233,7 @@ public class CatalogController
             String pubDateLog;
 
             if(requestSuccess)
-                message = searchResults + " books were found under this search.";
+                message = searchResults + " book(s) were found under this search.";
 
             else
                 message = "No books are available under this search.";
