@@ -38,9 +38,11 @@ public class BookItem extends Book
     @JoinColumn(name = "library_name")
     private Library library;
 
+    @JsonIgnore
     @Column(name = "Rack")
     private int rackNumber;
-    
+
+    @JsonIgnore
     @Column(name = "Location")
     private String locationIdentifier;
 
