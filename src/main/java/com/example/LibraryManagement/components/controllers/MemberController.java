@@ -65,8 +65,8 @@ public class MemberController
 
     @GetMapping("/checkout/books")
     public ResponseEntity<List<BookItem>> viewBookLoans(HttpServletRequest httpServletRequest,
-                                                         @RequestParam(value = "barcode") Long barcode,
-                                                         @RequestParam(value = "card") String number)
+                                                        @RequestParam(value = "barcode") Long barcode,
+                                                        @RequestParam(value = "card") String number)
     {
         boolean cardValidationSuccess = false;
         boolean requestSuccess = false;
