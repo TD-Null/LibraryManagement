@@ -152,7 +152,7 @@ public class MemberController
             if(cardValidationSuccess)
             {
                 if (requestSuccess)
-                    message = "Member has viewed their book loans. (# Reserved Books:" + num_bookReservations + ")";
+                    message = "Member has viewed their book reservations. (# Reserved Books:" + num_bookReservations + ")";
 
                 else
                     message = "Member has no current book reservations.";
@@ -204,7 +204,7 @@ public class MemberController
             if(cardValidationSuccess)
             {
                 if (requestSuccess)
-                    message = "Member has viewed their book loans. (# Notifications:" + num_notifications + ")";
+                    message = "Member has viewed their notifications. (# Notifications:" + num_notifications + ")";
 
                 else
                     message = "Member has no current notifications.";
