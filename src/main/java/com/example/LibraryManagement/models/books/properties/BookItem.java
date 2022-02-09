@@ -62,7 +62,6 @@ public class BookItem extends Book
     @Column(name = "Format", nullable = false)
     private BookFormat format;
 
-    @JsonIgnore
     @Column(name = "Status", nullable = false)
     private BookStatus status;
 
