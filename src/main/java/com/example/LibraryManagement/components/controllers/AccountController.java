@@ -274,13 +274,13 @@ public class AccountController
         if(loginValidation)
         {
             userLog += " [Valid])";
-            successLog = "(Success! Completed in " + time + " ms)";
+            successLog = "(Success! Completed in " + time + " ms. Date: + " + new Date() + ")";
         }
 
         else
         {
             userLog += " [Invalid])";
-            successLog = "(Failed! Completed in " + time + " ms)";
+            successLog = "(Failure! Completed in " + time + " ms. Date: + " + new Date() + ")";
         }
 
         log.info(requestType + " " + requestURL + " " + message + " " +
@@ -288,7 +288,7 @@ public class AccountController
     }
 
     private void signupLog(String requestURL, String message, String name, String password,
-                           String email, boolean loginValidation, long time)
+                           String email, boolean signupValidation, long time)
     {
         String requestType = "POST";
         String userLog = "(Added Member:" +
@@ -297,7 +297,7 @@ public class AccountController
                 ", Email = " + email;
         String successLog;
 
-        if(loginValidation)
+        if(signupValidation)
         {
             userLog += " [Valid])";
             successLog = "(Success! Completed in " + time + " ms. Date: + " + new Date() + ")";
