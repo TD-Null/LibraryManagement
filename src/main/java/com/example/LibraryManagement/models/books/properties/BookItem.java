@@ -147,6 +147,12 @@ public class BookItem extends Book
 
     public void clearRecords()
     {
+        for(BookLending bl: lendingRecords)
+            bl.setBookItem(null);
+
+        for(BookReservation br: reservationRecords)
+            br.setBookItem(null);
+
         lendingRecords.clear();
         reservationRecords.clear();
     }

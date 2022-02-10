@@ -3,6 +3,7 @@ package com.example.LibraryManagement.models.books.actions;
 import com.example.LibraryManagement.models.accounts.types.Member;
 import com.example.LibraryManagement.models.books.properties.BookItem;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
 
 import javax.persistence.*;
@@ -21,10 +22,12 @@ public class BookLending
     @Column(name = "ID")
     private Long id;
 
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     @ManyToOne
     @JoinColumn(name = "barcode")
     private BookItem bookItem;
 
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     @ManyToOne
     @JoinColumn(name = "member")
     private Member member;
