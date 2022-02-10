@@ -72,7 +72,7 @@ public class CatalogController
                 message = "No books are available.";
 
             catalogLog(httpServletRequest.getRequestURL().toString(), message,
-                    time);
+                    requestSuccess, time);
         }
     }
 
@@ -110,7 +110,7 @@ public class CatalogController
                 message = "No libraries are available.";
 
             catalogLog(httpServletRequest.getRequestURL().toString(), message,
-                    time);
+                    requestSuccess, time);
         }
     }
 
@@ -148,7 +148,7 @@ public class CatalogController
                 message = "No subjects are available.";
 
             catalogLog(httpServletRequest.getRequestURL().toString(), message,
-                    time);
+                    requestSuccess, time);
         }
     }
 
@@ -186,7 +186,7 @@ public class CatalogController
                 message = "No authors are available.";
 
             catalogLog(httpServletRequest.getRequestURL().toString(), message,
-                    time);
+                    requestSuccess, time);
         }
     }
 
@@ -246,14 +246,20 @@ public class CatalogController
 
             catalogSearchLog(httpServletRequest.getRequestURL().toString(), message,
                     library, title, author, subjects.toString(), pubDateLog,
-                    time);
+                    requestSuccess, time);
         }
     }
 
-    private void catalogLog(String requestURL, String message, long time)
+    private void catalogLog(String requestURL, String message, boolean requestSuccess, long time)
     {
         String requestType = "GET";
-        String successLog = "(Success! Completed in " + time + " ms)";
+        String successLog;
+
+        if(requestSuccess)
+            successLog = "(Success! Completed in " + time + " ms. Date: + " + new Date() + ")";
+
+        else
+            successLog = "(Failure! Completed in " + time + " ms. Date: + " + new Date() + ")";
 
         log.info(requestType + " " + requestURL + " " + message + " " +
                 successLog);
@@ -261,10 +267,17 @@ public class CatalogController
 
     private void catalogSearchLog(String requestURL, String message, String library,
                                   String title, String author, String subjects,
-                                  String pub_date, long time)
+                                  String pub_date, boolean requestSuccess, long time)
     {
         String requestType = "GET";
-        String successLog = "(Success! Completed in " + time + " ms)";
+        String successLog;
+
+        if(requestSuccess)
+            successLog = "(Success! Completed in " + time + " ms. Date: + " + new Date() + ")";
+
+        else
+            successLog = "(Failure! Completed in " + time + " ms. Date: + " + new Date() + ")";
+
         String search = "(Search: " +
                 "Library = " + library + ", " +
                 "Title = " + title + ", " +

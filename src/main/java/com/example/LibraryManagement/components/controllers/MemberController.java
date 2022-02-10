@@ -872,10 +872,10 @@ public class MemberController
             userLog += " [Invalid])";
 
         if(requestSuccess)
-            successLog = "(Success! Completed in " + time + " ms)";
+            successLog = "(Success! Completed in " + time + " ms. Date: + " + new Date() + ")";
 
         else
-            successLog = "(Failure! Completed in " + time + " ms)";
+            successLog = "(Failure! Completed in " + time + " ms. Date: + " + new Date() + ")";
 
         log.info(requestType + " " + requestURL + " " + message + " " +
                 userLog + " " + successLog);
@@ -906,10 +906,10 @@ public class MemberController
             bookLog += " [Invalid])";
 
         if(requestSuccess)
-            successLog = "(Success! Completed in " + time + " ms)";
+            successLog = "(Success! Completed in " + time + " ms. Date: + " + new Date() + ")";
 
         else
-            successLog = "(Failure! Completed in " + time + " ms)";
+            successLog = "(Failure! Completed in " + time + " ms. Date: + " + new Date() + ")";
 
         log.info(requestType + " " + requestURL + " " + message + " " +
                 userLog + " " + bookLog + " " + successLog);
@@ -956,13 +956,13 @@ public class MemberController
         if(requestSuccess)
         {
             transactionLog += " [Valid])";
-            successLog = "(Success! Completed in " + time + " ms)";
+            successLog = "(Success! Completed in " + time + " ms. Date: + " + new Date() + ")";
         }
 
         else
         {
             transactionLog += " [Invalid])";
-            successLog = "(Failure! Completed in " + time + " ms)";
+            successLog = "(Failure! Completed in " + time + " ms. Date: + " + new Date() + ")";
         }
 
         log.info(requestType + " " + requestURL + " " + message + " " +
@@ -980,15 +980,16 @@ public class MemberController
                 ", Password = " + password;
         String successLog;
 
-        if(requestSuccess) {
+        if(requestSuccess)
+        {
             userLog += " [Valid])";
-            successLog = "(Success! Completed in " + time + " ms)";
+            successLog = "(Success! Completed in " + time + " ms. Date: + " + new Date() + ")";
         }
 
         else
         {
-            successLog = "(Failure! Completed in " + time + " ms)";
             userLog += " [Invalid])";
+            successLog = "(Failure! Completed in " + time + " ms. Date: + " + new Date() + ")";
         }
 
         log.info(requestType + " " + requestURL + " " + message + " " +
