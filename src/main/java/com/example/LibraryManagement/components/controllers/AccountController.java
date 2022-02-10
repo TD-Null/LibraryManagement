@@ -274,13 +274,13 @@ public class AccountController
         if(loginValidation)
         {
             userLog += " [Valid])";
-            successLog = "(Success! Completed in " + time + " ms. Date: + " + new Date() + ")";
+            successLog = "(Success! Completed in " + time + " ms. Date: " + new Date() + ")";
         }
 
         else
         {
             userLog += " [Invalid])";
-            successLog = "(Failure! Completed in " + time + " ms. Date: + " + new Date() + ")";
+            successLog = "(Failure! Completed in " + time + " ms. Date: " + new Date() + ")";
         }
 
         log.info(requestType + " " + requestURL + " " + message + " " +
@@ -300,13 +300,13 @@ public class AccountController
         if(signupValidation)
         {
             userLog += " [Valid])";
-            successLog = "(Success! Completed in " + time + " ms. Date: + " + new Date() + ")";
+            successLog = "(Success! Completed in " + time + " ms. Date: " + new Date() + ")";
         }
 
         else
         {
             userLog += " [Invalid])";
-            successLog = "(Failure! Completed in " + time + " ms. Date: + " + new Date() + ")";
+            successLog = "(Failure! Completed in " + time + " ms. Date: " + new Date() + ")";
         }
 
         log.info(requestType + " " + requestURL + " " + message + " " +
@@ -329,10 +329,10 @@ public class AccountController
             userLog += " [Invalid])";
 
         if(requestSuccess)
-            successLog = "(Success! Completed in " + time + " ms. Date: + " + new Date() + ")";
+            successLog = "(Success! Completed in " + time + " ms. Date: " + new Date() + ")";
 
         else
-            successLog = "(Failure! Completed in " + time + " ms. Date: + " + new Date() + ")";
+            successLog = "(Failure! Completed in " + time + " ms. Date: " + new Date() + ")";
 
         log.info(requestType + " " + requestURL + " " + message + " " +
                 userLog + " " + successLog);

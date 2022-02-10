@@ -1192,10 +1192,10 @@ public class LibrarianController
             userLog += " [Invalid])";
 
         if(requestSuccess)
-            successLog = "(Success! Completed in " + time + " ms. Date: + " + new Date() + ")";
+            successLog = "(Success! Completed in " + time + " ms. Date: " + new Date() + ")";
 
         else
-            successLog = "(Failure! Completed in " + time + " ms. Date: + " + new Date() + ")";
+            successLog = "(Failure! Completed in " + time + " ms. Date: " + new Date() + ")";
 
         log.info(requestType + " " + requestURL + " " + message + " " +
                 userLog + " " + successLog);
@@ -1214,13 +1214,13 @@ public class LibrarianController
         if(requestSuccess)
         {
             userLog += " [Valid])";
-            successLog = "(Success! Completed in " + time + " ms. Date: + " + new Date() + ")";
+            successLog = "(Success! Completed in " + time + " ms. Date: " + new Date() + ")";
         }
 
         else
         {
             userLog += " [Invalid])";
-            successLog = "(Failed! Completed in " + time + " ms. Date: + " + new Date() + ")";
+            successLog = "(Failed! Completed in " + time + " ms. Date: " + new Date() + ")";
         }
 
         log.info(requestType + " " + requestURL + " " + message + " " +
@@ -1243,10 +1243,10 @@ public class LibrarianController
             userLog += " [Invalid])";
 
         if(requestSuccess)
-            successLog = "(Success! Completed in " + time + " ms. Date: + " + new Date() + ")";
+            successLog = "(Success! Completed in " + time + " ms. Date: " + new Date() + ")";
 
         else
-            successLog = "(Failure! Completed in " + time + " ms. Date: + " + new Date() + ")";
+            successLog = "(Failure! Completed in " + time + " ms. Date: " + new Date() + ")";
 
         log.info(requestType + " " + requestURL + " " + message + " " +
                 userLog + " " + successLog);
@@ -1277,10 +1277,10 @@ public class LibrarianController
             userLog += " [Invalid])";
 
         if(requestSuccess)
-            successLog = "(Success! Completed in " + time + " ms. Date: + " + new Date() + ")";
+            successLog = "(Success! Completed in " + time + " ms. Date: " + new Date() + ")";
 
         else
-            successLog = "(Failure! Completed in " + time + " ms. Date: + " + new Date() + ")";
+            successLog = "(Failure! Completed in " + time + " ms. Date: " + new Date() + ")";
 
         log.info(requestType + " " + requestURL + " " + message + " " +
                 userLog + " " + successLog);
@@ -1302,10 +1302,10 @@ public class LibrarianController
             userLog += " [Invalid])";
 
         if(requestSuccess)
-            successLog = "(Success! Completed in " + time + " ms. Date: + " + new Date() + ")";
+            successLog = "(Success! Completed in " + time + " ms. Date: " + new Date() + ")";
 
         else
-            successLog = "(Failure! Completed in " + time + " ms. Date: + " + new Date() + ")";
+            successLog = "(Failure! Completed in " + time + " ms. Date: " + new Date() + ")";
 
         log.info(requestType + " " + requestURL + " " + message + " " +
                 userLog + " " + catalogLog + " " + successLog);

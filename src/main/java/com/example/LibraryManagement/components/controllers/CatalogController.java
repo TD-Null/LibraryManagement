@@ -256,10 +256,10 @@ public class CatalogController
         String successLog;
 
         if(requestSuccess)
-            successLog = "(Success! Completed in " + time + " ms. Date: + " + new Date() + ")";
+            successLog = "(Success! Completed in " + time + " ms. Date: " + new Date() + ")";
 
         else
-            successLog = "(Failure! Completed in " + time + " ms. Date: + " + new Date() + ")";
+            successLog = "(Failure! Completed in " + time + " ms. Date: " + new Date() + ")";
 
         log.info(requestType + " " + requestURL + " " + message + " " +
                 successLog);
@@ -273,10 +273,10 @@ public class CatalogController
         String successLog;
 
         if(requestSuccess)
-            successLog = "(Success! Completed in " + time + " ms. Date: + " + new Date() + ")";
+            successLog = "(Success! Completed in " + time + " ms. Date: " + new Date() + ")";
 
         else
-            successLog = "(Failure! Completed in " + time + " ms. Date: + " + new Date() + ")";
+            successLog = "(Failure! Completed in " + time + " ms. Date: " + new Date() + ")";
 
         String search = "(Search: " +
                 "Library = " + library + ", " +
