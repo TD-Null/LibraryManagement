@@ -555,6 +555,7 @@ public class MemberController
 
             BookItem book = validationService.bookValidation(bookBarcode);
             bookValidationSuccess = true;
+            bookTitle = book.getTitle();
 
             response = memberService.reserveBook(member, book, new Date());
             requestSuccess = true;
